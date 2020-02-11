@@ -1,118 +1,133 @@
-import requests
-import time
+from requests import get
+from time import sleep
 from datetime import datetime as dt
 
 class Request:
-    ''' Method to check and respond to API rate limit status before subsequent call.
-        Class variables initialized:
-            ratelimit_day              :: Total number of requests allowed per day
-            ratelimit_day_remaining    :: Total number of requests remaining for the current day
-            ratelimit_day_start        :: Time for daily ratelimit start
-            ratelimit_day_reset        :: Time for daily ratelimit reset
-            ratelimit_minute           :: Total number of requests allowed per minute
-            ratelimit_minute_remaining :: Total number of requests remaining for the current minute
-            ratelimit_minute_start     :: Time for per-minute ratelimit start
-            ratelimit_minute_reset     :: Time for per-minute ratelimit reset
+    ''' Class defining methods used during the collection of data through API requests. 
+        Child classes:
+            LeagueRequest :: Request all league data for current season (leagues/season/<2019>)
+            TeamRequest   :: Request all team data for current league (teams/league/<league_id>)
+            PlayerRequest :: Request all player data for current team/season (players/team/<team_id>/<2019-2020>)
+        Class variables:
+            _RATELIMIT_DAY              :: Total number of requests allowed per day
+            _RATELIMIT_DAY_REMAINING    :: Total number of requests remaining for the current day
+            _RATELIMIT_DAY_RESET        :: Time for daily ratelimit reset
+            _RATELIMIT_MINUTE           :: Total number of requests allowed per minute
+            _RATELIMIT_MINUTE_REMAINING :: Total number of requests remaining for the current minute
+            _RATELIMIT_MINUTE_RESET     :: Time for per-minute ratelimit reset
     '''
 
-    # CLASS VARIABLES
-    API_URL = "https://api-football-v1.p.rapidapi.com/v2/"
-    CURRENT_SEASON = "2019-2020" # necessary, should become a CLI parameter
-    reset_hour = 17 # necessary, should become a CLI parameter
-    reset_minute = 50 # necessary, should become a CLI parameter
-    self.ratelimit_day              = None
-    self.ratelimit_day_remaining    = None
-    self.ratelimit_day_reset        = None
-    self.ratelimit_day_start        = None
-    self.ratelimit_minute           = 30
-    self.ratelimit_minute_remaining = 30
-    self.ratelimit_minute_reset     = None
-    self.ratelimit_minute_start     = None
+    # CLASS VARIABLES - change some of these to CLI arguments
+    _CURRENT_SEASON = 2019
+    _RESET_HOUR = 17
+    _RESET_MINUTE = 50
+    _API_URL = "https://api-football-v1.p.rapidapi.com/v2/"
+    _HEADERS = {
+        'x-rapidapi-host':"api-football-v1.p.rapidapi.com",
+        'x-rapidapi-key':"e5d1ceda67mshdfe4d820b3e6835p1187fbjsn9c760f31342c"
+    }
+
+    # RATELIMIT VARIABLES
+    _RATELIMIT_DAY              = None
+    _RATELIMIT_DAY_REMAINING    = None
+    _RATELIMIT_DAY_RESET        = None
+    _RATELIMIT_MINUTE           = 30
+    _RATELIMIT_MINUTE_REMAINING = 30
+    _RATELIMIT_MINUTE_RESET     = None
 
 
-    # CLASS METHODS
-    def __init__(self, endpoint, token):
+    def __init__(self, endpoint):
         ''' Method initializing instance variables.
                 endpoint            :: API endpoint to be queried for Request instance
-                headers             :: API request headers
-                token               :: API token to be used for Request instance
         '''
         self.endpoint = endpoint
-        self.token    = token
-        # specify rate limit variables
-        self.headers  = {
-            'x-rapidapi-host':API_URL[8:API_URL.index(".com")], # API-URL without HTTP protocol specified
-            'x-rapidapi-key':self.token    # **TO-DO** figure out if demo api requires token
-        }
-        
-    def get_ratelimit(self):
-        ''' Method to check and respond to API rate limit status before subsequent call.
-        '''
-        # deal with daily rate limit
-        if self.ratelimit_day_remaining and self.ratelimit_day_remaining == 0:
-            current_time = time.time() # current time (epoch)
-            time.sleep(self.ratelimit_day_reset-current_time + 1) # sleep until reset time plus one second
 
-        # deal with per-minute rate limit
-        if self.ratelimit_minute_remaining and self.ratelimit_minute_remaining == 0:
-            current_time = time.time() # current time (epoch)
-            time.sleep(self.ratelimit_minute_reset - current_time + 1) # sleep until reset time plus one second
-
-    def set_reset_time_day(self):
+    @classmethod
+    def set_reset_time_day(cls):
         ''' Method to calculate reset time for daily ratelimit
         '''
+        # Set reset time to <reset_hour> <reset_minute> on current date
         today = dt.today()
-        # check if past today's reset time
-        reset_dt = dt(today.year, today.month, today.day, reset_hour, reset_minute)
+        reset_dt = dt(today.year, today.month, today.day, cls._RESET_HOUR, cls._RESET_MINUTE)
         reset_dt_epoch = reset_dt.timestamp()
-        if reset_dt_epoch < time.time():            
-            self.ratelimit_day_reset = dt(today.year, today.month, today.day + 1, reset_hour, reset_minute).timestamp()
-        else:
-            self.ratelimit_day_reset = reset_dt_epoch
+        # If past <reset_hour> <reset_minute> on current date set reset time to the same time tomorrow
+        if reset_dt_epoch <= dt.today().timestamp():            
+            reset_dt_epoch = reset_dt.replace(day=reset_dt.day + 1).timestamp()
+        cls._RATELIMIT_DAY_RESET = reset_dt_epoch
 
-    def set_ratelimit(self, headers):
+    @classmethod
+    def set_reset_time_minute(cls):
+        ''' Method to calculate reset time for per-minute ratelimit
+        '''
+        cls._RATELIMIT_MINUTE_RESET = dt.today().timestamp() + 61 
+        cls._RATELIMIT_MINUTE_REMAINING = cls._RATELIMIT_MINUTE
+
+    @classmethod
+    def get_ratelimit(cls):
         ''' Method to check and respond to API rate limit status before subsequent call.
         '''
-        # deal with daily rate limit
-        if !self.ratelimit_day:
-            self.ratelimit_day = headers.get('X-RateLimit-requests-Limit') # on first request set ratelimit
-        self.ratelimit_day_remaining = headers.get('X-RateLimit-requests-Remaining') # update ratelimit remaining
+        # update daily ratelimit reset time if passed
+        if cls._RATELIMIT_DAY_RESET and cls._RATELIMIT_DAY_RESET <= dt.today().timestamp():
+            cls.set_reset_time_day()
 
-        # on first request set daily ratelimit reset time
-        if !self.ratelimit_day_reset:
-            self.set_reset_time_day()
+        # If the number of requests remaining for daily rate limit hits 0, sleep until reset time + one second
+        if cls._RATELIMIT_DAY_REMAINING and cls._RATELIMIT_DAY_REMAINING == 0:
+            sleep(cls._RATELIMIT_DAY_RESET - dt.today().timestamp() + 1)
+
+        # update per-minute ratelimit reset time if passed
+        if cls._RATELIMIT_MINUTE_RESET and cls._RATELIMIT_MINUTE_RESET <= dt.today().timestamp():
+            cls.set_reset_time_minute()
+
+        # If the number of requests remaining for per-minute rate limit hits 0, sleep until reset time + one second
+        if cls._RATELIMIT_MINUTE_REMAINING and cls._RATELIMIT_MINUTE_REMAINING == 0:
+            sleep(cls._RATELIMIT_MINUTE_RESET - dt.today().timestamp() + 1)
+            cls._RATELIMIT_MINUTE_REMAINING = cls._RATELIMIT_MINUTE # reset request remaining
+
+    @classmethod
+    def set_ratelimit(cls, headers):
+        ''' Method to check and respond to API rate limit status before subsequent call.
+        '''
+        # DAILY RATELIMIT
+        # If daily ratelimit has not been set, set it 
+        if !cls._RATELIMIT_DAY:
+            cls._RATELIMIT_DAY = headers.get('X-RateLimit-requests-Limit') # on first request set ratelimit
+        # Always update requests remaining for daily ratelimit
+        cls._RATELIMIT_DAY_REMAINING = headers.get('X-RateLimit-requests-Remaining') # update ratelimit remaining
+        # Set daily ratelimit reset time on first request
+        if !cls._RATELIMIT_DAY_RESET:
+            cls.set_reset_time_day()
             
-        # deal with per-minute rate limit
-        if self.ratelimit_minute_remaining == self.ratelimit_minute:
-            self.ratelimit_minute_start         = time.time()
-            self.ratelimit_minute_reset         = self.ratelimit_day_start + 61 # minute plus one second after the first request was made
-        else:
-            self.ratelimit_minute_remaining -= 1 # decrement remaining requests
+        # PER-MINUTE RATELIMIT
+        # Always update requests remaining for daily ratelimit
+        cls._RATELIMIT_MINUTE_REMAINING -= 1 # decrement remaining requests
+        # Set per-minute ratelimit reset time on first request
+        if cls._RATELIMIT_MINUTE_REMAINING == cls._RATELIMIT_MINUTE:
+            cls.set_reset_time_minute()
 
-    def store_result(self):
-        ''' Method to update SQLite DB with API response data.
-        '''
-        return "To be implemented at instance-level"
-
-    def process_result(self):
-        ''' Method to process API response data.
-        '''
-        return "To be implemented at instance-level"
-
-    def make_call(self):
+    def make_call(self, path):
         ''' Method to make API call.
         '''
-        # Query rate limit before proceeding, sleep if needed
-        get_ratelimit()
+        # View ratelimit before proceeding, sleep if needed
+        self.get_ratelimit()
 
         # Make API request
-        api_response = requests.get(f"{API_URL}{self.endpoint}", headers=self.headers)
-        api_response_headers = api_response.headers
-        api_response_json = api_reponse.json()
+        api_response = get(f"{self._API_URL}{self.endpoint}{path}", headers=self._HEADERS)
 
-        # Query rate limit before proceeding, give user option to sleep or incur charges
-        set_ratelimit(api_response_headers)
+        # Update ratelimit
+        self.set_ratelimit(api_response.headers)
 
         if api_response.status_code != 200:
-            return "To be implemented..." # **TO-DO** create a log of redo requests
+            print("**TO-DO** create a log of redo requests")
 
+        return api_response.json()
+
+    def process_response(self):
+        ''' Method to process the response of API call. Implement in child classes.
+        '''
+        pass
+
+    def store_response(self):
+        ''' Method to store processed response of API call. Implement in child classes.
+        '''
+        pass
+    
