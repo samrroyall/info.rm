@@ -22,6 +22,7 @@ class Request:
     _RESET_HOUR = 17
     _RESET_MINUTE = 50
     _API_URL = "https://api-football-v1.p.rapidapi.com/v2/"
+    _ENDPOINT = ""
     _HEADERS = {
         'x-rapidapi-host':"api-football-v1.p.rapidapi.com",
         'x-rapidapi-key':"e5d1ceda67mshdfe4d820b3e6835p1187fbjsn9c760f31342c"
@@ -34,13 +35,6 @@ class Request:
     _RATELIMIT_MINUTE           = 30
     _RATELIMIT_MINUTE_REMAINING = 30
     _RATELIMIT_MINUTE_RESET     = None
-
-
-    def __init__(self, endpoint):
-        ''' Method initializing instance variables.
-                endpoint            :: API endpoint to be queried for Request instance
-        '''
-        self.endpoint = endpoint
 
     @classmethod
     def set_reset_time_day(cls):
@@ -111,7 +105,7 @@ class Request:
         self.get_ratelimit()
 
         # Make API request
-        api_response = get(f"{self._API_URL}{self.endpoint}{path}", headers=self._HEADERS)
+        api_response = get(f"{self._API_URL}{self._ENDPOINT.format(path=path)}", headers=self._HEADERS)
 
         # Update ratelimit
         self.set_ratelimit(api_response.headers)
@@ -130,4 +124,82 @@ class Request:
         ''' Method to store processed response of API call. Implement in child classes.
         '''
         pass
-    
+
+    def update(self):
+        ''' Method to gather, process, and store API data. Implement in child classes. 
+        '''
+        pass
+
+########################################################
+#################### CHILD CLASSES #####################
+########################################################
+
+class LeagueRequest(Request):
+    _ENDPOINT = f"leagues/season/{Request._CURRENT_SEASON}"
+    _CURRENT_LEAGUES = [ 
+        ("Premier League", "England"),
+        ("Ligue 1", "France"),
+        ("Serie A", "Italy"),
+        ("Primera Division", "Spain"),
+        ("Bundesliga 1", "Germany")
+    ]
+
+    def process_response(self, response_data):
+        ''' Method to process the response of API call.
+        '''
+        processed_response = []
+        leagues = response_data.get("api").get("leagues")
+        for league in leagues:
+            if (league.get("name"), league.get("country")) in self._CURRENT_LEAGUES:
+                processed_response.append(league)
+        return processed_response
+
+    def store_response(self, processed_data):
+        ''' Method to store the processed response of API call.
+        '''
+
+    def update(self):
+        ''' Method to gather, process, and store API data. Implement in child classes. 
+        '''
+
+        response_data = self.make_call("")
+        processed_data = self.process_response(response_data)
+        return self.store_response(processed_data)
+        
+
+class TeamRequest(Request):
+    _ENDPOINT = "teams/league/{path}"
+
+    def __init__(self, league_id):
+        self.path = league_id
+
+    def process_response(self):
+        ''' Method to process the response of API call.
+        '''
+
+    def store_response(self):
+        ''' Method to store the processed response of API call.
+        '''
+
+    def update(self):
+        ''' Method to gather, process, and store API data. Implement in child classes. 
+        '''
+        
+class PlayerRequest(Request):
+    _ENDPOINT = f"players/team/{{path}}/{Request._CURRENT_SEASON}-{Request._CURRENT_SEASON + 1}"
+
+    def __init__(self, team_id):
+        self.path = team_id
+
+    def process_response(self):
+        ''' Method to process the response of API call.
+        '''
+
+    def store_response(self):
+        ''' Method to store the processed response of API call.
+        '''
+
+    def update(self):
+        ''' Method to gather, process, and store API data. Implement in child classes. 
+        '''
+

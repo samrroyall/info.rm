@@ -39,10 +39,10 @@
 /status - grabs token *deprecated for some reason*
   token = response.get("api").get("status").get("token")
 
-/seasons - grabs all seaons, take current season
+/seasons - grabs all seaons, take current season *shows future seasons, no need to query*
   season = int(response.get("api").get("seasons")[-1])
 
-/leagues/season/<season> - grabs all leagues by season (prem id for the 2019 season is 524)
+/leagues/season/<season> - grabs all leagues by season (prem id for the 2019-2020 season is 524)
   leagues = response.get("leagues")
   # populate league class
   for league in leagues:
