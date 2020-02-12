@@ -126,23 +126,30 @@ class Request:
         pass
 
     def update(self):
-        ''' Method to gather, process, and store API data. Implement in child classes. 
+        ''' Method to gather, process, and store API data.
         '''
-        pass
+
+        response_data = self.make_call(self.path)
+        processed_data = self.process_response(response_data)
+        return self.store_response(processed_data)
 
 ########################################################
 #################### CHILD CLASSES #####################
 ########################################################
 
 class LeagueRequest(Request):
-    _ENDPOINT = f"leagues/season/{Request._CURRENT_SEASON}"
+    ''' Class for gathering, processing, and storing API data from the .../leauges/season/<current_season> endpoint.
+    '''
+    _ENDPOINT = f"leagues/season/{Request._CURRENT_SEASON}" # requires current season of '2019'
     _CURRENT_LEAGUES = [ 
         ("Premier League", "England"),
         ("Ligue 1", "France"),
         ("Serie A", "Italy"),
         ("Primera Division", "Spain"),
         ("Bundesliga 1", "Germany")
-    ]
+
+    def __init__(self):
+        self.path = ""
 
     def process_response(self, response_data):
         ''' Method to process the response of API call.
@@ -157,36 +164,30 @@ class LeagueRequest(Request):
     def store_response(self, processed_data):
         ''' Method to store the processed response of API call.
         '''
-
-    def update(self):
-        ''' Method to gather, process, and store API data. Implement in child classes. 
-        '''
-
-        response_data = self.make_call("")
-        processed_data = self.process_response(response_data)
-        return self.store_response(processed_data)
-        
+        pass
 
 class TeamRequest(Request):
+    ''' Class for gathering, processing, and storing API data from the .../teams/league/<league_id> endpoint.
+    '''
     _ENDPOINT = "teams/league/{path}"
 
     def __init__(self, league_id):
         self.path = league_id
 
-    def process_response(self):
+    def process_response(self, response_data):
         ''' Method to process the response of API call.
         '''
+        pass
 
     def store_response(self):
         ''' Method to store the processed response of API call.
         '''
+        pass
 
-    def update(self):
-        ''' Method to gather, process, and store API data. Implement in child classes. 
-        '''
-        
 class PlayerRequest(Request):
-    _ENDPOINT = f"players/team/{{path}}/{Request._CURRENT_SEASON}-{Request._CURRENT_SEASON + 1}"
+    ''' Class for gathering, processing, and storing API data from the .../players/team/<team_id>/<current_season> endpoint.
+    '''
+    _ENDPOINT = f"players/team/{{path}}/{Request._CURRENT_SEASON}-{Request._CURRENT_SEASON + 1}" # requires current season of '2019-2020'
 
     def __init__(self, team_id):
         self.path = team_id
@@ -194,12 +195,10 @@ class PlayerRequest(Request):
     def process_response(self):
         ''' Method to process the response of API call.
         '''
+        pass
 
     def store_response(self):
         ''' Method to store the processed response of API call.
         '''
-
-    def update(self):
-        ''' Method to gather, process, and store API data. Implement in child classes. 
-        '''
+        pass
 
