@@ -1,13 +1,11 @@
 from requests import get
 from time import sleep
-from datetime import datetime as dt
+from datetime import datetime
+
+from .orm import Leagues, Teams, Players
 
 class Request:
     ''' Class defining methods used during the collection of data through API requests. 
-        Child classes:
-            LeagueRequest :: Request all league data for current season (leagues/season/<2019>)
-            TeamRequest   :: Request all team data for current league (teams/league/<league_id>)
-            PlayerRequest :: Request all player data for current team/season (players/team/<team_id>/<2019-2020>)
         Class variables:
             _RATELIMIT_DAY              :: Total number of requests allowed per day
             _RATELIMIT_DAY_REMAINING    :: Total number of requests remaining for the current day
@@ -22,10 +20,16 @@ class Request:
     _RESET_HOUR = 17
     _RESET_MINUTE = 50
     _API_URL = "https://api-football-v1.p.rapidapi.com/v2/"
-    _ENDPOINT = ""
     _HEADERS = {
         'x-rapidapi-host':"api-football-v1.p.rapidapi.com",
         'x-rapidapi-key':"e5d1ceda67mshdfe4d820b3e6835p1187fbjsn9c760f31342c"
+    }
+    _CURRENT_LEAGUES = {
+         "Premier League,England",
+         "Ligue 1,France",
+         "Serie A,Italy",
+         "Primera Division,Spain",
+         "Bundesliga 1,Germany"
     }
 
     # RATELIMIT VARIABLES
@@ -36,37 +40,46 @@ class Request:
     _RATELIMIT_MINUTE_REMAINING = 30
     _RATELIMIT_MINUTE_RESET     = None
 
+    def __init__(self, endpoint, type):
+        self.path = endpoint
+        self.path = type
+
     @classmethod
     def set_reset_time_day(cls):
         ''' Method to calculate reset time for daily ratelimit
         '''
+        today = datetime.today()
+        # If past <reset_hour> <reset_minute> on current date set reset time to tomorrow
+        if today.hour > cls._RESET_HOUR or (today.hour == cls._RESET_HOUR and today.minute >= cls._RESET_MINUTE):            
+            reset_dt = today.replace( 
+                hour = cls._RESET_HOUR, 
+                minute = cls._RESET_MINUTE,
+                second = 0,
+                microsecond = 0 
+            )
         # Set reset time to <reset_hour> <reset_minute> on current date
-        today = dt.today()
-        reset_dt = dt(today.year, today.month, today.day, cls._RESET_HOUR, cls._RESET_MINUTE)
-        reset_dt_epoch = reset_dt.timestamp()
-        # If past <reset_hour> <reset_minute> on current date set reset time to the same time tomorrow
-        if reset_dt_epoch <= dt.today().timestamp():            
-            reset_dt_epoch = reset_dt.replace(day=reset_dt.day + 1).timestamp()
-        cls._RATELIMIT_DAY_RESET = reset_dt_epoch
+        else:
+            reset_dt = today.replace(
+                day = today.day + 1, 
+                hour = cls._RESET_HOUR, 
+                minute = cls._RESET_MINUTE,
+                second = 0,
+                microsecond = 0
+            )
+        cls._RATELIMIT_DAY_RESET = reset_dt.timestamp()
 
     @classmethod
     def set_reset_time_minute(cls):
         ''' Method to calculate reset time for per-minute ratelimit
         '''
-        cls._RATELIMIT_MINUTE_RESET = dt.today().timestamp() + 61 
+        cls._RATELIMIT_MINUTE_RESET = datetime.today().timestamp() + 61 
         cls._RATELIMIT_MINUTE_REMAINING = cls._RATELIMIT_MINUTE
 
     @classmethod
     def get_ratelimit(cls):
         ''' Method to check and respond to API rate limit status before subsequent call.
         '''
-        # update daily ratelimit reset time if passed
-        if cls._RATELIMIT_DAY_RESET and cls._RATELIMIT_DAY_RESET <= dt.today().timestamp():
-            cls.set_reset_time_day()
-
-        # If the number of requests remaining for daily rate limit hits 0, sleep until reset time + one second
-        if cls._RATELIMIT_DAY_REMAINING and cls._RATELIMIT_DAY_REMAINING == 0:
-            sleep(cls._RATELIMIT_DAY_RESET - dt.today().timestamp() + 1)
+        # Check PER-MINUTE RATELIMIT
 
         # update per-minute ratelimit reset time if passed
         if cls._RATELIMIT_MINUTE_RESET and cls._RATELIMIT_MINUTE_RESET <= dt.today().timestamp():
@@ -77,35 +90,51 @@ class Request:
             sleep(cls._RATELIMIT_MINUTE_RESET - dt.today().timestamp() + 1)
             cls._RATELIMIT_MINUTE_REMAINING = cls._RATELIMIT_MINUTE # reset request remaining
 
+        # Check DAILY RATELIMIT
+
+        # update daily ratelimit reset time if passed
+        if cls._RATELIMIT_DAY_RESET and cls._RATELIMIT_DAY_RESET <= datetime.today().timestamp():
+            cls.set_reset_time_day()
+
+        # If the number of requests remaining for daily rate limit hits 0, sleep until reset time + one second
+        if cls._RATELIMIT_DAY_REMAINING and cls._RATELIMIT_DAY_REMAINING == 0:
+            sleep(cls._RATELIMIT_DAY_RESET - datetime.today().timestamp() + 1)
+
+        
     @classmethod
     def set_ratelimit(cls, headers):
         ''' Method to check and respond to API rate limit status before subsequent call.
         '''
         # DAILY RATELIMIT
+
         # If daily ratelimit has not been set, set it 
         if !cls._RATELIMIT_DAY:
-            cls._RATELIMIT_DAY = headers.get('X-RateLimit-requests-Limit') # on first request set ratelimit
+            cls._RATELIMIT_DAY = headers.get('X-RateLimit-requests-Limit')
+
         # Always update requests remaining for daily ratelimit
-        cls._RATELIMIT_DAY_REMAINING = headers.get('X-RateLimit-requests-Remaining') # update ratelimit remaining
+        cls._RATELIMIT_DAY_REMAINING = headers.get('X-RateLimit-requests-Remaining')
+
         # Set daily ratelimit reset time on first request
         if !cls._RATELIMIT_DAY_RESET:
             cls.set_reset_time_day()
             
         # PER-MINUTE RATELIMIT
+
         # Always update requests remaining for daily ratelimit
         cls._RATELIMIT_MINUTE_REMAINING -= 1 # decrement remaining requests
+
         # Set per-minute ratelimit reset time on first request
         if cls._RATELIMIT_MINUTE_REMAINING == cls._RATELIMIT_MINUTE:
             cls.set_reset_time_minute()
 
-    def make_call(self, path):
+    def make_call(self, parameter):
         ''' Method to make API call.
         '''
         # View ratelimit before proceeding, sleep if needed
         self.get_ratelimit()
 
         # Make API request
-        api_response = get(f"{self._API_URL}{self._ENDPOINT.format(path=path)}", headers=self._HEADERS)
+        api_response = get(f"{self._API_URL}{self.endpoint}{parameter}", headers=self._HEADERS)
 
         # Update ratelimit
         self.set_ratelimit(api_response.headers)
@@ -115,21 +144,39 @@ class Request:
 
         return api_response.json()
 
-    def process_response(self):
-        ''' Method to process the response of API call. Implement in child classes.
+    @classmethod
+    def filter_leagues(cls, leagues_data):
+        ''' Method to filter the response of league API call to only include current leagues.
         '''
-        pass
+        filtered_data = []
+
+        for league in leagues_data.get("api").get("leagues"):
+            if f"{league.get('name')},{league.get('country')}" in cls._CURRENT_LEAGUES:
+                filtered_data.append(league)
+
+        return filtered_data
+
+
+    def process_response(self, response_data):
+        ''' Method to process the response of API call.
+        '''
+        orm_class = eval(self.type)
+
+        if self.type == "Leagues":
+            response_data = self.filter_leagues(response_data)
+
+
 
     def store_response(self):
-        ''' Method to store processed response of API call. Implement in child classes.
+        ''' Method to store processed response of API call.
         '''
         pass
 
-    def update(self):
+    def update(self, parameter = ""):
         ''' Method to gather, process, and store API data.
         '''
 
-        response_data = self.make_call(self.path)
+        response_data = self.make_call(parameter)
         processed_data = self.process_response(response_data)
         return self.store_response(processed_data)
 
@@ -137,68 +184,62 @@ class Request:
 #################### CHILD CLASSES #####################
 ########################################################
 
-class LeagueRequest(Request):
-    ''' Class for gathering, processing, and storing API data from the .../leauges/season/<current_season> endpoint.
-    '''
-    _ENDPOINT = f"leagues/season/{Request._CURRENT_SEASON}" # requires current season of '2019'
-    _CURRENT_LEAGUES = [ 
-        ("Premier League", "England"),
-        ("Ligue 1", "France"),
-        ("Serie A", "Italy"),
-        ("Primera Division", "Spain"),
-        ("Bundesliga 1", "Germany")
-
-    def __init__(self):
-        self.path = ""
-
-    def process_response(self, response_data):
-        ''' Method to process the response of API call.
-        '''
-        processed_response = []
-        leagues = response_data.get("api").get("leagues")
-        for league in leagues:
-            if (league.get("name"), league.get("country")) in self._CURRENT_LEAGUES:
-                processed_response.append(league)
-        return processed_response
-
-    def store_response(self, processed_data):
-        ''' Method to store the processed response of API call.
-        '''
-        pass
-
-class TeamRequest(Request):
-    ''' Class for gathering, processing, and storing API data from the .../teams/league/<league_id> endpoint.
-    '''
-    _ENDPOINT = "teams/league/{path}"
-
-    def __init__(self, league_id):
-        self.path = league_id
-
-    def process_response(self, response_data):
-        ''' Method to process the response of API call.
-        '''
-        pass
-
-    def store_response(self):
-        ''' Method to store the processed response of API call.
-        '''
-        pass
-
-class PlayerRequest(Request):
-    ''' Class for gathering, processing, and storing API data from the .../players/team/<team_id>/<current_season> endpoint.
-    '''
-    _ENDPOINT = f"players/team/{{path}}/{Request._CURRENT_SEASON}-{Request._CURRENT_SEASON + 1}" # requires current season of '2019-2020'
-
-    def __init__(self, team_id):
-        self.path = team_id
-
-    def process_response(self):
-        ''' Method to process the response of API call.
-        '''
-        pass
-
-    def store_response(self):
-        ''' Method to store the processed response of API call.
-        '''
-        pass
-
+#class LeagueRequest(Request):
+#    ''' Class for gathering, processing, and storing API data from the .../leauges/season/<current_season> endpoint.
+#    '''
+#    _ENDPOINT = f"leagues/season/{Request._CURRENT_SEASON}" # requires current season of '2019'
+#    
+#
+#    def __init__(self):
+#        self.path = ""
+#
+#    def process_response(self, response_data):
+#        ''' Method to process the response of API call.
+#        '''
+#        processed_response = []
+#        leagues = response_data.get("api").get("leagues")
+#        for league in leagues:
+#            if (f"{league.get(\"name\")},{league.get(\"country\")}" in self._CURRENT_LEAGUES:
+#                processed_response.append(league)
+#        return processed_response
+#
+#    def store_response(self, processed_data):
+#        ''' Method to store the processed response of API call.
+#        '''
+#        pass
+#
+#class TeamRequest(Request):
+#    ''' Class for gathering, processing, and storing API data from the .../teams/league/<league_id> endpoint.
+#    '''
+#    _ENDPOINT = "teams/league/{path}"
+#
+#    def __init__(self, league_id):
+#        self.path = league_id
+#
+#    def process_response(self, response_data):
+#        ''' Method to process the response of API call.
+#        '''
+#        pass
+#
+#    def store_response(self):
+#        ''' Method to store the processed response of API call.
+#        '''
+#        pass
+#
+#class PlayerRequest(Request):
+#    ''' Class for gathering, processing, and storing API data from the .../players/team/<team_id>/<current_season> endpoint.
+#    '''
+#    _ENDPOINT = f"players/team/{{path}}/{Request._CURRENT_SEASON}-{Request._CURRENT_SEASON + 1}" # requires current season of '2019-2020'
+#
+#    def __init__(self, team_id):
+#        self.path = team_id
+#
+#    def process_response(self):
+#        ''' Method to process the response of API call.
+#        '''
+#        pass
+#
+#    def store_response(self):
+#        ''' Method to store the processed response of API call.
+#        '''
+#        pass
