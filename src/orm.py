@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+
 from sqlalchemy import Column
 from sqlalchemy.types import Integer, String, Date, Boolean, Float
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
+#from datetime import date
 
 Base = declarative_base()
 
@@ -18,6 +22,24 @@ class Leagues(Base):
     flag = Column(String)
     is_current = Column(Boolean) # 1 or 0 -> True or False
 
+def league_from_json(datum):
+    ''' Function that converts an API response datum into a Leagues instance.
+    '''
+
+    instance = Leagues()
+    for key,value in datum.items():
+        if key == "season_start" or key == "season_end":
+            setattr(instance, key, datetime.strptime(value, "%Y-%m-%d").date()) # python3.6 functionality
+            #setattr(instance, key, date.fromisoformat(value)) # python3.8 functionality
+        elif key == "is_current":
+            setattr(instance, key, bool(value))
+        elif hasattr(Leauges, key):
+            setattr(instance, key, value)
+        else:
+            print("*TODO* throw error")
+    return instance
+
+
 class Teams(Base):
     __tablename__ = "teams"
 
@@ -31,11 +53,23 @@ class Teams(Base):
     country = Column(String)
     venue_capacity = Column(Integer)
 
+def team_from_json(datum, foreign_key):
+    ''' Function that converts an API response datum into a Teams instance.
+    '''
+    instance = Teams()
+    for key,value in datum.items():
+        if hasattr(Teams, key):
+            setattr(instance, key, value)
+        else:
+            print("*TODO* throw error")
+    setattr(instance, "league_id", foreign_key)
+    return instance
+
 class Players(Base):
     __tablename__ = "players"
 
     player_id = Column(Integer, primary_key = True)
-    team_id = Column(Integer, ForeignKey("teams.team_id"), nullable = False)
+    team_id = Column(Integer, ForeignKey("teams.team_id"), nullable = False) # not included in output
     firstname = Column(String)
     lastname = Column(String)
     position = Column(String) # Attacker, ... 
@@ -96,3 +130,7 @@ class Players(Base):
     substitutes_out = Column(Integer)
     games_bench = Column(Integer)
 
+def player_from_json(datum, foreign_key):
+    ''' Function that converts an API response datum into a Players instance.
+    '''
+    pass 

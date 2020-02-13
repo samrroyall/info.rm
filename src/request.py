@@ -2,7 +2,7 @@ from requests import get
 from time import sleep
 from datetime import datetime
 
-from .orm import Leagues, Teams, Players
+from .orm import Leagues, league_from_json, Teams, team_from_json, Players, player_from_json
 
 class Request:
     ''' Class defining methods used during the collection of data through API requests. 
@@ -24,13 +24,14 @@ class Request:
         'x-rapidapi-host':"api-football-v1.p.rapidapi.com",
         'x-rapidapi-key':"e5d1ceda67mshdfe4d820b3e6835p1187fbjsn9c760f31342c"
     }
-    _CURRENT_LEAGUES = {
-         "Premier League,England",
-         "Ligue 1,France",
-         "Serie A,Italy",
-         "Primera Division,Spain",
-         "Bundesliga 1,Germany"
-    }
+    _CURRENT_LEAGUES = {"Premier League,England"}
+    #_CURRENT_LEAGUES = {
+    #     "Premier League,England",
+    #     "Ligue 1,France",
+    #     "Serie A,Italy",
+    #     "Primera Division,Spain",
+    #     "Bundesliga 1,Germany"
+    #}
 
     # RATELIMIT VARIABLES
     _RATELIMIT_DAY              = None
@@ -156,90 +157,33 @@ class Request:
 
         return filtered_data
 
+    def orm_from_json(self, datum, id)
+        ''' Method to convert datum of API response data to its corresponding ORM object.
+        '''
 
-    def process_response(self, response_data):
-        ''' Method to process the response of API call.
+        if self.type == "Leauges":
+            return league_from_json(datum)
+        elif self.type == "Teams":
+            return team_from_json(datum, id)
+        elif self.type == "Players":
+            return player_from_json(datum, id)
+
+    def process_response(self, response_data, id):
+        ''' Method to process the response of API call, turning JSON response into list of ORM class instances.
         '''
         orm_class = eval(self.type)
 
         if self.type == "Leagues":
             response_data = self.filter_leagues(response_data)
+        else:
+            response_data = response_data.get("api").get(self.type.lower())
 
+        # return list of ORM instances derived from API output
+        return [self.orm_from_json(datum, id) for datum in response_data]
 
-
-    def store_response(self):
-        ''' Method to store processed response of API call.
-        '''
-        pass
-
-    def update(self, parameter = ""):
+    def update(self, parameter = "", id = None):
         ''' Method to gather, process, and store API data.
         '''
 
-        response_data = self.make_call(parameter)
-        processed_data = self.process_response(response_data)
-        return self.store_response(processed_data)
+        return self.process_response(self.make_call(parameter), id)
 
-########################################################
-#################### CHILD CLASSES #####################
-########################################################
-
-#class LeagueRequest(Request):
-#    ''' Class for gathering, processing, and storing API data from the .../leauges/season/<current_season> endpoint.
-#    '''
-#    _ENDPOINT = f"leagues/season/{Request._CURRENT_SEASON}" # requires current season of '2019'
-#    
-#
-#    def __init__(self):
-#        self.path = ""
-#
-#    def process_response(self, response_data):
-#        ''' Method to process the response of API call.
-#        '''
-#        processed_response = []
-#        leagues = response_data.get("api").get("leagues")
-#        for league in leagues:
-#            if (f"{league.get(\"name\")},{league.get(\"country\")}" in self._CURRENT_LEAGUES:
-#                processed_response.append(league)
-#        return processed_response
-#
-#    def store_response(self, processed_data):
-#        ''' Method to store the processed response of API call.
-#        '''
-#        pass
-#
-#class TeamRequest(Request):
-#    ''' Class for gathering, processing, and storing API data from the .../teams/league/<league_id> endpoint.
-#    '''
-#    _ENDPOINT = "teams/league/{path}"
-#
-#    def __init__(self, league_id):
-#        self.path = league_id
-#
-#    def process_response(self, response_data):
-#        ''' Method to process the response of API call.
-#        '''
-#        pass
-#
-#    def store_response(self):
-#        ''' Method to store the processed response of API call.
-#        '''
-#        pass
-#
-#class PlayerRequest(Request):
-#    ''' Class for gathering, processing, and storing API data from the .../players/team/<team_id>/<current_season> endpoint.
-#    '''
-#    _ENDPOINT = f"players/team/{{path}}/{Request._CURRENT_SEASON}-{Request._CURRENT_SEASON + 1}" # requires current season of '2019-2020'
-#
-#    def __init__(self, team_id):
-#        self.path = team_id
-#
-#    def process_response(self):
-#        ''' Method to process the response of API call.
-#        '''
-#        pass
-#
-#    def store_response(self):
-#        ''' Method to store the processed response of API call.
-#        '''
-#        pass
