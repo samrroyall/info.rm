@@ -1,8 +1,11 @@
+#!/usr/bin/env python3
+
 from requests import get
 from time import sleep
 from datetime import datetime
+#from datetime import date
+from .orm import Leagues, Teams, Players
 
-import .orm
 
 class Registry(type):
     """ Class defining Subclass registry. All metaclasses of registry will be listed in _REGISTRY as
@@ -21,9 +24,6 @@ class Request(metaclass=Registry):
     """ Class defining methods used during the collection and processing of data through API requests. 
         Class variables:
             _REGISTER
-            _CURRENT_SEASON
-            _RESET_HOUR
-            _RESET_MINUTE
             _RATELIMIT_DAY              :: Total number of requests allowed per day
             _RATELIMIT_DAY_REMAINING    :: Total number of requests remaining for the current day
             _RATELIMIT_DAY_RESET        :: Time for daily ratelimit reset
@@ -33,16 +33,11 @@ class Request(metaclass=Registry):
     """
 
     # CLASS VARIABLES - change some of these to CLI arguments
-    _REGISTER = False
-    _CURRENT_SEASON = None
-    _RESET_HOUR = None
-    _RESET_MINUTE = None
-    _API_URL = "https://api-football-v1.p.rapidapi.com/v2/"
-    _HEADERS = {
-        "x-rapidapi-host":"api-football-v1.p.rapidapi.com",
-        "x-rapidapi-key":"e5d1ceda67mshdfe4d820b3e6835p1187fbjsn9c760f31342c"
-    }
-    _CURRENT_LEAGUES = {"Premier League,England"}
+    _REGISTER             = False
+    _API_URL              = "https://api-football-v1.p.rapidapi.com/v2/"
+    _HEADERS              = {"x-rapidapi-host":"api-football-v1.p.rapidapi.com"}
+    _CURRENT_LEAGUES      = {"Premier League,England"}
+    endpoint              = None
     #_CURRENT_LEAGUES = {
     #     "Premier League,England",
     #     "Ligue 1,France",
@@ -59,11 +54,13 @@ class Request(metaclass=Registry):
     _RATELIMIT_MINUTE_REMAINING = 30
     _RATELIMIT_MINUTE_RESET     = None
 
-    def __init__(self, path):
-        self.path = path
-        class_name = self.__class__.__name__
-        self.orm_class = getattr(.orm, class_name[ : class_name.index("Request")])
-
+    def __init__(self, **kwargs):
+        self.current_season_short = kwargs.get("current_season").split('-')[0]
+        self.current_season_long = kwargs.get("current_season") 
+        self.reset_hour = int(kwargs.get("subscription_time").split(':')[0])
+        self.reset_minute = int(kwargs.get("subscription_time").split(':')[1])
+        self._HEADERS.update({"token":kwargs.get("token")})
+        
     @classmethod
     def set_reset_time_day(cls):
         """ Method to calculate reset time for daily ratelimit.
@@ -150,7 +147,7 @@ class Request(metaclass=Registry):
         # View ratelimit before proceeding, sleep if needed
         self.get_ratelimit()
         # Make API request
-        api_response = get(f"{self._API_URL}{self.endpoint}{parameter}", headers=self._HEADERS)
+        api_response = get(f"{self._API_URL}{self.endpoint}", headers=self._HEADERS)
         # Update ratelimit
         self.set_ratelimit(api_response.headers)
 
@@ -185,7 +182,12 @@ class LeaguesRequest(Request):
     """ Class defining methods used during the collection and processing of data through API requests regarding
     Leagues data.
     """
-    _REGISTER = True
+    _REGISTER  = True
+    _ORM_CLASS = Leagues
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.endpoint = f"/leagues/{self.current_season_short}"
 
     def process_response(self, response_data, **kwargs):
         """ Method to process the response of API call, altering fields and adding foreign key if needed.
@@ -212,13 +214,20 @@ class TeamsRequest(Request):
     Teams data.
     """
 
-    _REGISTER = True
-    _ENDPOINT = "leagues/season/{season}"
+    _REGISTER  = True
+    _ORM_CLASS = Teams
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.league_id = kwargs.get("foreign_key")
+        self.endpoint = f"teams/league/{self.team_id}"
 
     def process_response(self, response_data, **kwargs):
         """ Method to process the response of API call, altering fields and adding foreign key if needed.
         """
-        league_id = kwargs.get("foreign_key")
+        league_id = self.league_id 
+        # ...
+        return teams
 
 
 class PlayersRequest(Request):
@@ -226,11 +235,19 @@ class PlayersRequest(Request):
     Teams data.
     """    
 
-    _REGISTER = True
+    _REGISTER  = True
+    _ORM_CLASS = Players
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.team_id = kwargs.get("foreign_key")
+        self.endpoint = f"players/team/{self.team_id}/{self.current_season_short}"
 
     def process_response(self, response_data, **kwargs):
         """ Method to process the response of API call, altering fields and adding foreign key if needed.
         """
-        team_id = kwargs.get("foreign_key")
+        team_id = self.team_id
+        # ...
+        return players
 
 

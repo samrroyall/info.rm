@@ -1,54 +1,53 @@
+#!/usr/bin/env python3
+
 from .request import Request
 
 ########################
 #### UPDATE METHODS ####
 ########################
 
-def update_leagues(request):
-    """ Function for updating leagues data from API and storing in DB
-        Parameters:
-            season :: current season, pulled from config file
+def update_table(action, ids, **kwargs):
+    """ Function for updating data from API and storing in DB
     """
-    request_class = request()
-    league_data = request_class.update()
-    # db.store_response(orm_instances)
+    request = Request._REGISTRY.get(action.split("_")[1].capitalize())
+    if ids:
+        result = []
+        for id in ids:
+            kwargs["foreign_key"] = id
+            data, ids = request(kwargs).update()
+            result += data
+    else:
+        result, ids = request(kwargs).update()
+    db.store_response()
 
-    return league_ids
+    return ids
 
-def update_teams(request, league_ids):
-    """ Function for updating teams data from API and storing in DB
-        Parameters:
-            leagues :: current watched leagues, pulled from DB
-    """
-    request_class = request(endpoint=f"teams/league/")
-    for league_id in league_ids:
-        team_data = request_class.update(parameter=f"{league_id}", foreign_key=league_id)
-        # db.store_response(orm_instances)
+def update_all(**kwargs):
+    league_ids = update_leagues(kwargs)
+    kwargs["ids"] = league_ids
+    team_ids = update_leagues(kwargs)
+    kwargs["ids"] = team_ids
+    update_leagues(kwargs)
 
-    return team_ids
+    return 
 
-def update_players(request, team_ids):
-    """ Function for updating players data from API and storing in DB
-        Parameters:
-            season :: current season, pulled from config file
-            teams  :: teams from current watched leagues, pulled from DB
-    """
-    request_class = request(endpoint="players/team/")
-    for team_id in team_ids:
-        player_data = request_class.update(paramter=f"{team_id}/{season}", foreign_key=team_id))
-        # db.store_response(orm_instances)
-
-    return
-
-def config(token, sub_hour, sub_minute, season, leagues):
+def config(**kwargs):
     """ Function for writing CLI arguments to config file.
         Parameters:
-            token      :: API token to be used for future responses
-            sub_hour   :: Hour current API subscription began
-            sub_minute :: Minute current API subscription began
-            season     :: Start year of current season (e.g. 2019, for the 2019-2020 season)
-            leagues    :: Leagues to be watched
+            token             :: API token to be used for future responses
+            subscription_time :: Hour current API subscription began
+            current_season    :: Start year of current season (e.g. 2019, for the 2019-2020 season)
     """
+    with open("config.ini", "w") as f:
+        for key,value in kwargs:
+            f.write(f"{key}={value}\n"
+
+def read_config():
+    with open("config.ini", "r") as f:
+        args = {}
+        for line in f.readlines():
+            args.update({line.split("=")[0]:line.split("=")[1]})
+        return args
 
 def main(**kwargs)
     """ info.rm.py's main function.
@@ -61,14 +60,17 @@ def main(**kwargs)
     """
     action = kwargs.get("action")
     if action == "config":
+        config(kwargs)
     else:
-        if kwargs.get("action") == "update_all":
-
-            
+        args = read_config()
+        ids = None # somefunction(action)
+        if action == "update_all":
+            ids = update_table("update_leagues", ids, args)
+            ids = update_table("update_teams", ids, args)
+            update_table("update_players", ids, args)
         else:
-            request = Request._REGISTRY.get(f"{action.split('_')[1].capitalize()}Request")
-    pass 
-
-# utilize argparse
+            update_table(action, ids, args)
+        
 if __name__ == "__main__":
-    main()
+    args = None # argparse result
+    main(args)
