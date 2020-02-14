@@ -2,27 +2,45 @@ from requests import get
 from time import sleep
 from datetime import datetime
 
-from .orm import Leagues, league_from_json, Teams, team_from_json, Players, player_from_json
+import .orm
 
-class Request:
-    ''' Class defining methods used during the collection of data through API requests. 
+class Registry(type):
+    """ Class defining Subclass registry. All metaclasses of registry will be listed in _REGISTRY as
+    {class_name:class} key-value pairs.
         Class variables:
+            _REGISTRY :: Dictionary mapping child class names to child class objects
+    """
+    _REGISTRY = {} # Dict[str:class]
+    def __new__(cls, *args, **kwargs):
+        new_class = super().__new__(cls, *args, **kwargs)
+        if new_class._REGISTER:
+            cls._REGISTRY[new_class.__name__] = new_class
+        return new_class
+
+class Request(metaclass=Registry):
+    """ Class defining methods used during the collection and processing of data through API requests. 
+        Class variables:
+            _REGISTER
+            _CURRENT_SEASON
+            _RESET_HOUR
+            _RESET_MINUTE
             _RATELIMIT_DAY              :: Total number of requests allowed per day
             _RATELIMIT_DAY_REMAINING    :: Total number of requests remaining for the current day
             _RATELIMIT_DAY_RESET        :: Time for daily ratelimit reset
             _RATELIMIT_MINUTE           :: Total number of requests allowed per minute
             _RATELIMIT_MINUTE_REMAINING :: Total number of requests remaining for the current minute
             _RATELIMIT_MINUTE_RESET     :: Time for per-minute ratelimit reset
-    '''
+    """
 
     # CLASS VARIABLES - change some of these to CLI arguments
-    _CURRENT_SEASON = 2019
-    _RESET_HOUR = 17
-    _RESET_MINUTE = 50
+    _REGISTER = False
+    _CURRENT_SEASON = None
+    _RESET_HOUR = None
+    _RESET_MINUTE = None
     _API_URL = "https://api-football-v1.p.rapidapi.com/v2/"
     _HEADERS = {
-        'x-rapidapi-host':"api-football-v1.p.rapidapi.com",
-        'x-rapidapi-key':"e5d1ceda67mshdfe4d820b3e6835p1187fbjsn9c760f31342c"
+        "x-rapidapi-host":"api-football-v1.p.rapidapi.com",
+        "x-rapidapi-key":"e5d1ceda67mshdfe4d820b3e6835p1187fbjsn9c760f31342c"
     }
     _CURRENT_LEAGUES = {"Premier League,England"}
     #_CURRENT_LEAGUES = {
@@ -41,14 +59,15 @@ class Request:
     _RATELIMIT_MINUTE_REMAINING = 30
     _RATELIMIT_MINUTE_RESET     = None
 
-    def __init__(self, endpoint, type):
-        self.path = endpoint
-        self.path = type
+    def __init__(self, path):
+        self.path = path
+        class_name = self.__class__.__name__
+        self.orm_class = getattr(.orm, class_name[ : class_name.index("Request")])
 
     @classmethod
     def set_reset_time_day(cls):
-        ''' Method to calculate reset time for daily ratelimit
-        '''
+        """ Method to calculate reset time for daily ratelimit.
+        """
         today = datetime.today()
         # If past <reset_hour> <reset_minute> on current date set reset time to tomorrow
         if today.hour > cls._RESET_HOUR or (today.hour == cls._RESET_HOUR and today.minute >= cls._RESET_MINUTE):            
@@ -71,15 +90,15 @@ class Request:
 
     @classmethod
     def set_reset_time_minute(cls):
-        ''' Method to calculate reset time for per-minute ratelimit
-        '''
+        """ Method to calculate reset time for per-minute ratelimit
+        """
         cls._RATELIMIT_MINUTE_RESET = datetime.today().timestamp() + 61 
         cls._RATELIMIT_MINUTE_REMAINING = cls._RATELIMIT_MINUTE
 
     @classmethod
     def get_ratelimit(cls):
-        ''' Method to check and respond to API rate limit status before subsequent call.
-        '''
+        """ Method to check and respond to API rate limit status before subsequent call.
+        """
         # Check PER-MINUTE RATELIMIT
 
         # update per-minute ratelimit reset time if passed
@@ -104,39 +123,34 @@ class Request:
         
     @classmethod
     def set_ratelimit(cls, headers):
-        ''' Method to check and respond to API rate limit status before subsequent call.
-        '''
+        """ Method to check and respond to API rate limit status before subsequent call.
+        """
         # DAILY RATELIMIT
-
         # If daily ratelimit has not been set, set it 
         if !cls._RATELIMIT_DAY:
             cls._RATELIMIT_DAY = headers.get('X-RateLimit-requests-Limit')
-
         # Always update requests remaining for daily ratelimit
         cls._RATELIMIT_DAY_REMAINING = headers.get('X-RateLimit-requests-Remaining')
-
         # Set daily ratelimit reset time on first request
         if !cls._RATELIMIT_DAY_RESET:
             cls.set_reset_time_day()
             
         # PER-MINUTE RATELIMIT
-
         # Always update requests remaining for daily ratelimit
         cls._RATELIMIT_MINUTE_REMAINING -= 1 # decrement remaining requests
-
         # Set per-minute ratelimit reset time on first request
         if cls._RATELIMIT_MINUTE_REMAINING == cls._RATELIMIT_MINUTE:
             cls.set_reset_time_minute()
 
     def make_call(self, parameter):
-        ''' Method to make API call.
-        '''
+        """ Method to make API call.
+            Arguments:
+                parameter :: specific location in endpoint for API call (optional)
+        """
         # View ratelimit before proceeding, sleep if needed
         self.get_ratelimit()
-
         # Make API request
         api_response = get(f"{self._API_URL}{self.endpoint}{parameter}", headers=self._HEADERS)
-
         # Update ratelimit
         self.set_ratelimit(api_response.headers)
 
@@ -145,45 +159,78 @@ class Request:
 
         return api_response.json()
 
-    @classmethod
-    def filter_leagues(cls, leagues_data):
-        ''' Method to filter the response of league API call to only include current leagues.
-        '''
-        filtered_data = []
+    def process_response(self, response_data, **kwargs):
+        """ Method to process the response of an API call, altering fields and adding foreign key if needed.
+        Implement in child classes.
+            Arguments:
+                response_data :: data returned by API 
+                foreign_key   :: ID corresponding to higher-level API object (optional)
+        """
 
+        pass
+
+    def update(self, parameter = "", **kwargs):
+        """ Method to gather, process, and store API data.
+            Arguments:
+                parameter   :: specific location in endpoint for API call (optional)
+                foreign_key :: ID corresponding to higher-level API object (optional)
+        """
+        api_response = self.make_call(parameter)
+        response_data = api_response.get("api").get(self.orm_class.__name__.lower())
+
+        return self.process_response(response_data, kwargs)
+
+
+class LeaguesRequest(Request):
+    """ Class defining methods used during the collection and processing of data through API requests regarding
+    Leagues data.
+    """
+    _REGISTER = True
+
+    def process_response(self, response_data, **kwargs):
+        """ Method to process the response of API call, altering fields and adding foreign key if needed.
+        """
+        filtered_leagues = []
         for league in leagues_data.get("api").get("leagues"):
             if f"{league.get('name')},{league.get('country')}" in cls._CURRENT_LEAGUES:
-                filtered_data.append(league)
+                # python3.6 functionality
+                league.set("season_start", datetime.strptime(league.get("season_start"), "%Y-%m-%d").date())
+                # python3.8 functionality
+                #league.set("season_start", date.fromisoformat(league.get("season_start"))) 
+                # python3.6 functionality
+                league.set("season_end", datetime.strptime(league.get("season_end"), "%Y-%m-%d").date())
+                # python3.8 functionality
+                #league.set("season_end", date.fromisoformat(league.get("season_end")))
+                league.set("is_current", bool(league.get("is_current")))
+                filtered_leagues.append(league)
 
-        return filtered_data
+        return filtered_leagues
 
-    def orm_from_json(self, datum, id)
-        ''' Method to convert datum of API response data to its corresponding ORM object.
-        '''
 
-        if self.type == "Leauges":
-            return league_from_json(datum)
-        elif self.type == "Teams":
-            return team_from_json(datum, id)
-        elif self.type == "Players":
-            return player_from_json(datum, id)
+class TeamsRequest(Request):
+    """ Class defining methods used during the collection and processing of data through API requests regarding
+    Teams data.
+    """
 
-    def process_response(self, response_data, id):
-        ''' Method to process the response of API call, turning JSON response into list of ORM class instances.
-        '''
-        orm_class = eval(self.type)
+    _REGISTER = True
+    _ENDPOINT = "leagues/season/{season}"
 
-        if self.type == "Leagues":
-            response_data = self.filter_leagues(response_data)
-        else:
-            response_data = response_data.get("api").get(self.type.lower())
+    def process_response(self, response_data, **kwargs):
+        """ Method to process the response of API call, altering fields and adding foreign key if needed.
+        """
+        league_id = kwargs.get("foreign_key")
 
-        # return list of ORM instances derived from API output
-        return [self.orm_from_json(datum, id) for datum in response_data]
 
-    def update(self, parameter = "", id = None):
-        ''' Method to gather, process, and store API data.
-        '''
+class PlayersRequest(Request):
+    """ Class defining methods used during the collection and processing of data through API requests regarding
+    Teams data.
+    """    
 
-        return self.process_response(self.make_call(parameter), id)
+    _REGISTER = True
+
+    def process_response(self, response_data, **kwargs):
+        """ Method to process the response of API call, altering fields and adding foreign key if needed.
+        """
+        team_id = kwargs.get("foreign_key")
+
 
