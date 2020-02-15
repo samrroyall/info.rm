@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import sys
 import argparse
-import request.Request
+import pathlib
+from request import Request
 
 ########################
 #### UPDATE METHODS ####
@@ -10,78 +12,111 @@ import request.Request
 def update_table(action, ids, **kwargs):
     """ Function for updating data from API and storing in DB
     """
-    request = Request.get_registry().get(action.split("_")[1].capitalize())
+    request_type_string = "{}Request".format(action.split("_")[1].capitalize())
+    request_type = Request.get_registry().get(request_type_string)
+    orm_instances = []
+    response_ids = []
+    if action != "update_leagues" and not ids:
+        print(f"ERROR: Required IDs not present for {action} procedure. Ensure that the setup and higher-level procedures have been run.")
+        sys.exit(1)
     if ids:
-        result = []
-        response_ids = []
         for id in ids:
             kwargs["foreign_key"] = id
-            data, id_data = request(kwargs).update()
-            result += data
-            response_ids += id_data
+            result = request_type(**kwargs).update()
+            orm_instances += result.get("orm_data")
+            response_ids += result.get("ids")
     else:
-        result, response_ids = request(kwargs).update()
-    db.store_response(result)
-
+        result = request_type(**kwargs).update()
+        orm_instances = result.get("orm_data")
+        response_ids = result.get("ids")
+    #db.store_response(result)
+    key_string = f"{action.split('_')[1][:-1]}_ids"
+    set_ids({key_string:response_ids})
     return response_ids
 
 def update_all(**kwargs):
-    league_ids = update_table("update_leagues", None, kwargs)
-    team_ids = update_table("update_teams", league_ids, kwargs)
-    update_table("update_players", team_ids, kwargs)
-
+    league_ids = update_table("update_leagues", None, **kwargs)
+    team_ids = update_table("update_teams", league_ids, **kwargs)
+    update_table("update_players", team_ids, **kwargs)
+    set_ids({"league_ids":league_ids,"team_ids":team_id})
     return 
 
-def config(**kwargs):
+def read_config():
+    current_path = pathlib.Path(__file__).parent.absolute()
+    config_args = {}
+    with open(f"{current_path}/config.ini", "r") as f:
+        for line in f.readlines():
+            key_value_list = line.strip().split("=")
+            config_args.update({key_value_list[0]:key_value_list[1]})
+    return config_args
+
+def write_config(kwargs):
+    current_path = pathlib.Path(__file__).parent.absolute()
+    with open(f"{current_path}/config.ini", "w") as f:
+        for key,value in kwargs.items():
+            f.write(f"{key}={value}\n")
+
+def setup(kwargs):
     """ Function for writing CLI arguments to config file.
         Parameters:
             token             :: API token to be used for future responses
-            subscription_time :: Hour current API subscription began
-            current_season    :: Start year of current season (e.g. 2019, for the 2019-2020 season)
+            subscription_time :: Time current API subscription began (HH:MM)
+            current_season    :: Current season (e.g. 2019-2020)
     """
-    with open("config.ini", "w") as f:
-        for key,value in kwargs:
-            f.write(f"{key}={value}\n")
+    write_config(kwargs)
 
-def read_config():
-    args = {}
-    with open("config.ini", "r") as f:
-        for line in f.readlines():
-            args.update({line.split("=")[0]:line.split("=")[1]})
-    return args
+def get_ids(action, config_args):
+    if action == "update_teams":
+        key_string = "league_ids"
+    elif action == "update_players":
+        key_string = "team_ids"
+    else:
+        key_string = None
+    if key_string and key_string in config_args:
+        return eval(config_args.get(key_string))
+    else:
+        return None
+
+def set_ids(id_dict):
+    current_path = pathlib.Path(__file__).parent.absolute()
+    config_args = read_config()
+    config_args.update(id_dict)
+    write_config(config_args)
 
 def main(**kwargs):
     """ info.rm.py's main function.
         action :: desired procedure
-            config
+            setup
             update_all
             update_leagues
             update_teams
             update_players
     """
     action = kwargs.get("action")
-    if action == "config":
-        config(kwargs)
+    del kwargs["action"]
+    if action == "setup":
+        setup(kwargs)
     else:
-        args = read_config()
-        ids = None # somefunction(action)
+        config_args = read_config()
         if action == "update_all":
-            ids = update_table("update_leagues", ids, args)
-            ids = update_table("update_teams", ids, args)
-            update_table("update_players", ids, args)
+            update_all(**config_args)
         else:
-            update_table(action, ids, args)
-        
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="""\
-        >>>>>>>DESCRIPTION GOES HERE<<<<<<<
-    """)
+            ids = get_ids(action, config_args)
+            update_table(action, ids, **config_args)
+
+def initialize_parser():
+    parser = argparse.ArgumentParser(description="""
+            _       ____                     
+           (_)___  / __/___    _________ ___ 
+          / / __ \/ /_/ __ \  / ___/ __ `__ \ 
+         / / / / / __/ /_/ / / /  / / / / / /
+        /_/_/ /_/_/  \____(_)_/  /_/ /_/ /_/ 
+        """, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         "action",
-        nargs = 1,
         type = str,
         choices = [
-            "config",
+            "setup",
             "update_all",
             "update_leagues",
             "update_teams",
@@ -92,29 +127,36 @@ if __name__ == "__main__":
     parser.add_argument(
         "-t",
         "--token",
-        nargs = 1,
         type = str,
-        required = False,
         dest = "token",
-        help = "the user's API-Football access token"
+        help = "(setup only) the user's API-Football access token"
     )
     parser.add_argument(
         "-s",
         "--season",
-        nargs = 1,
         type = str,
-        required = False,
         dest = "current_season",
-        help = "the season the user desires data on: 'YYYY-YYYY'"
+        help = "(setup only) the season the user desires data on: 'YYYY-YYYY'"
     )
     parser.add_argument(
         "-st",
-        "--subcription-time",
-        nargs = 1,
+        "--subscription-time",
         type = str,
-        required = False,
         dest = "subscription_time",
-        help = "the hour and minute a user's API-Football subscription began: 'HH:MM'"
-    )
-    args = parser.parse_args() 
-    main(args)
+        help = "(setup only) the hour and minute a user's API-Football subscription began: 'HH:MM'"
+    )    
+    args = parser.parse_args()
+    if args.action == "setup" and (not args.token or not args.current_season or not args.subscription_time):
+        print("info.rm.py: error: setup procedure requires the following arguments: -t/--token, -s/--season, and -st/--subscription-time")
+        parser.print_help()
+        sys.exit(1)
+    elif args.action != "setup" and (args.token or args.current_season or args.subscription_time):
+        print(f"info.rm.py: error: {args.action} procedure takes no additional arguments")
+        parser.print_help()
+        sys.exit(1)
+    else:
+        return args
+
+if __name__ == "__main__":
+    args = vars(initialize_parser())
+    main(**args)

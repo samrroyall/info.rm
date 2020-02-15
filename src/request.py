@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
+from orm import Leagues, Teams, Players
 from requests import get
 from time import sleep
 from datetime import datetime
-#from datetime import date
-from orm import Leagues, Teams, Players
 
 
 class Registry(type):
@@ -41,7 +40,6 @@ class Request(metaclass=Registry):
     _API_URL              = "https://api-football-v1.p.rapidapi.com/v2/"
     _HEADERS              = {"x-rapidapi-host":"api-football-v1.p.rapidapi.com"}
     _CURRENT_LEAGUES      = {"Premier League,England"}
-    _ORM_CLASS            = None
     #_CURRENT_LEAGUES = {
     #     "Premier League,England",
     #     "Ligue 1,France",
@@ -59,12 +57,13 @@ class Request(metaclass=Registry):
     _RATELIMIT_MINUTE_RESET     = None
 
     def __init__(self, **kwargs):
+        cls = self.__class__
         self.current_season_short = kwargs.get("current_season").split('-')[0]
         self.current_season_long = kwargs.get("current_season") 
         self.reset_hour = int(kwargs.get("subscription_time").split(':')[0])
         self.reset_minute = int(kwargs.get("subscription_time").split(':')[1])
-        self._HEADERS.update({"token":kwargs.get("token")})
-        self.endpoint = None
+        self.headers = {"x-rapidapi-key":kwargs.get("token")}
+        self.headers.update(cls._HEADERS)
         
     def set_reset_time_day(self):
         """ Method to calculate reset time for daily ratelimit.
@@ -72,7 +71,8 @@ class Request(metaclass=Registry):
         cls = self.__class__
         today = datetime.today()
         # If past <reset_hour> <reset_minute> on current date set reset time to tomorrow
-        if today.hour > self.reset_hour or (today.hour == self.reset_hour and today.minute >= self.reset_minute):            
+        if (today.hour > self.reset_hour or today.hour == self.reset_hour and 
+                today.minute >= self.reset_minute):
             reset_dt = today.replace( 
                 hour = self.reset_hour, 
                 minute = self.reset_minute,
@@ -124,23 +124,19 @@ class Request(metaclass=Registry):
         cls = self.__class__
 
         # Check PER-MINUTE RATELIMIT
-
         # update per-minute ratelimit reset time if passed
         if cls._RATELIMIT_MINUTE_RESET and cls._RATELIMIT_MINUTE_RESET <= datetime.today().timestamp():
             cls.set_reset_time_minute()
-
-        # If the number of requests remaining for per-minute rate limit hits 0, sleep until reset time + one second
+        # If per-minute ratelimit requests remaining hits 0, sleep until reset time + one second
         if cls._RATELIMIT_MINUTE_REMAINING and cls._RATELIMIT_MINUTE_REMAINING == 0:
             sleep(cls._RATELIMIT_MINUTE_RESET - dt.today().timestamp() + 1)
             cls._RATELIMIT_MINUTE_REMAINING = cls._RATELIMIT_MINUTE # reset request remaining
 
         # Check DAILY RATELIMIT
-
         # update daily ratelimit reset time if passed
         if cls._RATELIMIT_DAY_RESET and cls._RATELIMIT_DAY_RESET <= datetime.today().timestamp():
             self.set_reset_time_day()
-
-        # If the number of requests remaining for daily rate limit hits 0, sleep until reset time + one second
+        # If daily ratelimit requests remaining hits 0, sleep until reset time + one second
         if cls._RATELIMIT_DAY_REMAINING and cls._RATELIMIT_DAY_REMAINING == 0:
             sleep(cls._RATELIMIT_DAY_RESET - datetime.today().timestamp() + 1)
     
@@ -153,70 +149,59 @@ class Request(metaclass=Registry):
         # View ratelimit before proceeding, sleep if needed
         self.get_ratelimit()
         # Make API request
-        api_response = get(f"{cls._API_URL}{self.endpoint}", headers=cls._HEADERS)
+        url = f"{cls._API_URL}{self.endpoint}" 
+        api_response = get(url, headers=self.headers)
         # Update ratelimit
         self.set_ratelimit(api_response.headers)
-
+        # Deal with API response status code
         if api_response.status_code != 200:
-            print("**TO-DO** create a log of redo requests")
-
+            print(f"ERROR: HTTP Request '{url}' Failed. Status: {api_response.status_code}.")
+            print(f"\tDescription: {api_response.json().get('message')}")
         return api_response.json()
 
-    def process_response(self, response_data, **kwargs):
-        """ Method to process the response of an API call, altering fields and adding foreign key if needed.
-        Implement in child classes.
+    def process_response(self, response_data):
+        """ Method to process the response of an API call, altering fields and adding foreign key if 
+        needed. Implement in child classes.
             Arguments:
                 response_data :: data returned by API 
-                foreign_key   :: ID corresponding to higher-level API object (optional)
         """
-
         pass
 
-    def update(self, **kwargs):
-        """ Method to gather, process, and store API data.
-            Arguments:
-                parameter   :: specific location in endpoint for API call (optional)
-                foreign_key :: ID corresponding to higher-level API object (optional)
-        """
-        cls = self.__class__
+    def update(self):
+        """ Method to gather, process, and store API data. """
         api_response = self.make_call()
-        response_data = api_response.get("api").get(cls._ORM_CLASS.__name__.lower())
-
-        return self.process_response(response_data, kwargs) 
+        response_data = api_response.get("api").get(self.orm_class.__name__.lower())
+        return self.process_response(response_data) 
 
 
 class LeaguesRequest(Request):
-    """ Class defining methods used during the collection and processing of data through API requests regarding
-    Leagues data.
+    """ Class defining methods used during the collection and processing of data through API requests 
+    regarding Leagues data.
     """
     _REGISTER  = True
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.endpoint = f"/leagues/{self.current_season_short}"
+        self.endpoint = f"leagues/season/{self.current_season_short}"
+        self.orm_class = Leagues
 
-    def process_response(self, leagues_data, **kwargs):
-        """ Method to process the leagues data returned by the API call, altering fields 
-        and adding foreign key if needed.
-        """
+    def process_response(self, leagues_data):
         cls = self.__class__
-
         filtered_leagues = []
         league_ids = []
         for league in leagues_data:
             if f"{league.get('name')},{league.get('country')}" in cls._CURRENT_LEAGUES:
-                league["season_start"] = datetime.strptime(league.get("season_start"), "%Y-%m-%d").date()
-                league["season_end"] = datetime.strptime(league.get("season_end"), "%Y-%m-%d").date()
+                league["season_start"] = datetime.strptime(league.get("season_start"),"%Y-%m-%d").date()
+                league["season_end"] = datetime.strptime(league.get("season_end"),"%Y-%m-%d").date()
                 league["is_current"] = bool(league.get("is_current"))
                 league_ids.append(league.get("league_id"))
-                filtered_leagues.append(Leagues.from_json(league))
-
-        return league_ids, filtered_leagues
+                filtered_leagues.append(self.orm_class().from_json(league))
+        return {"ids":league_ids,"orm_data":filtered_leagues}
 
 
 class TeamsRequest(Request):
-    """ Class defining methods used during the collection and processing of data through API requests regarding
-    Teams data.
+    """ Class defining methods used during the collection and processing of data through API requests 
+    regarding Teams data.
     """
 
     _REGISTER  = True
@@ -224,25 +209,22 @@ class TeamsRequest(Request):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.league_id = kwargs.get("foreign_key")
-        self.endpoint = f"teams/league/{self.team_id}"
+        self.endpoint = f"teams/league/{self.league_id}"
+        self.orm_class = Teams
 
-    def process_response(self, teams_data, **kwargs):
-        """ Method to process the response data of API call, altering fields and adding foreign key if needed.
-        """
-
+    def process_response(self, teams_data):
         team_ids = []
         for idx in range(len(teams_data)):
             team = teams_data[idx]
             team["league_id"] = self.league_id 
             team_ids.append(team.get("team_id"))
-            teams_data[idx] = Teams.from_json(team)
-
-        return team_ids, teams_data
+            teams_data[idx] = self.orm_class().from_json(team)
+        return {"ids":team_ids,"orm_data":teams_data}
 
 
 class PlayersRequest(Request):
-    """ Class defining methods used during the collection and processing of data through API requests regarding
-    Teams data.
+    """ Class defining methods used during the collection and processing of data through API requests 
+    regarding Teams data.
     """    
 
     _REGISTER  = True
@@ -250,17 +232,10 @@ class PlayersRequest(Request):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.team_id = kwargs.get("foreign_key")
-        self.endpoint = f"players/team/{self.team_id}/{self.current_season_short}"
+        self.endpoint = f"players/team/{self.team_id}/{self.current_season_long}"
+        self.orm_class = Players
 
-    def process_stats(self, stats):
-        """ Helper method of process_response(). Handles processing of player stats data. 
-        """
-
-
-    def process_response(self, players_data, **kwargs):
-        """ Method to process the response of API call, altering fields and adding foreign key if needed.
-        """
-
+    def process_response(self, players_data):
         for idx in range(len(players_data)):
             player = players_data[idx]
             player["team_id"] = self.team_id
@@ -270,8 +245,57 @@ class PlayersRequest(Request):
             player["captain"] = bool(player.get("captain"))
             player["birth_date"] = datetime.strptime(player.get("birth_date", "%Y/%m/%d").date())
             player["position"] = player.get("position").lower()
-            player = process_stats(player)
-            players_data[idx] = Players.from_json(player)
-        return players
+            stats = player.get("stats")
+            # shots
+            player["shots"] = stats.get("shots").get("total")
+            player["shots_on"] = stats.get("shots").get("on")
+            player["shots_on_pct"] = round(100.0 * player.get("shots_on") / player.get("shots"))
+            # goals
+            player["goals"] = stats.get("goals").get("total")
+            player["goals_conceded"] = stats.get("goals").get("conceded")
+            player["assists"] = stats.get("goals").get("assists")
+            # passes
+            player["passes"] = stats.get("passes").get("total")
+            player["passes_key"] = stats.get("passes").get("key")
+            player["passes_accuracy"] = stats.get("passes").get("accuracy")
+            # tackles
+            player["tackles"] = stats.get("tackles").get("total")
+            player["blocks"] = stats.get("tackles").get("blocks")
+            player["interceptions"] = stats.get("tackles").get("interceptions")
+            # duels
+            player["duels"] = stats.get("duels").get("total")
+            player["duels_won"] = stats.get("duels").get("won")
+            player["duels_won_pct"] = round(100.0 * player.get("duels_won") / player.get("duels"))
+            # dribbles
+            player["dribbles_attempted"] = stats.get("dribbles").get("attempted")
+            player["dribbles_succeeded"] = stats.get("dribbles").get("success")
+            player["dribbles_succeeded_pct"] = round(100.0 * player.get("dribbles_succeeded") / 
+                                                         player.get("dribbles_attempted"))
+            # fouls
+            player["fouls_drawn"] = stats.get("fouls").get("drawn")
+            player["fouls_committed"] = stats.get("fouls").get("committed")
+            # cards
+            player["cards_yellow"] = stats.get("cards").get("yellow")
+            player["cards_red"] = stats.get("cards").get("red")
+            player["cards_second_yellow"] = stats.get("cards").get("yellowred")
+            player["cards_straight_red"] = player.get("cards_red") - player.get("cards_second_yellow") 
+            # pentalties
+            player["penalties_won"] = stats.get("penalty").get("won")
+            player["penalties_committed"] = stats.get("penalty").get("commited") # [sic]
+            player["penalties_saved"] = stats.get("penalty").get("saved")
+            player["penalties_scored"] = stats.get("penalty").get("success")
+            player["penalties_missed"] = stats.get("penalty").get("missed")
+            player["penalties_scored_pct"] = round(100.0 * player.get("penalties_scored") / 
+                                                       (player.get("penalties_scored") + 
+                                                        player.get("penalties_missed")))
+            # games
+            player["games_appearances"] = stats.get("games").get("appearences") # [sic]
+            player["minutes_played"] = stats.get("games").get("appearences") # [sic]
+            player["games_started"] = stats.get("games").get("lineups") # [sic]
+            player["games_bench"] = stats.get("substitutes").get("bench") # [sic]
+            player["substitutions_in"] = stats.get("substitutes").get("in")
+            player["substitutions_out"] = stats.get("substitutes").get("out")
+            players_data[idx] = self.orm_class().from_json(player)
+        return {"ids":[],"orm_data":players_data}
 
 
