@@ -7,15 +7,13 @@ from datetime import datetime
 #from datetime import date
 
 class BaseMixin:
-""" Mixin Class to set common attributes and methodsfor Base class.
-"""
+    """ Mixin Class to set common attributes and methodsfor Base class. """
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
 
-    def _from_json(self, json_data):  
-    """ Instance method to set class attributes from json input.
-    """
+    def from_json(self, json_data):  
+        """ Instance method to set class attributes from json input."""
         for key, value in json_data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
@@ -23,8 +21,7 @@ class BaseMixin:
 Base = declarative_base(cls=BaseMixin)
 
 class Leagues(Base):
-""" ORM Class defining attributes corresponding to columns in 'leagues' table.
-"""
+    """ ORM Class defining attributes corresponding to columns in 'leagues' table. """
     league_id = Column(Integer, primary_key = True)
     name = Column(String)
     type = Column(String)
@@ -37,8 +34,7 @@ class Leagues(Base):
     is_current = Column(Boolean) # 1 or 0 -> True or False
 
 class Teams(BaseTable):
-""" ORM Class defining attributes corresponding to columns in 'teams' table.
-"""
+    """ ORM Class defining attributes corresponding to columns in 'teams' table."""
     team_id = Column(Integer, primary_key = True)
     league_id = Column(Integer, ForeignKey("leagues.league_id"), nullable = False) # not included in output
     name = Column(String)
@@ -50,8 +46,7 @@ class Teams(BaseTable):
     venue_capacity = Column(Integer)
 
 class Players(BaseTable):
-""" ORM Class defining attributes corresponding to columns in 'players' table.
-"""
+    """ ORM Class defining attributes corresponding to columns in 'players' table."""
     player_id = Column(Integer, primary_key = True)
     team_id = Column(Integer, ForeignKey("teams.team_id"), nullable = False) # not included in output
     firstname = Column(String)
@@ -88,7 +83,7 @@ class Players(BaseTable):
     # "dribbles": {"attempts":x,"success":y}
     dribbles_attempted = Column(Integer)
     dribbles_won = Column(Integer)
-    dribbles_percent = # CALCULATE dribbles_won/dribbles_attempted
+    dribbles_percent = Column(Integer) # CALCULATE dribbles_won/dribbles_attempted
     # "fouls": {"drawn":x,"committed":y}
     fouls_drawn = Column(Integer)
     fouls_committed = Column(Integer)
@@ -112,52 +107,4 @@ class Players(BaseTable):
     substitutes_in = Column(Integer)
     substitutes_out = Column(Integer)
     games_bench = Column(Integer)
-
-##########################################
-############## TO BE MOVED ###############
-##########################################
-
-def team_from_json(data, foreign_key):
-    """ Function that converts an API response data into a Teams instance.
-    """
-
-    instance = Teams()
-    for key, value in data.items():
-        if hasattr(Teams, key):
-            setattr(instance, key, value)
-        else:
-            print("*TODO* throw error")
-    setattr(instance, "league_id", foreign_key)
-    return instance
-
-def set_player_stats(instance, stats_data):
-    """ Function that converts an API player response data to.
-    """
-
-def player_from_json(data, foreign_key):
-    """ Function that converts an API response data into a Players instance.
-    """
-
-    instance = Players()
-    for key, value in data.items():
-        if key == "height":
-            height_in = float(value[:value.index(" ")]) * 0.393701
-            setattr(instance, key, height_in)
-        elif key == "weight":
-            weight_lb = float(value[:value.index(" ")]) * 2.20462
-            setattr(instance, key, weight_lb)
-        elif key == "rating":
-            setattr(instance, key, float(value))
-        elif key == "captain":
-            setattr(instance, key, bool(value))
-        elif key == "birth_date":
-            setattr(instance, key, datetime.strptime(value, "%Y/%m/%d").date())
-        elif key == "position":
-            setattr(instance, key, value.lower())
-        elif key == "stats":
-            set_player_stats(instance, value)
-        elif hasattr(Players, key):
-            setattr(instance, key, value)
-        else:
-            print("*TODO* Throw error")
 
