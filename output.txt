@@ -611,6 +611,8 @@ LEICESTER CITY
 
 
 
+
+
 WOLVES
 <Players(player_id=92984, firstname=Edward, lastname=Francis, team_id=39,
                    league=Premier League, age=20, position=midfielder, nationality=England, ...)>
@@ -960,23 +962,23 @@ ______________________________________________________________________
 
 
 
-<Teams(team_id=33, league_id=524, name=Manchester United, country=England, ...)>
-<Teams(team_id=34, league_id=524, name=Newcastle, country=England, ...)>
-<Teams(team_id=35, league_id=524, name=Bournemouth, country=England, ...)>
-<Teams(team_id=38, league_id=524, name=Watford, country=England, ...)>
-<Teams(team_id=39, league_id=524, name=Wolves, country=England, ...)>
-<Teams(team_id=40, league_id=524, name=Liverpool, country=England, ...)>
-<Teams(team_id=41, league_id=524, name=Southampton, country=England, ...)>
-<Teams(team_id=42, league_id=524, name=Arsenal, country=England, ...)>
-<Teams(team_id=44, league_id=524, name=Burnley, country=England, ...)>
-<Teams(team_id=45, league_id=524, name=Everton, country=England, ...)>
-<Teams(team_id=46, league_id=524, name=Leicester, country=England, ...)>
-<Teams(team_id=47, league_id=524, name=Tottenham, country=England, ...)>
-<Teams(team_id=48, league_id=524, name=West Ham, country=England, ...)>
-<Teams(team_id=49, league_id=524, name=Chelsea, country=England, ...)>
-<Teams(team_id=50, league_id=524, name=Manchester City, country=England, ...)>
-<Teams(team_id=51, league_id=524, name=Brighton, country=England, ...)>
-<Teams(team_id=52, league_id=524, name=Crystal Palace, country=England, ...)>
-<Teams(team_id=62, league_id=524, name=Sheffield Utd, country=England, ...)>
-<Teams(team_id=66, league_id=524, name=Aston Villa, country=England, ...)>
-<Teams(team_id=71, league_id=524, name=Norwich, country=England, ...)>
+*YES* <Teams(team_id=33, league_id=524, name=Manchester United, country=England, ...)>
+      <Teams(team_id=34, league_id=524, name=Newcastle, country=England, ...)>
+      <Teams(team_id=35, league_id=524, name=Bournemouth, country=England, ...)>
+      <Teams(team_id=38, league_id=524, name=Watford, country=England, ...)>
+*YES* <Teams(team_id=39, league_id=524, name=Wolves, country=England, ...)>
+*YES* <Teams(team_id=40, league_id=524, name=Liverpool, country=England, ...)>
+      <Teams(team_id=41, league_id=524, name=Southampton, country=England, ...)>
+      <Teams(team_id=42, league_id=524, name=Arsenal, country=England, ...)>
+      <Teams(team_id=44, league_id=524, name=Burnley, country=England, ...)>
+*YES* <Teams(team_id=45, league_id=524, name=Everton, country=England, ...)>
+*YES* <Teams(team_id=46, league_id=524, name=Leicester, country=England, ...)>
+*YES* <Teams(team_id=47, league_id=524, name=Tottenham, country=England, ...)>
+*YES* <Teams(team_id=48, league_id=524, name=West Ham, country=England, ...)>
+      <Teams(team_id=49, league_id=524, name=Chelsea, country=England, ...)>
+*YES* <Teams(team_id=50, league_id=524, name=Manchester City, country=England, ...)>
+      <Teams(team_id=51, league_id=524, name=Brighton, country=England, ...)>
+*YES* <Teams(team_id=52, league_id=524, name=Crystal Palace, country=England, ...)>
+*YES* <Teams(team_id=62, league_id=524, name=Sheffield Utd, country=England, ...)>
+*YES* <Teams(team_id=66, league_id=524, name=Aston Villa, country=England, ...)>
+*YES* <Teams(team_id=71, league_id=524, name=Norwich, country=England, ...)>
