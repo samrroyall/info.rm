@@ -194,7 +194,7 @@ class LeaguesRequest(Request):
                 league["season_start"] = datetime.strptime(league.get("season_start"),"%Y-%m-%d").date()
                 league["season_end"] = datetime.strptime(league.get("season_end"),"%Y-%m-%d").date()
                 league["is_current"] = bool(league.get("is_current"))
-                league_ids.append(league.get("league_id"))
+                league_ids.append({"name":league.get("name"),"id":league.get("league_id")})
                 filtered_leagues.append(self.orm_class().from_json(league))
         return {"ids":league_ids,"orm_data":filtered_leagues}
 
@@ -208,7 +208,8 @@ class TeamsRequest(Request):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.league_id = kwargs.get("foreign_key")
+        self.league_id = kwargs.get("foreign_key").get("id")
+        self.league_name = kwargs.get("foreign_key").get("name")
         self.endpoint = f"teams/league/{self.league_id}"
         self.orm_class = Teams
 
@@ -217,7 +218,7 @@ class TeamsRequest(Request):
         for idx in range(len(teams_data)):
             team = teams_data[idx]
             team["league_id"] = self.league_id 
-            team_ids.append(team.get("team_id"))
+            team_ids.append({"league_name":self.league_name,"team_name":team.get("name"),"id":team.get("team_id")})
             teams_data[idx] = self.orm_class().from_json(team)
         return {"ids":team_ids,"orm_data":teams_data}
 
@@ -231,71 +232,105 @@ class PlayersRequest(Request):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.team_id = kwargs.get("foreign_key")
+        self.team_id = kwargs.get("foreign_key").get("id")
+        self.team_name = kwargs.get("foreign_key").get("team_name")
+        self.league_name = kwargs.get("foreign_key").get("league_name")
         self.endpoint = f"players/team/{self.team_id}/{self.current_season_long}"
         self.orm_class = Players
 
     def process_response(self, players_data):
+        orm_instances = []
         for idx in range(len(players_data)):
             player = players_data[idx]
-            player["team_id"] = self.team_id
-            player["weight"] = float(player.get("weight").split(" ")[0]) * 0.393701
-            player["height"] = float(player.get("height").split(" ")[0]) * 2.20462
-            player["rating"] = float(player.get("rating"))
-            player["captain"] = bool(player.get("captain"))
-            player["birth_date"] = datetime.strptime(player.get("birth_date", "%Y/%m/%d").date())
-            player["position"] = player.get("position").lower()
-            stats = player.get("stats")
-            # shots
-            player["shots"] = stats.get("shots").get("total")
-            player["shots_on"] = stats.get("shots").get("on")
-            player["shots_on_pct"] = round(100.0 * player.get("shots_on") / player.get("shots"))
-            # goals
-            player["goals"] = stats.get("goals").get("total")
-            player["goals_conceded"] = stats.get("goals").get("conceded")
-            player["assists"] = stats.get("goals").get("assists")
-            # passes
-            player["passes"] = stats.get("passes").get("total")
-            player["passes_key"] = stats.get("passes").get("key")
-            player["passes_accuracy"] = stats.get("passes").get("accuracy")
-            # tackles
-            player["tackles"] = stats.get("tackles").get("total")
-            player["blocks"] = stats.get("tackles").get("blocks")
-            player["interceptions"] = stats.get("tackles").get("interceptions")
-            # duels
-            player["duels"] = stats.get("duels").get("total")
-            player["duels_won"] = stats.get("duels").get("won")
-            player["duels_won_pct"] = round(100.0 * player.get("duels_won") / player.get("duels"))
-            # dribbles
-            player["dribbles_attempted"] = stats.get("dribbles").get("attempted")
-            player["dribbles_succeeded"] = stats.get("dribbles").get("success")
-            player["dribbles_succeeded_pct"] = round(100.0 * player.get("dribbles_succeeded") / 
-                                                         player.get("dribbles_attempted"))
-            # fouls
-            player["fouls_drawn"] = stats.get("fouls").get("drawn")
-            player["fouls_committed"] = stats.get("fouls").get("committed")
-            # cards
-            player["cards_yellow"] = stats.get("cards").get("yellow")
-            player["cards_red"] = stats.get("cards").get("red")
-            player["cards_second_yellow"] = stats.get("cards").get("yellowred")
-            player["cards_straight_red"] = player.get("cards_red") - player.get("cards_second_yellow") 
-            # pentalties
-            player["penalties_won"] = stats.get("penalty").get("won")
-            player["penalties_committed"] = stats.get("penalty").get("commited") # [sic]
-            player["penalties_saved"] = stats.get("penalty").get("saved")
-            player["penalties_scored"] = stats.get("penalty").get("success")
-            player["penalties_missed"] = stats.get("penalty").get("missed")
-            player["penalties_scored_pct"] = round(100.0 * player.get("penalties_scored") / 
-                                                       (player.get("penalties_scored") + 
-                                                        player.get("penalties_missed")))
-            # games
-            player["games_appearances"] = stats.get("games").get("appearences") # [sic]
-            player["minutes_played"] = stats.get("games").get("appearences") # [sic]
-            player["games_started"] = stats.get("games").get("lineups") # [sic]
-            player["games_bench"] = stats.get("substitutes").get("bench") # [sic]
-            player["substitutions_in"] = stats.get("substitutes").get("in")
-            player["substitutions_out"] = stats.get("substitutes").get("out")
-            players_data[idx] = self.orm_class().from_json(player)
-        return {"ids":[],"orm_data":players_data}
+            if player.get("league") == self.league_name:
+                player["team_id"] = player.get("team_id")
+                player["league"] = player.get("league")
+                if player.get("weight"):
+                    player["weight"] = float(player.get("weight").split(" ")[0]) * 0.393701
+                else:
+                    player["weight"] = None
+                if player.get("height"):
+                    player["height"] = float(player.get("height").split(" ")[0]) * 2.20462
+                else:
+                    player["height"] = None
+                if player.get("rating"):
+                    player["rating"] = float(player.get("rating"))
+                else:
+                    player["rating"] = None
+                if player.get("captain"):
+                    player["captain"] = bool(player.get("captain"))
+                else:
+                    player["captain"] = None
+                if player.get("birth_date"):
+                    player["birth_date"] = datetime.strptime(player.get("birth_date"), "%d/%m/%Y").date()
+                else:
+                    player["birth_date"] = None
+                if player.get("position"):
+                    player["position"] = player.get("position").lower()
+                else:
+                    player["position"] = None
+                # shots
+                player["shots_on"] = player.get("shots").get("on")
+                player["shots"] = player.get("shots").get("total")
+                if player.get("shots") and player.get("shots") > 0:
+                    player["shots_on_pct"] = round(100.0 * player.get("shots_on") / player.get("shots"))
+                else:
+                    player["shots_on_pct"] = None
+                # goals
+                player["goals_conceded"] = player.get("goals").get("conceded")
+                player["assists"] = player.get("goals").get("assists")
+                player["goals"] = player.get("goals").get("total")
+                # passes
+                player["passes_key"] = player.get("passes").get("key")
+                player["passes_accuracy"] = player.get("passes").get("accuracy")
+                player["passes"] = player.get("passes").get("total")
+                # tackles
+                player["blocks"] = player.get("tackles").get("blocks")
+                player["interceptions"] = player.get("tackles").get("interceptions")
+                player["tackles"] = player.get("tackles").get("total")
+                # duels
+                player["duels_won"] = player.get("duels").get("won")
+                player["duels"] = player.get("duels").get("total")
+                if player.get("duels") and player.get("duels") > 0:
+                    player["duels_won_pct"] = round(100.0 * player.get("duels_won") / player.get("duels"))
+                else:
+                    player["duels_won_pct"] = None
+                # dribbles
+                player["dribbles_attempted"] = player.get("dribbles").get("attempted")
+                player["dribbles_succeeded"] = player.get("dribbles").get("success")
+                if player.get("dribbles_attempted") and player.get("dribbles_attempted") > 0:
+                    player["dribbles_succeeded_pct"] = round(100.0 * player.get("dribbles_succeeded") / 
+                                                                player.get("dribbles_attempted"))
+                else:
+                    player["dribbles_succeeded_pct"] = None
+                # fouls
+                player["fouls_drawn"] = player.get("fouls").get("drawn")
+                player["fouls_committed"] = player.get("fouls").get("committed")
+                # cards
+                player["cards_yellow"] = player.get("cards").get("yellow")
+                player["cards_red"] = player.get("cards").get("red")
+                player["cards_second_yellow"] = player.get("cards").get("yellowred")
+                player["cards_straight_red"] = player.get("cards_red") - player.get("cards_second_yellow") 
+                # pentalties
+                player["penalties_won"] = player.get("penalty").get("won")
+                player["penalties_committed"] = player.get("penalty").get("commited") # [sic]
+                player["penalties_saved"] = player.get("penalty").get("saved")
+                player["penalties_scored"] = player.get("penalty").get("success")
+                player["penalties_missed"] = player.get("penalty").get("missed")
+                if player.get("penalties_scored_pct") and player.get("penalties_scored_pct") > 0:
+                    player["penalties_scored_pct"] = round(100.0 * player.get("penalties_scored") / 
+                                                                (player.get("penalties_scored") + 
+                                                                player.get("penalties_missed")))
+                else:
+                    player["penalties_scored_pct"] = None
+                # games
+                player["games_appearances"] = player.get("games").get("appearences") # [sic]
+                player["minutes_played"] = player.get("games").get("appearences") # [sic]
+                player["games_started"] = player.get("games").get("lineups") # [sic]
+                player["games_bench"] = player.get("substitutes").get("bench") # [sic]
+                player["substitutions_in"] = player.get("substitutes").get("in")
+                player["substitutions_out"] = player.get("substitutes").get("out")
+                orm_instances.append(self.orm_class().from_json(player))
+        return {"ids":[],"orm_data":orm_instances}
 
 

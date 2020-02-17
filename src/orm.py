@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import Column
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.types import Integer, String, Date, Boolean, Float
-from sqlalchemy.ext.declarative import declared_attr, declarative_base
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy import Column, Integer, String, Date, Boolean, Float, ForeignKey, create_engine
+from sqlalchemy_utils import create_database, database_exists
 from datetime import datetime
-#from datetime import date
+import pathlib
+
+# ORM Classes
 
 class BaseMixin:
     """ Mixin Class to set common attributes and methodsfor Base class. """
@@ -20,11 +21,13 @@ class BaseMixin:
                 setattr(self, key, value)
         return self
 
+
 Base = declarative_base(cls=BaseMixin)
+
 
 class Leagues(Base):
     """ ORM Class defining attributes corresponding to columns in 'leagues' table. """
-    league_id = Column(Integer, primary_key = True)
+    league_id = Column(Integer, primary_key=True)
     name = Column(String)
     type = Column(String)
     country = Column(String)
@@ -35,10 +38,15 @@ class Leagues(Base):
     flag = Column(String)
     is_current = Column(Boolean)
 
+    def __repr__(self):
+        """ Instance to print class objects """
+        return f"<Leagues(league_id={self.league_id}, name={self.name}, country={self.country}, season={self.season}, ...)>"
+
+
 class Teams(Base):
     """ ORM Class defining attributes corresponding to columns in 'teams' table."""
-    team_id = Column(Integer, primary_key = True)
-    league_id = Column(Integer, ForeignKey("leagues.league_id"), nullable = False)     
+    team_id = Column(Integer, primary_key=True)
+    league_id = Column(Integer, ForeignKey("leagues.league_id"), nullable=False)     
     name = Column(String)
     logo = Column(String)
     founded = Column(Integer)
@@ -47,10 +55,18 @@ class Teams(Base):
     country = Column(String)
     venue_capacity = Column(Integer)
 
+    def __repr__(self):
+        """ Instance to print class objects """
+        return f"<Teams(team_id={self.team_id}, league_id={self.league_id}, name={self.name}, country={self.country}, ...)>"
+
+
 class Players(Base):
-    """ ORM Class defining attributes corresponding to columns in 'players' table."""
-    player_id = Column(Integer, primary_key = True)
-    team_id = Column(Integer, ForeignKey("teams.team_id"), nullable = False) 
+    """ ORM Class defining attributes corresponding to columns in 'players' table. Players are identified
+    through a composite primary key made up by the combination of their player_id and league.
+    """
+    player_id = Column(Integer, primary_key=True)
+    league = Column(String, primary_key=True)
+    team_id = Column(Integer, ForeignKey("teams.team_id"), nullable=False) 
     firstname = Column(String)
     lastname = Column(String)
     position = Column(String) # Attacker, Defender, Midfielder, Goalkeeper
@@ -109,4 +125,19 @@ class Players(Base):
     substitutions_in = Column(Integer)
     substitutions_out = Column(Integer)
     games_bench = Column(Integer)
+
+    def __repr__(self):
+        """ Instance to print class objects """
+        return f"""<Players(player_id={self.player_id}, firstname={self.firstname}, lastname={self.lastname}, team_id={self.team_id}, 
+                   league={self.league}, age={self.age}, position={self.position}, nationality={self.nationality}, ...)>"""
+
+
+def initialize_engine():
+    db_path = pathlib.Path(__file__).parent.parent.absolute()
+    db_url = f"sqlite:///{db_path}/db/info.rm.db"
+    if not database_exists(db_url):
+        create_database(db_url)
+    engine = create_engine(db_url)
+    Base.metadata.create_all(engine)
+    return engine
 
