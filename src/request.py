@@ -4,6 +4,7 @@ from orm import Leagues, Teams, Players
 from requests import get
 from time import sleep
 from datetime import datetime
+from hashlib import md5
 
 
 class Registry(type):
@@ -243,8 +244,7 @@ class PlayersRequest(Request):
         for idx in range(len(players_data)):
             player = players_data[idx]
             if player.get("league") == self.league_name:
-                player["team_id"] = player.get("team_id")
-                player["league"] = player.get("league")
+                player["uid"] = md5((f"{player.get('player_id')}{player.get('team_id')}{player.get('league')}").encode()).hexdigest()
                 if player.get("weight"):
                     player["weight"] = float(player.get("weight").split(" ")[0]) * 0.393701
                 else:

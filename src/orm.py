@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, Integer, String, Date, Boolean, Float, ForeignKey, create_engine
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy_utils import create_database, database_exists
 from datetime import datetime
 import pathlib
@@ -64,8 +64,9 @@ class Players(Base):
     """ ORM Class defining attributes corresponding to columns in 'players' table. Players are identified
     through a composite primary key made up by the combination of their player_id and league.
     """
-    player_id = Column(Integer, primary_key=True)
-    league = Column(String, primary_key=True)
+    uid = Column(String, primary_key=True) # hash of player_id, team_id, league
+    player_id = Column(Integer)
+    league = Column(String)
     team_id = Column(Integer, ForeignKey("teams.team_id"), nullable=False) 
     firstname = Column(String)
     lastname = Column(String)

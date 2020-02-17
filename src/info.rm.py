@@ -66,11 +66,18 @@ def initialize_parser():
     else:
         return args
 
-def initialize_session(engine):
+def store_data(engine, data):
     """ Function for initializing session with DB """
     Session = sessionmaker(bind=engine) 
     session = Session()
-    return session
+    # add ORM instances from api_response to session
+    session.add_all(data)
+    # update database tables with api_response
+    try:
+        session.commit()
+    except IntegrityError as ie:
+        print("INFO: An attmempt to insert an existing row into the database was made.")
+        print(ie)
 
 def read_config():
     """ Function for reading configuration information from config.ini """
@@ -127,22 +134,12 @@ def update_table(action, ids, engine, **kwargs):
             kwargs["foreign_key"] = id
             result = request_type(**kwargs).update()
             response_ids += result.get("ids")
-            orm_instances += result.get("orm_data")
+            store_data(engine, result.get("orm_data"))
     else:
         result = request_type(**kwargs).update()
         response_ids = result.get("ids")
-        orm_instances = result.get("orm_data")
-    # initialize database connection
-    session = initialize_session(engine)
-    # add ORM instances from api_response to session
-    session.add_all(orm_instances)
-    # update database tables with api_response
-    try:
-        session.commit()
-    except IntegrityError as ie:
-        print("INFO: An attmempt to insert an existing row into the database was made.")
-        print(ie)
-    # update config.ini with new IDs
+        store_data(engine, result.get("orm_data"))
+        # update config.ini with new IDs
     key_string = f"{action.split('_')[1][:-1]}_ids"
     set_ids({key_string:response_ids})
     return response_ids
@@ -158,7 +155,8 @@ def update_all(engine, **kwargs):
 def query_db(engine):
     """ Function for querying data from DB """
     # initialize database connection
-    session = initialize_session(engine) 
+    Session = sessionmaker(bind=engine) 
+    session = Session()
     orm_classes = [Leagues, Teams, Players]
     for orm_class in orm_classes:
         for row in session.query(orm_class):
