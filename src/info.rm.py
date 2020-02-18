@@ -157,11 +157,18 @@ def query_db(engine):
     # initialize database connection
     Session = sessionmaker(bind=engine) 
     session = Session()
-    orm_classes = [Leagues, Teams, Players]
-    for orm_class in orm_classes:
-        for row in session.query(orm_class):
-            print(row)
-        print()
+    # print Premier League Top Scorers
+    for fname, lname, goals, minutes_played in session.query(
+                                                   Players.firstname, 
+                                                   Players.lastname, 
+                                                   Players.goals, 
+                                                   Players.minutes_played
+                                               ).filter(
+                                                    Players.minutes_played > 450.0
+                                               ).order_by(
+                                                    Players.goals/(Players.minutes_played/90.0)
+                                               )[::-1][:10]:
+        print(f"{fname} {lname}, {goals/(minutes_played/90.0)} g/90")
 
 
 def setup(kwargs):
