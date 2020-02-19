@@ -59,7 +59,6 @@ class Teams(Base):
         """ Instance to print class objects """
         return f"<Teams(team_id={self.team_id}, league_id={self.league_id}, name={self.name}, country={self.country}, ...)>"
 
-
 class Players(Base):
     """ ORM Class defining attributes corresponding to columns in 'players' table. Players are identified
     through a composite primary key made up by the combination of their player_id and league.

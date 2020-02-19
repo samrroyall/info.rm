@@ -5,6 +5,7 @@ import argparse
 import pathlib
 from request import Request
 from orm import initialize_engine, Leagues, Teams, Players
+from sqlalchemy import and_
 from sqlalchemy.orm import sessionmaker, session
 from sqlalchemy.exc import IntegrityError
 
@@ -25,10 +26,10 @@ def initialize_parser():
         type = str,
         choices = [
             "setup",
-            "update_all",
-            "update_leagues",
-            "update_teams",
-            "update_players",
+            "insert_all",
+            "insert_leagues",
+            "insert_teams",
+            "insert_players",
             "query_db"
         ],
         help = "procedure to be run by info.rm"
@@ -75,9 +76,33 @@ def store_data(engine, data):
     # update database tables with api_response
     try:
         session.commit()
+        session.close()
     except IntegrityError as ie:
         print("INFO: An attmempt to insert an existing row into the database was made.")
-        print(ie)
+        #print(ie)
+
+def id_inserted(engine, action, id):
+    """ Function for ensuring duplicate DB insertions are not made"""
+    Session = sessionmaker(bind=engine) 
+    session = Session()
+    if action == "insert_teams":
+        query_result = session.query(League.league_id).\
+                filter(League.league_id == id.get("id"))
+        if len(query_result) > 0:
+            return True
+    if action == "insert_players":
+        league_id = session.query(Leagues.id).\
+                filter(Leagues.name == id.get("league_name"))[0][0]
+        query_result = session.query(Teams.team_id, Teams.league.id).\
+                filter(
+                        and_( 
+                            Teams.team_id == id.get("id"), 
+                            Teams.league_id == league_id
+                        )
+                )
+        if len(query_result) > 0:
+            return True
+    return False
 
 def read_config():
     """ Function for reading configuration information from config.ini """
@@ -120,7 +145,7 @@ def set_ids(id_dict):
 #### ACTION FUNCTIONS ####
 ##########################
 
-def update_table(action, ids, engine, **kwargs):
+def insert_table(action, ids, engine, **kwargs):
     """ Function for updating specific table data from API and storing in DB """
     request_type_string = "{}Request".format(action.split("_")[1].capitalize())
     request_type = Request.get_registry().get(request_type_string)
@@ -131,6 +156,8 @@ def update_table(action, ids, engine, **kwargs):
         sys.exit(1)
     if ids:
         for id in ids:
+            if id_inserted(action, id):
+                continue
             kwargs["foreign_key"] = id
             result = request_type(**kwargs).update()
             response_ids += result.get("ids")
@@ -140,15 +167,16 @@ def update_table(action, ids, engine, **kwargs):
         response_ids = result.get("ids")
         store_data(engine, result.get("orm_data"))
         # update config.ini with new IDs
-    key_string = f"{action.split('_')[1][:-1]}_ids"
-    set_ids({key_string:response_ids})
+    if len(response_ids) > 0:
+        key_string = f"{action.split('_')[1][:-1]}_ids"
+        set_ids({key_string:response_ids})
     return response_ids
 
-def update_all(engine, **kwargs):
+def insert_all(engine, **kwargs):
     """ Function for updating all data from API and storing in DB """
-    league_ids = update_table("update_leagues", None, engine, **kwargs)
-    team_ids = update_table("update_teams", league_ids, engine, **kwargs)
-    update_table("update_players", team_ids, engine, **kwargs)
+    league_ids = insert_table("update_leagues", None, engine, **kwargs)
+    team_ids = insert_table("update_teams", league_ids, engine, **kwargs)
+    insert_table("update_players", team_ids, engine, **kwargs)
     set_ids({"league_ids":league_ids,"team_ids":team_id})
     return
 
@@ -157,18 +185,22 @@ def query_db(engine):
     # initialize database connection
     Session = sessionmaker(bind=engine) 
     session = Session()
-    # print Premier League Top Scorers
-    for fname, lname, goals, minutes_played in session.query(
-                                                   Players.firstname, 
-                                                   Players.lastname, 
-                                                   Players.goals, 
-                                                   Players.minutes_played
-                                               ).filter(
-                                                    Players.minutes_played > 450.0
-                                               ).order_by(
-                                                    Players.goals/(Players.minutes_played/90.0)
-                                               )[::-1][:10]:
-        print(f"{fname} {lname}, {goals/(minutes_played/90.0)} g/90")
+    # print Premier League Top 25 Scorers by goals/minute
+    query_result = session.query( 
+            Players.firstname,
+            Players.lastname, 
+            Players.goals, 
+            Players.minutes_played 
+        ).filter( 
+            Players.minutes_played > 900.0 
+        ).order_by( 
+            Players.goals/(Players.minutes_played/90.0
+        ))[::-1][:25]
+
+    print("NAME\t\t\t\t\tG/90\tGOALS\tMINUTES PLAYED")
+    for fname, lname, goals, minutes_played in query_result:
+        print(f"{(fname + ' ' + lname).ljust(35,' ')}\t{round(goals/(minutes_played/90.0), 2)}\t{goals}\t{minutes_played}")
+    session.close()
 
 
 def setup(kwargs):
@@ -188,10 +220,10 @@ def main(**kwargs):
     """ info.rm.py's main function.
         action :: desired procedure
             setup
-            update_all
-            update_leagues
-            update_teams
-            update_players
+            insert_all
+            insert_leagues
+            insert_teams
+            insert_players
     """
     action = kwargs.get("action")
     del kwargs["action"]
@@ -202,11 +234,11 @@ def main(**kwargs):
         config_args = read_config()
         if action == "query_db":
             query_db(engine)
-        elif action == "update_all":
-            update_all(engine, **config_args)
-        else:
+        elif action == "insert_all":
+            insert_all(engine, **config_args)
+        elif action.startswith("insert"):
             ids = get_ids(action, config_args)
-            update_table(action, ids, engine, **config_args)
+            insert_table(action, ids, engine, **config_args)
 
 if __name__ == "__main__":
     args = vars(initialize_parser())
