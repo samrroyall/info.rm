@@ -5,12 +5,12 @@ import argparse
 import pathlib
 from request import Request
 from orm import initialize_engine, Leagues, Teams, Players
-from sqlalchemy import and_
+from sqlalchemy import and_, update
 from sqlalchemy.orm import sessionmaker, session
 from sqlalchemy.exc import IntegrityError
 
 ##########################
-#### HELPER FUNCTIONS ####
+#### PARSER FUNCTIONS ####
 ##########################
 
 def initialize_parser():
@@ -30,6 +30,7 @@ def initialize_parser():
             "insert_leagues",
             "insert_teams",
             "insert_players",
+            "update_players",
             "query_db"
         ],
         help = "procedure to be run by info.rm"
@@ -67,8 +68,22 @@ def initialize_parser():
     else:
         return args
 
+#############################
+#### DB HELPER FUNCTIONS ####
+#############################
+
+def update_data(engine, data):
+    """ Function for initializing session with DB and updating existing Players rows"""
+    Session = sessionmaker(bind=engine) 
+    session = Session()
+    # update DB rows
+    for player in data:
+        session.query(Players).filter(Players.uid == player.get("uid")).update(player)
+        session.commit()
+    session.close()
+
 def store_data(engine, data):
-    """ Function for initializing session with DB """
+    """ Function for initializing session with DB and inserting new rows"""
     Session = sessionmaker(bind=engine) 
     session = Session()
     # add ORM instances from api_response to session
@@ -81,28 +96,40 @@ def store_data(engine, data):
         print("INFO: An attmempt to insert an existing row into the database was made.")
         #print(ie)
 
-def id_inserted(engine, action, id):
+def previously_inserted(engine, action, id):
     """ Function for ensuring duplicate DB insertions are not made"""
     Session = sessionmaker(bind=engine) 
     session = Session()
-    if action == "insert_teams":
-        query_result = session.query(League.league_id).\
-                filter(League.league_id == id.get("id"))
-        if len(query_result) > 0:
-            return True
-    if action == "insert_players":
-        league_id = session.query(Leagues.id).\
-                filter(Leagues.name == id.get("league_name"))[0][0]
-        query_result = session.query(Teams.team_id, Teams.league.id).\
-                filter(
-                        and_( 
-                            Teams.team_id == id.get("id"), 
-                            Teams.league_id == league_id
-                        )
-                )
-        if len(query_result) > 0:
-            return True
-    return False
+    query_result = None
+    sub_action = action.split("_")[1]
+    if sub_action == "teams":
+        # check if table in DB
+        if engine.has_table("Leagues"):
+            query_result = session.query(Leagues.league_id).\
+                    filter(Leagues.league_id == id.get("id"))
+    elif sub_action == "players":
+        # check if tables in DB
+        if engine.has_table("Leagues") and engine.has_table("Teams"):
+            league_id = session.query(Leagues.league_id).\
+                    filter(Leagues.name == id.get("league_name"))[0][0]
+            query_result = session.query(Teams.team_id, Teams.league_id).\
+                    filter(
+                            and_( 
+                                Teams.team_id == id.get("id"), 
+                                Teams.league_id == league_id
+                            )
+                    )
+    if query_result and len(list(query_result)) > 0:
+        return True
+    elif query_result:
+        return False
+    else:
+        print("ERROR: An error occurred in previously_inserted.")
+        sys.exit(1)
+
+##########################
+#### CONFIG FUNCTIONS ####
+##########################
 
 def read_config():
     """ Function for reading configuration information from config.ini """
@@ -123,9 +150,10 @@ def write_config(kwargs):
 
 def get_ids(action, config_args):
     """ Function for reading IDs from config.ini """
-    if action == "update_teams":
+    sub_action = action.split("_")[1]
+    if sub_action == "teams":
         key_string = "league_ids"
-    elif action == "update_players":
+    elif sub_action == "players":
         key_string = "team_ids"
     else:
         key_string = None
@@ -145,27 +173,37 @@ def set_ids(id_dict):
 #### ACTION FUNCTIONS ####
 ##########################
 
-def insert_table(action, ids, engine, **kwargs):
+def update_table(action, ids, engine, **kwargs):
     """ Function for updating specific table data from API and storing in DB """
     request_type_string = "{}Request".format(action.split("_")[1].capitalize())
     request_type = Request.get_registry().get(request_type_string)
     orm_instances = []
     response_ids = []
-    if action != "update_leagues" and not ids:
+    if action != "insert_leagues" and not ids:
         print(f"ERROR: Required IDs not present for {action} procedure. Ensure that the setup and higher-level procedures have been run.")
         sys.exit(1)
     if ids:
+        sub_action = action.split("_")[0]
         for id in ids:
-            if id_inserted(action, id):
-                continue
             kwargs["foreign_key"] = id
-            result = request_type(**kwargs).update()
-            response_ids += result.get("ids")
-            store_data(engine, result.get("orm_data"))
+            if sub_action == "insert":
+                # ensure data has not been previously inserted into database
+                if previously_inserted(engine, action, id):
+                    print("ERROR: Attempt to insert data already present in DB stopped.")
+                    continue
+                result = request_type(**kwargs).update("insert")
+                response_ids += result.get("ids")
+                store_data(engine, result.get("processed_data"))
+            elif sub_action == "update":
+                if not previously_inserted(engine, action, id):
+                    print("ERROR: Attempt to update data not present in DB stopped.")
+                    continue
+                result = request_type(**kwargs).update("update")
+                update_data(engine, result.get("processed_data"))
     else:
-        result = request_type(**kwargs).update()
+        result = request_type(**kwargs).update("insert")
         response_ids = result.get("ids")
-        store_data(engine, result.get("orm_data"))
+        store_data(engine, result.get("processed_data"))
         # update config.ini with new IDs
     if len(response_ids) > 0:
         key_string = f"{action.split('_')[1][:-1]}_ids"
@@ -174,9 +212,9 @@ def insert_table(action, ids, engine, **kwargs):
 
 def insert_all(engine, **kwargs):
     """ Function for updating all data from API and storing in DB """
-    league_ids = insert_table("update_leagues", None, engine, **kwargs)
-    team_ids = insert_table("update_teams", league_ids, engine, **kwargs)
-    insert_table("update_players", team_ids, engine, **kwargs)
+    league_ids = update_table("insert_leagues", None, engine, **kwargs)
+    team_ids = update_table("insert_teams", league_ids, engine, **kwargs)
+    update_table("insert_players", team_ids, engine, **kwargs)
     set_ids({"league_ids":league_ids,"team_ids":team_id})
     return
 
@@ -224,6 +262,7 @@ def main(**kwargs):
             insert_leagues
             insert_teams
             insert_players
+            update_players
     """
     action = kwargs.get("action")
     del kwargs["action"]
@@ -236,9 +275,10 @@ def main(**kwargs):
             query_db(engine)
         elif action == "insert_all":
             insert_all(engine, **config_args)
-        elif action.startswith("insert"):
+        # handle update_players, and insert_*
+        else:
             ids = get_ids(action, config_args)
-            insert_table(action, ids, engine, **config_args)
+            update_table(action, ids, engine, **config_args)
 
 if __name__ == "__main__":
     args = vars(initialize_parser())

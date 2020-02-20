@@ -160,7 +160,7 @@ class Request(metaclass=Registry):
             print(f"\tDescription: {api_response.json().get('message')}")
         return api_response.json()
 
-    def process_response(self, response_data):
+    def process_response(self, response_data, type):
         """ Method to process the response of an API call, altering fields and adding foreign key if 
         needed. Implement in child classes.
             Arguments:
@@ -168,11 +168,11 @@ class Request(metaclass=Registry):
         """
         pass
 
-    def update(self):
+    def update(self, action_type):
         """ Method to gather, process, and store API data. """
         api_response = self.make_call()
         response_data = api_response.get("api").get(self.orm_class.__name__.lower())
-        return self.process_response(response_data) 
+        return self.process_response(response_data, action_type) 
 
 
 class LeaguesRequest(Request):
@@ -186,7 +186,7 @@ class LeaguesRequest(Request):
         self.endpoint = f"leagues/season/{self.current_season_short}"
         self.orm_class = Leagues
 
-    def process_response(self, leagues_data):
+    def process_response(self, leagues_data, action_type):
         cls = self.__class__
         filtered_leagues = []
         league_ids = []
@@ -196,8 +196,11 @@ class LeaguesRequest(Request):
                 league["season_end"] = datetime.strptime(league.get("season_end"),"%Y-%m-%d").date()
                 league["is_current"] = bool(league.get("is_current"))
                 league_ids.append({"name":league.get("name"),"id":league.get("league_id")})
-                filtered_leagues.append(self.orm_class().from_json(league))
-        return {"ids":league_ids,"orm_data":filtered_leagues}
+                if type == "update":
+                    filtered_leagues.append(league)
+                elif type == "insert":
+                    filtered_leagues.append(self.orm_class().from_json(league))
+        return {"ids":league_ids,"processed_data":filtered_leagues}
 
 
 class TeamsRequest(Request):
@@ -214,14 +217,15 @@ class TeamsRequest(Request):
         self.endpoint = f"teams/league/{self.league_id}"
         self.orm_class = Teams
 
-    def process_response(self, teams_data):
+    def process_response(self, teams_data, action_type):
         team_ids = []
         for idx in range(len(teams_data)):
             team = teams_data[idx]
             team["league_id"] = self.league_id 
             team_ids.append({"league_name":self.league_name,"team_name":team.get("name"),"id":team.get("team_id")})
-            teams_data[idx] = self.orm_class().from_json(team)
-        return {"ids":team_ids,"orm_data":teams_data}
+            if action_type == "insert":
+                teams_data[idx] = self.orm_class().from_json(team)
+        return {"ids":team_ids,"processed_data":teams_data}
 
 
 class PlayersRequest(Request):
@@ -240,6 +244,17 @@ class PlayersRequest(Request):
         self.orm_class = Players
 
     def process_player(self, player):
+        attributes = { 
+            "uid", "player_id", "league", "team_id", "firstname", "lastname", "position", "age", "birth_date", 
+            "nationality", "height", "weight", "rating", "captain", "shots", "shots_on", "shots_on_pct", 
+            "goals", "goals_conceded", "assists", "passes", "passes_key", "passes_accuracy", "tackles", 
+            "blocks", "interceptions", "duels", "duels_won", "duels_won_pct", "dribbles_attempted", 
+            "dribbles_succeeded", "dribbles_succeeded_pct", "fouls_drawn", "fouls_committed", 
+            "cards_red", "cards_second_yellow", "cards_straight_red", "penalties_won", 
+            "penalties_committed", "penalties_success", "penalties_missed", "pentlties_scored_pct", 
+            "penalties_saved", "minutes_played", "games_started", "substitutions_out", "games_bench"
+        }
+
         # process player data
         if player.get("weight"):
              player["weight"] = float(player.get("weight").split(" ")[0]) * 0.393701
@@ -326,26 +341,33 @@ class PlayersRequest(Request):
         player["games_bench"] = player.get("substitutes").get("bench") # [sic]
         player["substitutions_in"] = player.get("substitutes").get("in")
         player["substitutions_out"] = player.get("substitutes").get("out")
-        return player
 
-    def process_response(self, players_data):
-        orm_instances = {}
+        new_player = {}
+        for k, v in player.items():
+            if hasattr(self.orm_class, k):
+                new_player[k] = v
+        return new_player
+
+    def process_response(self, players_data, action_type):
+        filtered_players = {}
         for player in players_data:
             if player.get("league") == self.league_name:
                 player["uid"] = md5((f"{player.get('player_id')}{player.get('team_id')}{player.get('league')}").encode()).hexdigest()
                 # check for duplicates
-                if player.get("uid") in orm_instances.keys():
+                if player.get("uid") in filtered_players.keys():
                     # check which instance is most recent
                     if player.get("games").get("minutes_played") and (player.get("games").get("minutes_played") 
-                                                                        > orm_instances[player.get("uid")].get("minutes_played")):
+                                                                        > filtered_players[player.get("uid")].get("minutes_played")):
                         player = self.process_player(player)
                     else:
                         continue
                 else:
                     player = self.process_player(player)
-                orm_instances[player.get("uid")] = player
-                
-
-        return {"ids":[],"orm_data":[self.orm_class().from_json(instance) for instance in orm_instances.values()]}
+                filtered_players[player.get("uid")] = player
+        if action_type == "insert":
+            filtered_players = [self.orm_class().from_json(instance) for instance in filtered_players.values()]
+        elif action_type == "update":
+            filtered_players = filtered_players.values()
+        return {"ids":[],"processed_data":filtered_players}
 
 
