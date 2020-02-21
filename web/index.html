@@ -14,70 +14,403 @@
   </head>
   <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand mb-0 h1" href="index.html">info.rm</a>
-      <!-- Search Bar -->
-      <form class="form-inline">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-      </form>
-    </nav>
-    <!-- Wrapper Container -->
-    <div class="container-fluid">
-      <div class="row">
-        <p>
-          <h1>ROW 1</h1>
-        </p>
-      </div>
-      <div class="row">
-        <!-- Table Container -->
-        <div class="col-xs-10 col-sm-10 col-md-10">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="row">Column 1</th>
-                <th scope="row">Column 2</th>
-                <th scope="row">Column 3</th>
-                <th scope="row">Column 4</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Cell</td>
-                <td>Cell</td>
-                <td>Cell</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Cell</td>
-                <td>Cell</td>
-                <td>Cell</td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Cell</td>
-                <td>Cell</td>
-                <td>Cell</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- Filter Container -->
-        <div class="col-xs-2 col-sm-2 col-md-2">
-          <p>
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#filtermenu" aria-expanded="false" aria-controls="filtermenu">
-              Filter
-            </button>
-          </p>
-          <div class="collapse" id="filtermenu">
-            <ul class="list-group">
-              <li class="list-group-item">Goals</li>
-              <li class="list-group-item">Assists</li>
-              <li class="list-group-item">Tackles</li>
-            </ul>
+    <div class="border shadow p-3 mb-5 bg-white" style="width:75%; margin-left:auto; margin-right:auto">
+      <nav class="navbar navbar-fixed-top navbar-light bg-light" style="position:fixed; top:0; left:12.6%; width:74.8%; margin-left:auto; margin-right:auto">
+        <!-- Logo -->
+        <a class="navbar-brand mb-0 h1" href="index.html">info.rm</a>
+        <!-- Search Bar -->
+        <form class="form-inline">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </nav>
+      <!-- Wrapper Container -->
+      <div class="container-fluid" style="padding-top: 7%">
+        <div style="padding-bottom: 3%">
+          <h4 class="display-6">Attacking Statistics</h4>
+          <hr class="my-4">
+          <div class="row">
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Goals</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/46.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Jamie Vardy</strong>
+                      </div>
+                      <div class="row">
+                        Leicester
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>17</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/50.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Sergio Leonel Agüero del Castillo</strong>
+                      </div>
+                      <div class="row">
+                        Manchester City
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>16</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/41.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Daniel William John Ings</strong>
+                      </div>
+                      <div class="row">
+                        Southampton
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>15</strong>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Assists</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/50.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Kevin De Bruyne</strong>
+                      </div>
+                      <div class="row">
+                        Manchester City
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>16</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/40.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Trent Alexander-Arnold</strong>
+                      </div>
+                      <div class="row">
+                        Liverpool
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>10</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/47.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Heung-Min Son</strong>
+                      </div>
+                      <div class="row">
+                        Tottenham
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>7</strong>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Shots on Target</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/40.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Mohamed Salah Ghaly</strong>
+                      </div>
+                      <div class="row">
+                        Liverpool
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>38</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/50.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Marcus Rashford</strong>
+                      </div>
+                      <div class="row">
+                        Manchester United
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>34</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/40.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Roberto Firmino Barbosa de Oliveira</strong>
+                      </div>
+                      <div class="row">
+                        Liverpool
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>33</strong>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
+        </div>
+        <div style="padding-bottom: 3%">
+          <h4 class="display-6">Creation Statistics</h4>
+          <hr class="my-4">
+          <div class="row">
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Goals</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/46.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Jamie Vardy</strong>
+                      </div>
+                      <div class="row">
+                        Leicester
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>17</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/50.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Sergio Leonel Agüero del Castillo</strong>
+                      </div>
+                      <div class="row">
+                        Manchester City
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>16</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/41.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Daniel William John Ings</strong>
+                      </div>
+                      <div class="row">
+                        Southampton
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>15</strong>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Assists</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/50.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Kevin De Bruyne</strong>
+                      </div>
+                      <div class="row">
+                        Manchester City
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>16</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/40.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Trent Alexander-Arnold</strong>
+                      </div>
+                      <div class="row">
+                        Liverpool
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>10</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/47.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Heung-Min Son</strong>
+                      </div>
+                      <div class="row">
+                        Tottenham
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>7</strong>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Shots on Target</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/40.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Mohamed Salah Ghaly</strong>
+                      </div>
+                      <div class="row">
+                        Liverpool
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>38</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/50.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Marcus Rashford</strong>
+                      </div>
+                      <div class="row">
+                        Manchester United
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>34</strong>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-3 text-left float-left">
+                      <img src="https://media.api-football.com/teams/40.png" height="30px"/>
+                    </div>
+                    <div class="col-6 text-left float-center">
+                      <div class="row">
+                        <strong>Roberto Firmino Barbosa de Oliveira</strong>
+                      </div>
+                      <div class="row">
+                        Liverpool
+                      </div>
+                    </div>
+                    <div class="col-3 text-right float-right">
+                      <strong>33</strong>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h4 class="display-6">Defending Statistics</h4>
+          <hr class="my-4">
+        </div>
+        <div>
+          <h4 class="display-6">Goalkeeper Statistics</h4>
+          <hr class="my-4">
         </div>
       </div>
     </div>
