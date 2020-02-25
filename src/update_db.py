@@ -17,7 +17,6 @@ from config import read_config, get_ids
 def main(**kwargs):
     """ info.rm.py's main function.
         action :: desired procedure
-            setup
             insert_all
             insert_leagues
             insert_teams
@@ -31,9 +30,7 @@ def main(**kwargs):
     else:
         engine = initialize_engine()
         config_args = read_config()
-        if action == "query_db":
-            query_db(engine)
-        elif action == "insert_all":
+        if action == "insert_all":
             insert_all(engine, **config_args)
         # handle update_players, and insert_*
         else:

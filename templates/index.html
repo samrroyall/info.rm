@@ -17,7 +17,7 @@
     <div class="border shadow p-3 mb-5 bg-white" style="position:relative; width:75%; margin-left:auto; margin-right:auto; min-width: 1000px; padding-top: 130px">
       <nav class="navbar navbar-fixed-top navbar-light bg-light border" style="position:absolute; top:0; left:0; width:100%; margin-left:auto; margin-right:auto">
         <!-- Logo -->
-        <a class="navbar-brand mb-0 h1" href="index.html">info.rm</a>
+        <a class="navbar-brand mb-0 h1" href="{{ url_for('all_leagues') }}">info.rm</a>
         <!-- Search Bar -->
         <form class="form-inline">
           <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -26,27 +26,27 @@
       </nav>
       <nav class="navbar navbar-light bg-light border" style="position: absolute; top:55px; left:0; width:100%; margin-left:auto; margin-right:auto">
         <!-- All Leagues -->
-        <a class="nav-link" href="index.html">
+        <a class="nav-link" href="{{ url_for('all_leagues') }}">
           All
         </a>
         <!-- Bundesliga -->
-        <a class="nav-link" href="premier-league.html">
+        <a class="nav-link" href="{{ url_for('bundesliga') }}">
           <img src="https://media.api-football.com/leagues/8.png" height="40px">
         </a>
         <!-- Ligue 1 -->
-        <a class="nav-link" href="ligue-1.html">
+        <a class="nav-link" href="{{ url_for('ligue_1') }}">
           <img src="https://media.api-football.com/leagues/4.svg" height="40px">
         </a>
         <!-- Premier League -->
-        <a class="nav-link" href="premier-league.html">
+        <a class="nav-link" href="{{ url_for('premier_league') }}">
           <img src="https://media.api-football.com/leagues/2.png" height="40px">
         </a>
         <!-- All Leagues -->
-        <a class="nav-link" href="primera-division.html">
+        <a class="nav-link" href="{{ url_for('la_liga') }}">
           <img src="https://media.api-football.com/leagues/87.png" height="40px">
         </a>
         <!-- Serie A -->
-        <a class="nav-link" href="serie-a.html">
+        <a class="nav-link" href="{{ url_for('serie_a') }}">
           <img src="https://media.api-football.com/leagues/94.png" height="40px">
         </a>
       </nav>
@@ -118,7 +118,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -186,7 +187,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -254,7 +256,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -328,7 +331,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -396,7 +400,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -464,7 +469,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -538,7 +544,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -606,7 +613,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -674,7 +682,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -748,7 +757,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
@@ -816,7 +826,8 @@
                 <li class="list-group-item">
                   <div class="row h-100">
                     <div class="col-12 text-center">
-                      <img src="icons/arrow-left-circle.svg" height="25px">&nbsp&nbsp<img src="icons/arrow-right-circle.svg" height="25px">
+                      <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
+                      <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
                     </div>
                   </div>
                 </li>
