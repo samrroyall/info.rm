@@ -74,58 +74,67 @@ def initialize_parser():
 
 def update_data(engine, data):
     """ Function for initializing session with DB and updating existing Players rows"""
+    # initialize DB session
     Session = sessionmaker(bind=engine) 
     session = Session()
-    # update DB rows
+    # update database tables with api response data
     for player in data:
-        session.query(Players).filter(Players.uid == player.get("uid")).update(player)
-        session.commit()
+        try:
+            session.query(Players).filter(Players.uid == player.get("uid")).update(player)
+            session.commit()
+        except:
+            print("ERROR: A problem occurred while updating Players table.")
     session.close()
 
 def store_data(engine, data):
     """ Function for initializing session with DB and inserting new rows"""
-    Session = sessionmaker(bind=engine) 
-    session = Session()
-    # add ORM instances from api_response to session
-    session.add_all(data)
-    # update database tables with api_response
-    try:
-        session.commit()
-        session.close()
-    except IntegrityError as ie:
-        print("INFO: An attmempt to insert an existing row into the database was made.")
-        #print(ie)
+    for instance in data:
+        # initialize DB session
+        Session = sessionmaker(bind=engine) 
+        session = Session()
+        # add ORM instances from api_response to session
+        session.add(instance)
+        # insert api response data into database tables
+        try:
+            session.commit()
+            session.close()
+        except IntegrityError as ie:
+            print("INFO: An attmempt to insert an existing row into the database was made.")
+            #print(ie)
 
 def previously_inserted(engine, action, id):
     """ Function for ensuring duplicate DB insertions are not made"""
+    # initialize DB session
     Session = sessionmaker(bind=engine) 
     session = Session()
-    query_result = None
+    query_result = False
+    # handle updates to/inserts into tables for team and player data differently
     sub_action = action.split("_")[1]
     if sub_action == "teams":
-        # check if table in DB
-        if engine.has_table("Leagues"):
-            query_result = session.query(Leagues.league_id).\
-                    filter(Leagues.league_id == id.get("id"))
+        # check if tables in DB
+        if engine.has_table("Teams"):
+            query_result = session.query(Teams.league_id).\
+                    filter( Teams.league_id == id.get("id") )
     elif sub_action == "players":
         # check if tables in DB
         if engine.has_table("Leagues") and engine.has_table("Teams"):
-            league_id = session.query(Leagues.league_id).\
-                    filter(Leagues.name == id.get("league_name"))[0][0]
-            query_result = session.query(Teams.team_id, Teams.league_id).\
-                    filter(
+            # grab league_id matching player league_name
+            league_id_query = session.query(Leagues.league_id).\
+                    filter(Leagues.name == id.get("league_name"))
+            if len(list(league_id_query)) > 0:
+                league_id = league_id_query[0][0] # query responses like [(data, ), (data, )]
+                # check if team_id and league_id exist in DB matching player team_id and league_id
+                query_result = session.query(Teams.team_id, Teams.league_id).\
+                        filter(
                             and_( 
                                 Teams.team_id == id.get("id"), 
                                 Teams.league_id == league_id
                             )
                     )
     if query_result and len(list(query_result)) > 0:
-        return True
-    elif query_result:
-        return False
+        return True # matching DB rows were found
     else:
-        print("ERROR: An error occurred in previously_inserted.")
-        sys.exit(1)
+        return False # matching DB rows were not found
 
 ##########################
 #### CONFIG FUNCTIONS ####
@@ -150,6 +159,7 @@ def write_config(kwargs):
 
 def get_ids(action, config_args):
     """ Function for reading IDs from config.ini """
+    # handle team and player insert/update operations differently
     sub_action = action.split("_")[1]
     if sub_action == "teams":
         key_string = "league_ids"
@@ -175,36 +185,37 @@ def set_ids(id_dict):
 
 def update_table(action, ids, engine, **kwargs):
     """ Function for updating specific table data from API and storing in DB """
-    request_type_string = "{}Request".format(action.split("_")[1].capitalize())
-    request_type = Request.get_registry().get(request_type_string)
-    orm_instances = []
-    response_ids = []
-    if action != "insert_leagues" and not ids:
-        print(f"ERROR: Required IDs not present for {action} procedure. Ensure that the setup and higher-level procedures have been run.")
-        sys.exit(1)
-    if ids:
-        sub_action = action.split("_")[0]
+    sub_action = action.split("_")[1] 
+    action_type = action.split("_")[0]
+    request_type = Request.get_registry().get(f"{sub_action.capitalize()}Request") # grab correct request class from Request registry
+    response_ids = [] 
+    # league requests do not require ids from prior calls
+    if sub_action == "leagues":
+        result = request_type(**kwargs).update("insert")
+        response_ids = result.get("ids")
+        store_data(engine, result.get("processed_data"))
+    else:
+        if not ids:
+            print(f"ERROR: Required IDs not present for {action} procedure. Ensure that the setup and higher-level procedures have been run.")
+            sys.exit(1)
         for id in ids:
-            kwargs["foreign_key"] = id
-            if sub_action == "insert":
+            kwargs["foreign_key"] = id # points current Request class to previous Request class
+            if action_type == "insert":
                 # ensure data has not been previously inserted into database
                 if previously_inserted(engine, action, id):
                     print("ERROR: Attempt to insert data already present in DB stopped.")
                     continue
                 result = request_type(**kwargs).update("insert")
-                response_ids += result.get("ids")
+                response_ids += result.get("ids") 
                 store_data(engine, result.get("processed_data"))
-            elif sub_action == "update":
+            elif action_type == "update":
+                # ensure data has been previously inserted into database
                 if not previously_inserted(engine, action, id):
                     print("ERROR: Attempt to update data not present in DB stopped.")
                     continue
                 result = request_type(**kwargs).update("update")
                 update_data(engine, result.get("processed_data"))
-    else:
-        result = request_type(**kwargs).update("insert")
-        response_ids = result.get("ids")
-        store_data(engine, result.get("processed_data"))
-        # update config.ini with new IDs
+    # update config.ini with new IDs
     if len(response_ids) > 0:
         key_string = f"{action.split('_')[1][:-1]}_ids"
         set_ids({key_string:response_ids})
@@ -223,21 +234,38 @@ def query_db(engine):
     # initialize database connection
     Session = sessionmaker(bind=engine) 
     session = Session()
+    league_query = session.query(Leagues)
+    for row in league_query:
+        print(row)
+    print()
+
+    team_query = session.query(Teams)
+    for row in team_query:
+        print(row)
+    print()
+
     # print Premier League Top 25 Scorers by goals/minute
     query_result = session.query( 
             Players.firstname,
             Players.lastname, 
-            Players.goals, 
-            Players.minutes_played 
-        ).filter( 
-            Players.minutes_played > 900.0 
-        ).order_by( 
-            Players.goals/(Players.minutes_played/90.0
-        ))[::-1][:25]
+            Players.team_id,
+            Players.penalties_saved
+        ).\
+        order_by( 
+            Players.penalties_saved,
+            Players.lastname
+        )[::-1][:10]
 
-    print("NAME\t\t\t\t\tG/90\tGOALS\tMINUTES PLAYED")
-    for fname, lname, goals, minutes_played in query_result:
-        print(f"{(fname + ' ' + lname).ljust(35,' ')}\t{round(goals/(minutes_played/90.0), 2)}\t{goals}\t{minutes_played}")
+    for f, l, t, s in query_result:
+        tn = session.query(
+                Teams.name
+            ).filter(
+                Teams.team_id == t
+            )[0][0]
+        print(f"{f+' '+l}\t{tn}({t})\t{s}")
+
+    print()
+
     session.close()
 
 

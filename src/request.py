@@ -40,14 +40,13 @@ class Request(metaclass=Registry):
     _REGISTER             = False
     _API_URL              = "https://api-football-v1.p.rapidapi.com/v2/"
     _HEADERS              = {"x-rapidapi-host":"api-football-v1.p.rapidapi.com"}
-    _CURRENT_LEAGUES      = {"Premier League,England"}
-    #_CURRENT_LEAGUES = {
-    #     "Premier League,England",
-    #     "Ligue 1,France",
-    #     "Serie A,Italy",
-    #     "Primera Division,Spain",
-    #     "Bundesliga 1,Germany"
-    #}
+    _CURRENT_LEAGUES = {
+         "Premier League,England",
+         "Ligue 1,France",
+         "Serie A,Italy",
+         "Primera Division,Spain",
+         "Bundesliga 1,Germany"
+    }
 
     # RATELIMIT VARIABLES
     _RATELIMIT_DAY              = None
@@ -196,9 +195,9 @@ class LeaguesRequest(Request):
                 league["season_end"] = datetime.strptime(league.get("season_end"),"%Y-%m-%d").date()
                 league["is_current"] = bool(league.get("is_current"))
                 league_ids.append({"name":league.get("name"),"id":league.get("league_id")})
-                if type == "update":
+                if action_type == "update":
                     filtered_leagues.append(league)
-                elif type == "insert":
+                elif action_type == "insert":
                     filtered_leagues.append(self.orm_class().from_json(league))
         return {"ids":league_ids,"processed_data":filtered_leagues}
 
