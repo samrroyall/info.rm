@@ -31,9 +31,6 @@ class Request(metaclass=Registry):
             _RATELIMIT_DAY              :: Total number of requests allowed per day
             _RATELIMIT_DAY_REMAINING    :: Total number of requests remaining for the current day
             _RATELIMIT_DAY_RESET        :: Time for daily ratelimit reset
-            _RATELIMIT_MINUTE           :: Total number of requests allowed per minute
-            _RATELIMIT_MINUTE_REMAINING :: Total number of requests remaining for the current minute
-            _RATELIMIT_MINUTE_RESET     :: Time for per-minute ratelimit reset
     """
 
     # CLASS VARIABLES - change some of these to CLI arguments
@@ -52,9 +49,6 @@ class Request(metaclass=Registry):
     _RATELIMIT_DAY              = None
     _RATELIMIT_DAY_REMAINING    = None
     _RATELIMIT_DAY_RESET        = None
-    _RATELIMIT_MINUTE           = 30
-    _RATELIMIT_MINUTE_REMAINING = 30
-    _RATELIMIT_MINUTE_RESET     = None
 
     def __init__(self, **kwargs):
         cls = self.__class__
@@ -90,13 +84,6 @@ class Request(metaclass=Registry):
             )
         cls._RATELIMIT_DAY_RESET = reset_dt.timestamp()
 
-    @classmethod
-    def set_reset_time_minute(cls):
-        """ Method to calculate reset time for per-minute ratelimit
-        """
-        cls._RATELIMIT_MINUTE_RESET = datetime.today().timestamp() + 61 
-        cls._RATELIMIT_MINUTE_REMAINING = cls._RATELIMIT_MINUTE
-
     def set_ratelimit(self, headers):
         """ Method to check and respond to API rate limit status before subsequent call.
         """
@@ -110,27 +97,11 @@ class Request(metaclass=Registry):
         # Set daily ratelimit reset time on first request
         if not cls._RATELIMIT_DAY_RESET:
             self.set_reset_time_day()
-            
-        # PER-MINUTE RATELIMIT
-        # Always update requests remaining for daily ratelimit
-        cls._RATELIMIT_MINUTE_REMAINING -= 1 # decrement remaining requests
-        # Set per-minute ratelimit reset time on first request
-        if cls._RATELIMIT_MINUTE_REMAINING == cls._RATELIMIT_MINUTE:
-            cls.set_reset_time_minute()
 
     def get_ratelimit(self):
         """ Method to check and respond to API rate limit status before subsequent call.
         """
         cls = self.__class__
-
-        # Check PER-MINUTE RATELIMIT
-        # update per-minute ratelimit reset time if passed
-        if cls._RATELIMIT_MINUTE_RESET and cls._RATELIMIT_MINUTE_RESET <= datetime.today().timestamp():
-            cls.set_reset_time_minute()
-        # If per-minute ratelimit requests remaining hits 0, sleep until reset time + one second
-        if cls._RATELIMIT_MINUTE_REMAINING and cls._RATELIMIT_MINUTE_REMAINING == 0:
-            sleep(cls._RATELIMIT_MINUTE_RESET - dt.today().timestamp() + 1)
-            cls._RATELIMIT_MINUTE_REMAINING = cls._RATELIMIT_MINUTE # reset request remaining
 
         # Check DAILY RATELIMIT
         # update daily ratelimit reset time if passed
@@ -154,10 +125,18 @@ class Request(metaclass=Registry):
         # Update ratelimit
         self.set_ratelimit(api_response.headers)
         # Deal with API response status code
-        if api_response.status_code != 200:
+        if api_response.status_code == 429:
+            print("INFO: Minute Ratelimit Reached. Sleeping Now...")
+            sleep(61)
+            return self.make_call()
+        elif not api_response.json().get("api"):
+            print(f"ERROR: HTTP Request '{url}' Did Not Return Data.")
+            print(f"\tResponse: {api_response.json().get('api')}")
+        elif api_response.status_code != 200:
             print(f"ERROR: HTTP Request '{url}' Failed. Status: {api_response.status_code}.")
             print(f"\tDescription: {api_response.json().get('message')}")
-        return api_response.json()
+        else:
+            return api_response.json()
 
     def process_response(self, response_data, type):
         """ Method to process the response of an API call, altering fields and adding foreign key if 
@@ -239,8 +218,17 @@ class PlayersRequest(Request):
         self.team_id = kwargs.get("foreign_key").get("id")
         self.team_name = kwargs.get("foreign_key").get("team_name")
         self.league_name = kwargs.get("foreign_key").get("league_name")
+        self.alt_league_name = self.get_alternative_league_name()
         self.endpoint = f"players/team/{self.team_id}/{self.current_season_long}"
         self.orm_class = Players
+
+    def get_alternative_league_name(self):
+        if self.league_name == "Bundesliga 1":
+            return "Bundesliga"
+        elif self.league_name == "Primera Division":
+            return "La Liga"
+        else:
+            return None
 
     def process_player(self, player):
         attributes = { 
@@ -350,7 +338,7 @@ class PlayersRequest(Request):
     def process_response(self, players_data, action_type):
         filtered_players = {}
         for player in players_data:
-            if player.get("league") == self.league_name:
+            if player.get("league") == self.league_name or (self.alt_league_name and player.get("league") == self.alt_league_name):
                 player["uid"] = md5((f"{player.get('player_id')}{player.get('team_id')}{player.get('league')}").encode()).hexdigest()
                 # check for duplicates
                 if player.get("uid") in filtered_players.keys():
