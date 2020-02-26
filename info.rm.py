@@ -2,9 +2,13 @@
 
 from flask import Flask, render_template
 
+#####################
+### QUERY HELPERS ###
+#####################
+
 info_rm = Flask(__name__)
 
-@info_rm.route("/)
+@info_rm.route("/")
 def all_leagues():
     return render_template("index.html")
 
