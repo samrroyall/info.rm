@@ -2,6 +2,7 @@
 
 from orm import Leagues, Teams, Players
 from sqlalchemy.orm import sessionmaker, session, Query
+from sqlalchemy import and_
 
 import sys
 from sqlalchemy.exc import IntegrityError
@@ -11,7 +12,13 @@ def query_database(engine):
     # initialize database connection
     Session = sessionmaker(bind=engine) 
     session = Session()
-    query_result = session.query(Players.firstname, Players.lastname, Players.goals).order_by(Players.goals)[::-1][:25]
+    query_result = session.query(Players.firstname, Players.lastname, Players.position, Players.passes_accuracy).\
+        filter(and_(Players.minutes_played >= 900.0, Players.passes >= 500.0, Players.position == "midfielder")).\
+        order_by(Players.passes_accuracy)[::-1][:50]
+    #query_result = session.query(Players.firstname, Players.lastname, Players.team_id, Players.rating).\
+    #    filter(Players.minutes_played >= 350.0).\
+    #    order_by(Players.rating)[::-1][:25]
+
     session.close()
     return query_result
 

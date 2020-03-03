@@ -21,6 +21,7 @@ def initialize_parser():
             "insert_teams",
             "insert_players",
             "update_players",
+            "query_db"
         ],
         help = "procedure to be run by info.rm"
     )

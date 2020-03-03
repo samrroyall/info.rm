@@ -22,7 +22,6 @@ def main(**kwargs):
             insert_teams
             insert_players
             update_players
-            query_db
     """
     action = kwargs.get("action")
     del kwargs["action"]
@@ -31,9 +30,7 @@ def main(**kwargs):
     else:
         engine = initialize_engine()
         config_args = read_config()
-        if action == "query_db":
-            query_db(engine)
-        elif action == "insert_all":
+        if action == "insert_all":
             insert_all(engine, **config_args)
         # handle update_players, and insert_*
         else:

@@ -59,8 +59,10 @@ def insert_all(engine, **kwargs):
 def query_db(engine):
     """ Function for querying data from DB """
     # initialize database connection
-    for f, l, s in query_database(engine):
-        print(f"{f+' '+l}\t{s}")
+    count = 1
+    for f, l, t, s in query_database(engine):
+        print(f"{count}. {f+' '+l} ({t})\t{s}")
+        count += 1
         
 
 def setup(kwargs):
