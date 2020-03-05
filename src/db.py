@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
 
-from orm import Leagues, Teams, Players
-from sqlalchemy.orm import sessionmaker, session, Query
+from orm import Leagues, Teams, Players, Base
 from sqlalchemy import and_
+from sqlalchemy.orm import sessionmaker, session, Query
+from sqlalchemy_utils import create_database, database_exists
 
 import sys
+import pathlib
 from sqlalchemy.exc import IntegrityError
+
+def initialize_engine():
+    db_path = pathlib.Path(__file__).parent.parent.absolute()
+    db_url = f"sqlite:///{db_path}/db/info.rm.db"
+    if not database_exists(db_url):
+        create_database(db_url)
+    engine = create_engine(db_url)
+    Base.metadata.create_all(engine)
+    return engine
 
 def query_database(engine):
     """ Function for querying data from DB """
