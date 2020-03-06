@@ -64,6 +64,7 @@ class Teams(Base):
     _TYPES = {
         "team_id": int,
         "league_id": int,
+        "league_name": str,
         "name": str,
         "logo": str,
         "founded": str,
@@ -76,6 +77,7 @@ class Teams(Base):
 
     team_id = Column(Integer, primary_key=True)
     league_id = Column(Integer, ForeignKey("leagues.league_id"), nullable=False)
+    league_name = Column(String)
     name = Column(String)
     logo = Column(String)
     founded = Column(Integer)
@@ -99,6 +101,7 @@ class Players(Base):
         "player_id": int,
         "league": str,
         "team_id": int,
+        "team_name": str,
         "name": str,
         "firstname": str,
         "lastname": str,
@@ -152,6 +155,7 @@ class Players(Base):
     player_id = Column(Integer)
     league = Column(String)
     team_id = Column(Integer, ForeignKey("teams.team_id"), nullable=False) 
+    team_name = Column(String)
     name = Column(String)
     firstname = Column(String)
     lastname = Column(String)
