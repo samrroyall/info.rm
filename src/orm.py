@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, Date, Boolean, Float, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
@@ -35,8 +37,8 @@ class Leagues(Base):
         "type": str,
         "country": str,
         "season" int,
-        "season_start": str,
-        "season_end": str,
+        "season_start": datetime,
+        "season_end": datetime,
         "logo": str,
         "flag": str,
         "is_current": bool,
@@ -107,10 +109,10 @@ class Players(Base):
         "lastname": str,
         "position": str,
         "age": int,
-        "birth_date": str,
+        "birth_date": datetime,
         "nationality": str,
-        "height": float,
-        "weight": float,
+        "height": str,
+        "weight": str,
         "rating": float,
         "captain": bool,
         "shots": float,
@@ -163,8 +165,8 @@ class Players(Base):
     age = Column(Integer)
     birth_date = Column(Date) 
     nationality = Column(String)
-    height = Column(Float)  
-    weight = Column(Float) 
+    height = Column(String)  
+    weight = Column(String) 
     rating = Column(Float) 
     captain = Column(Boolean) 
     # "shots": {"total":x,"on":y}
