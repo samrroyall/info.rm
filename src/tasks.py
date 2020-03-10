@@ -1,77 +1,70 @@
 #!/usr/bin/env python3
 
+import sys
+
 from request import Request
 from orm import Leagues, Teams, Players
-from config import set_ids, write_config
-from db import store_data, update_data, previously_inserted, query_database
+from config import set_config_arg, get_config_arg, write_config
+from db import previously_inserted
 
-import sys
-from sqlalchemy import and_, update
+#from sqlalchemy import and_, update
 
-def update_table(action, ids, engine, **kwargs):
+def get_data(action, engine):
     """ Function for updating specific table data from API and storing in DB """
-    sub_action = action.split("_")[1] 
+    endpoint = action.split("_")[1] 
     action_type = action.split("_")[0]
-    request_type = Request.get_registry().get(f"{sub_action.capitalize()}Request") # grab correct request class from Request registry
-    response_ids = [] 
+    request_type = Request.get_registry().get(f"{endpoint.capitalize()}Request")
+
+    response_ids = []
+    response_data = []
     # league requests do not require ids from prior calls
-    if sub_action == "leagues":
-        result = request_type(**kwargs).update("insert")
+    if endpoint == "leagues":
+        result = request_type().update()
         response_ids = result.get("ids")
-        store_data(engine, result.get("processed_data"))
-    else:
-        if not ids:
-            print(f"ERROR: Required IDs not present for {action} procedure. Ensure that the setup and higher-level procedures have been run.")
-            sys.exit(1)
+        response_data = result.get("processed_data")
+    # player and team requests do not require ids from prior calls
+    elif endpoint == "teams" or endpoint == "players":
+        # get ids
+        id_type = "league_ids" if endpoint == "teams" else "team_ids"
+        assert get_config_arg(id_type), \
+            f"ERROR: Required IDs not present for {action} procedure."
+        ids = eval(get_config_arg(id_type)).keys()
+        # make requests
         for id in ids:
-            kwargs["foreign_key"] = id # points current Request class to previous Request class
             if action_type == "insert":
-                id_name = "name" if sub_action == "teams" else "team_name"
-                print(f"INFO: Attempting to insert rows for {id.get(id_name)}...")
                 # ensure data has not been previously inserted into database
-                if previously_inserted(engine, action, id):
-                    print("ERROR: Attempt to insert data already present in DB stopped.")
-                    continue
-                result = request_type(**kwargs).update("insert")
-                response_ids += result.get("ids") 
-                store_data(engine, result.get("processed_data"))
+                assert not previously_inserted(engine, action, id), \
+                    "ERROR: Attempt to insert data already present in DB stopped."
             elif action_type == "update":
                 # ensure data has been previously inserted into database
-                if not previously_inserted(engine, action, id):
-                    print("ERROR: Attempt to update data not present in DB stopped.")
-                    continue
-                result = request_type(**kwargs).update("update")
-                update_data(engine, result.get("processed_data"))
+                assert previously_inserted(engine, action, id), \
+                    "ERROR: Attempt to update data not present in DB stopped."
+            result = request_type(id).update()
+            if result.get("ids"):
+                response_ids += result.get("ids") 
+            response_data = result.get("processed_data")
     # update config.ini with new IDs
     if len(response_ids) > 0:
-        key_string = f"{action.split('_')[1][:-1]}_ids"
-        set_ids({key_string:response_ids})
-    return response_ids
+        config_arg = f"{endpoint[:-1]}_ids"
+        set_config_arg(config_arg, response_ids)
+    return response_data
 
-def insert_all(engine, **kwargs):
-    """ Function for updating all data from API and storing in DB """
-    league_ids = update_table("insert_leagues", None, engine, **kwargs)
-    team_ids = update_table("insert_teams", league_ids, engine, **kwargs)
-    update_table("insert_players", team_ids, engine, **kwargs)
-    set_ids({"league_ids":league_ids,"team_ids":team_id})
-    return
-
-def query_db(engine):
-    """ Function for querying data from DB """
-    # initialize database connection
-    count = 1
-    for f, l, t, s in query_database(engine):
-        print(f"{count}. {f+' '+l} ({t})\t{s}")
-        count += 1
+#def query_db(engine):
+#    """ Function for querying data from DB """
+#    # initialize database connection
+#    count = 1
+#    for f, l, t, s in query_database(engine):
+#        print(f"{count}. {f+' '+l} ({t})\t{s}")
+#        count += 1
         
 
-def setup(kwargs):
+def setup(config_args):
     """ Function for writing CLI arguments to config file.
         Parameters:
             token             :: API token to be used for future responses
             subscription_time :: Time current API subscription began (HH:MM)
             current_season    :: Current season (e.g. 2019-2020)
     """
-    write_config(kwargs)
+    write_config(config_args)
 
 

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
-from datetime import datetime
-from typing import Dict, Any, Optional, Type, Set, List
+from hashlib import md5
+from datetime import datetime, date
 
-from config import get_config_args
-from orm import Leagues, Teams, Players, Base
+from config import get_config_arg
+from orm import Leagues, Teams, Players
 
 ###########################
 ##### PROCESS HELPERS #####
 ###########################
 
-def get_alternative_league_name(league_name: str) -> str:
+def get_alternative_league(league_name):
     if league_name == "Bundesliga 1":
         return "Bundesliga"
     elif league_name == "Primera Division":
@@ -18,216 +18,281 @@ def get_alternative_league_name(league_name: str) -> str:
     else:
         return None
 
-def create_uid(player_id: int, team_id: int, league: str) -> str:
+def generate_uid(player_id, team_id, league):
     uid_string = f"{player_id}{team_id}{league}"
     return md5(uid_string.encode()).hexdigest()
 
-def process_height_weight(player: Dict[str, Any]) -> Dict[str, Any]:
-    if player.get("weight"):
-        weight_lb = round(float(player.get("weight").split(" ")[0]) * 2.20462)
-        player["weight"] = f"{weight_lb} lbs"
-    if player.get("height"): 
-        height_in = float(player.get("height").split(" ")[0]) * 0.393701
+def process_height_weight(height, weight):
+    if height: 
+        height_in = float(height.split(" ")[0]) * 0.393701
         feet = int(height_in // 12)
         inches = round(height_in % 12)
-        player["height"] = f"{feet}'{inches}\""
-    return player
+        height = f"{feet}'{inches}\""
+    if weight:
+        weight_lb = round(float(weight.split(" ")[0]) * 2.20462)
+        weight = f"{weight_lb} lbs"
+    return height, weight
 
-def process_birthdate(player: Dict[str, Any]) -> Dict[str, Any]:
-    if player.get("birth_date"):
-        player["birth_date"] = datetime.strptime(
-                                   player.get("birth_date"),
-                                   "%d/%m/%Y"
-                               ).date()
-    return player
+def process_birthdate(birthdate_str) -> date:
+    if birthdate_str:
+        birthdate_date = datetime.strptime(
+                             birthdate_str,
+                             "%d/%m/%Y"
+                         ).date()
+    return birthdate_date
 
-def check_keys(
-        response_data: Dict[str, Any], 
-        attributes: Dict[str, Any]
-    ) -> Dict[str, Any]:
+# no type checking on functions dealing with JSON data
+def check_keys(response_data, attributes):
     """ Function to fix response data types and remove unnecessary keys. """
     # cast keys to correct types, discard unneeded keys
-    unneeded_keys: List[str] = []
+    unneeded_keys = []
     for k, v in response_data.items():
         if k in attributes:
-            response_data[k] = attributes.get(k)(v)
+            type_func = attributes.get(k)
+            if type_func != date:
+                response_data[k] = attributes.get(k)(v)
         else:
-            unneeded_attrs.append(k)
+            unneeded_keys.append(k)
 
     # remove unneeded keys
     for key in unneeded_keys:
         del response_data[key]
     return response_data
 
-def process_stats(player: Dict[str, Any]) -> Dic[str, Any]:
-    # shots
-    temp_dict = player.get("shots")
-    player["shots"] = temp_dict.get("total")
-    player["shots_on"] = temp_dict.get("on")
-    player["shots_on_pct"] = None
-    # ensure shots exists and is != 0
-    if player.get("shots"): 
-        player["shots_on_pct"] = round(temp_dict.get("shots_on") * 100
-                                       / temp_dict.get("shots"))
-    # goals
-    temp_dict = player.get("goals")
-    player["goals"] = temp_dict.get("total")
-    player["assists"] = temp_dict.get("assists")
-    player["goals_conceded"] = temp_dict.get("conceded")
-    # passes
-    temp_dict = player.get("passes")
-    player["passes"] = temp_dict.get("total")
-    player["passes_key"] = temp_dict.get("key")
-    player["passes_accuracy"] = player.get("passes").get("accuracy")
-    # tackles
-    temp_dict = player.get("tackles")
-    player["tackles"] = temp_dict.get("total")
-    player["blocks"] = temp_dict.get("blocks")
-    player["interceptions"] = temp_dict.get("interceptions")
-    # duels
-    temp_dict = player.get("duels")
-    player["duels"] = temp_dict.get("total")
-    player["duels_won"] = temp_dict.get("won")
-    player["duels_won_pct"] = None
-    # ensure duels exists and is != 0
-    if player.get("duels"):
-        player["duels_won_pct"] = round(player.get("duels_won") * 100 
-                                        / player.get("duels"))
-    # dribbles
-    player["dribbles_attempted"] = temp_dict.get("attempted")
-    player["dribbles_succeeded"] = temp_dict.get("success")
-    player["dribbles_succeeded_pct"] = None
-    if player.get("dribbles_attempted"):
-        player["dribbles_succeeded_pct"] = round(player.get("dribbles_succeeded") * 100
-                                                 / player.get("dribbles_attempted"))
-    # fouls
-    player["fouls_drawn"] = player.get("fouls").get("drawn")
-    player["fouls_committed"] = player.get("fouls").get("committed")
-    # cards
-    player["cards_yellow"] = player.get("cards").get("yellow")
-    player["cards_red"] = player.get("cards").get("red")
-    player["cards_second_yellow"] = player.get("cards").get("yellowred")
-    player["cards_straight_red"] = (player.get("cards_red") 
-                                    - player.get("cards_second_yellow"))
-    # pentalties
-    player["penalties_won"] = player.get("penalty").get("won")
-    player["penalties_committed"] = player.get("penalty").get("commited") # [sic]
-    player["penalties_saved"] = player.get("penalty").get("saved")
-    player["penalties_scored"] = player.get("penalty").get("success")
-    player["penalties_missed"] = player.get("penalty").get("missed")
-    player["penalties_scored_pct"] = None
-    if player.get("penalties_scored") > 0 or 
-        player.get("penalties_missed") > 0:
-        player["penalties_scored_pct"] = round(player.get("penalties_scored") * 100
-                                               / (player.get("penalties_scored")
-                                                  + player.get("penalties_missed")))
+def not_null(value):
+    """ Function to turn quantitative stats to 0 if currently null. """
+    return 0 if value is None else value
+
+# no type checking on functions dealing with JSON data
+def process_stats(player):
+    # statistics
     # games
-    player["games_appearances"] = player.get("games").get("appearences") # [sic]
-    player["minutes_played"] = player.get("games").get("minutes_played")
-    player["games_started"] = player.get("games").get("lineups")
-    player["games_bench"] = player.get("substitutes").get("bench")
-    player["substitutions_in"] = player.get("substitutes").get("in")
-    player["substitutions_out"] = player.get("substitutes").get("out")
-    return player
-
-
+    player_game_info = player.get("statistics").get("games")
+    temp_player["position"] = player_game_info.get("position")
+    temp_player["rating"] = player_game_info.get("rating")
+    temp_player["captain"] = player_game_info.get("captain")
+    temp_player["minutes_played"] = not_null(player_game_info.get("minutes"))
+    temp_player["games_appearances"] = not_null(player_game_info.get("appearences")) #sic
+    temp_player["games_started"] = not_null(player_game_info.get("lineups"))
+    # substitutes
+    player_sub_info = player.get("statistics").get("substitutes")
+    temp_player["games_bench"] = not_null(player_sub_info.get("bench"))
+    temp_player["substitutions_in"] = not_null(player_sub_info.get("in"))
+    temp_player["substitutions_out"] = not_null(player_sub_info.get("out"))
+    # shots
+    player_shot_info = player.get("statistics").get("shots")
+    temp_player["shots"] = not_null(player_shot_info.get("total"))
+    temp_player["shots_on"] = not_null(player_shot_info.get("on"))
+    temp_player["shots_on_pct"] = None
+    # ensure >= 0 shots
+    if temp_player.get("shots") > 0: 
+        temp_player["shots_on_pct"] = round(temp_player.get("shots_on") * 100
+                                            / temp_player.get("shots"))
+    # goals
+    player_goal_info = player.get("statistics").get("goals")
+    temp_player["goals"] = not_null(player_goal_info.get("total"))
+    temp_player["goals_conceded"] = not_null(player_goal_info.get("conceded"))
+    temp_player["assists"] = not_null(player_goal_info.get("assists"))
+    # passes
+    player_pass_info = player.get("statistics").get("passes")
+    temp_player["passes"] = not_null(player_pass_info.get("total"))
+    temp_player["passes_key"] = not_null(player_pass_info.get("key"))
+    temp_player["passes_accuracy"] = player_pass_info.get("accuracy")
+    # tackles
+    player_tackle_info = player.get("statistics").get("tackles")
+    temp_player["tackles"] = not_null(player_tackle_info.get("total"))
+    temp_player["blocks"] = not_null(player_tackle_info.get("blocks"))
+    temp_player["interceptions"] = not_null(player_tackle_info.get("interceptions"))
+    # duels
+    player_duel_info = player.get("statistics").get("duels")
+    temp_player["duels"] = not_null(player_duel_info.get("total"))
+    temp_player["duels_won"] = not_null(player_duel_info.get("won"))
+    temp_player["duels_won_pct"] = None
+    # ensure >= 0 duels
+    if temp_player.get("duels") > 0: 
+        temp_player["duels_won_pct"] = round(temp_player.get("duels_won") * 100
+                                                / temp_player.get("duels"))
+    # dribbles
+    player_dribble_info = player.get("statistics").get("dribbles")
+    temp_player["dribbles_past"] = not_null(player_dribble_info.get("past"))
+    temp_player["dribbles_attempted"] = not_null(player_dribble_info.get("attempts"))
+    temp_player["dribbles_succeeded"] = not_null(player_dribble_info.get("success"))
+    temp_player["dribbles_succeeded_pct"] = None 
+    # ensure >= 0 dribbles_attempted
+    if temp_player.get("dribbles_attempted") > 0: 
+        temp_player["dribbles_succeeded_pct"] = round(
+                                            temp_player.get("dribbles_succeeded") 
+                                            / temp_player.get("dribbles_attempted")
+                                            * 100
+                                        )
+    # fouls
+    player_foul_info = player.get("statistics").get("fouls")
+    temp_player["fouls_drawn"] = not_null(player_foul_info.get("drawn"))
+    temp_player["fouls_committed"] = not_null(player_foul_info.get("committed"))
+    # cards
+    player_card_info = player.get("statistics").get("cards")
+    temp_player["cards_yellow"] = not_null(player_card_info.get("yellow"))
+    temp_player["cards_red"] = not_null(player_card_info.get("red"))
+    temp_player["cards_second_yellow"] = not_null(player_card_info.get("yellowred"))
+    temp_player["cards_straight_red"] = (temp_player.get("cards_red") 
+                                        - temp_player.get("cards_second_yellow"))
+    # penalty
+    player_pen_info = player.get("statistics").get("penalty")
+    temp_player["penalties_won"] = not_null(player_pen_info.get("won"))
+    temp_player["penalties_scored"] = not_null(player_pen_info.get("scored"))
+    temp_player["penalties_missed"] = not_null(player_pen_info.get("missed"))
+    temp_player["penalties_saved"] = not_null(player_pen_info.get("saved"))
+    temp_player["penalties_committed"] = not_null(player_pen_info.get("commited")) #sic
+    temp_player["penalties_scored_pct"] = None
+    if (temp_player.get("penalties_scored") > 0 or 
+        temp_player.get("penalties_missed") > 0): 
+        temp_player["penalties_scored_pct"] = round(
+                                            temp_player.get("penalties_scored") /
+                                            (temp_player.get("penalties_scored")
+                                                + temp_player.get("penalties_missed"))
+                                            * 100
+                                        )   
+    return temp_player
+         
 #############################
 ##### PROCESS FUNCTIONS #####
 #############################
 
-def process_leagues(
-        leagues: Dict[str, Any], 
-        _
-    ) -> Dict[str, Union[List[Dict[int, Any]], List[Dict[str, Any]]]]:
+# no type checking on functions dealing with JSON data
+def process_leagues(leagues, _):
     """ Function to process the API response regarding league data. """
-    orm_class: Type[Base] = Leagues
-    attributes: Dict[str, Any] = getattr(orm_class, "_TYPES")
-    current_leagues: Set[str] = get_config_args("current_leagues")
+    orm_class = Leagues
+    attributes = getattr(orm_class, "_TYPES")
+    current_leagues = eval(get_config_arg("leagues"))
 
-    leagues_id: List[Dict[int,Any]] = []
-    filtered_leagues: List[Dict[str,Any]] = []
-    for league in leagues:
-        if f"{league.get('name')},{league.get('country')}" in current_leagues:
-            league["season_start"]: datetime = datetime.strptime(
-                                                   league.get("season_start"),
-                                                   "%Y-%m-%d"
-                                               ).date()
-            league["season_end"]: datetime = datetime.strptime(
-                                                 league.get("season_end"),
-                                                 "%Y-%m-%d"
-                                             ).date()
-            league["is_current"]: bool = bool(league.get("is_current"))
+    league_ids = []
+    filtered_leagues = []
+    for idx in range(len(leagues)):
+        league = leagues[idx]
+        league_name = league.get("league").get("name")
+        league_country = league.get("country").get("name")
+        if f"{league_name},{league_country}" in current_leagues:
+            temp_league = dict()
+            # seasons
+            temp_league["season"] = league.get("seasons")[0].get("year")
+            temp_league["season_start"] = datetime.strptime(
+                                              league.get("seasons")[0].get("start"),
+                                              "%Y-%m-%d"
+                                          ).date()
+            temp_league["season_end"] = datetime.strptime(
+                                            league.get("seasons")[0].get("end"),
+                                            "%Y-%m-%d"
+                                        ).date()
+            temp_league["is_current"] = bool(league.get("seasons")[0].get("current"))
+            # league
+            temp_league["name"] = league_name
+            temp_league["id"] = league.get("league").get("id")
+            temp_league["logo"] = league.get("league").get("logo")
+            temp_league["type"] = league.get("league").get("type")
+            # country
+            temp_league["country"] = league_country
+            temp_league["flag"] = league.get("country").get("flag")
+            # generate output dict
             league_ids.append({
-                league.get("league_id"):league.get("name")
+                temp_league.get("id"):temp_league.get("name")
             })
-            filtered_leagues.append(check_keys(league, attributes))
+            filtered_leagues.append(check_keys(temp_league, attributes))
     return {"ids":league_ids,"processed_data":filtered_leagues}
 
-def process_teams(
-        teams: Dict[str, Any],
-        league_id: int
-    ) -> Dict[str, Union[List[Dict[int, Any]], List[Dict[str, Any]]]]:
+# no type checking on functions dealing with JSON data
+def process_teams(teams, league_id):
     """ Function to process the API response regarding team data. """
-    league_name: str = get_config_args("league_ids").get(league_id)
-    orm_class: Type[Base] = Teams
-    attributes: Dict[str, Any] = getattr(orm_class, "_TYPES")
+    league_name = get_config_arg("league_ids").get(league_id)
+    orm_class = Teams
+    attributes = getattr(orm_class, "_TYPES")
 
-    team_ids: List[Dict[int,Any]] = []
+    team_ids = []
     for idx in range(len(teams)):
         team = teams[idx]
-        team["league_id"]: int = league_id 
-        team["league_name"]: str = league_name
-        teams[idx] = check_keys(team, attributes)
+        temp_team = dict()
+        temp_team["league_id"] = league_id 
+        temp_team["league_name"] = league_name
+        # team
+        temp_team["id"] = team.get("team").get("id")
+        temp_team["name"] = team.get("team").get("name")
+        temp_team["logo"] = team.get("team").get("logo")
+        temp_team["founded"] = team.get("team").get("founded")
+        # coach
+        temp_team["coach_name"] = team.get("coach").get("name")
+        temp_team["coach_firstname"] = team.get("coach").get("firstname")
+        temp_team["coach_lastname"] = team.get("coach").get("lastname")
+        # venue
+        temp_team["venue_name"] = team.get("venue").get("name")
+        temp_team["venue_city"] = team.get("venue").get("city")
+        temp_team["venue_capacity"] = team.get("venue").get("capacity")
+        # generate output dict
+        teams[idx] = check_keys(temp_team, attributes)
         team_ids.append({
-            team.get("team_id"):{
-                "team_name":team.get("name"),
+            temp_team.get("id"):{
+                "team_name":temp_team.get("name"),
                 "league_name":league_name,
                 "league_id":league_id
             }
         })
     return {"ids":team_ids,"processed_data":teams}
 
-def process_player(
-        players: Dict[str, Any],
-        team_id: int
-    ) -> Dict[str, Dict[str, Any]]:
+def process_players(players, team_id):
     """ Function to process the API response regarding player data. """
-    config_values: Dic[str, Union[str, int]] = get_config_args("team_ids").get(team_id)
-    team_name: str = config_values.get("team_name")
-    league_id: int = config_values.get("league_id")
-    league_name: str = config_values.get("league_name")
-    alt_league_name: Optional[str] = get_alternative_league(league_name)
-    orm_class: Type[Base] = Players
-    attributes: Dict[str, Any] = getattr(orm_class, "_TYPES")
+    config_values = get_config_arg("team_ids").get(team_id)
+    league_name = config_values.get("league_name")
+    alt_league_name = get_alternative_league(league_name)
+    orm_class = Players
+    attributes = getattr(orm_class, "_TYPES")
 
-    filtered_players: Dict[str, Dict[str, Any]] = {}
-    for player in players_data:
+    filtered_players = {}
+    for idx in range(len(players)):
+        player = players[idx]
+        temp_player = dict()
+        # check player
         # ensure only player stats for current leagues are being processed
-        if player.get("league") != league_name and (not alt_league_name or 
-            player.get("league") != alt_league_name):
+        if player.get("league").get("name") != league_name and (not alt_league_name or 
+            player.get("league").get("name") != alt_league_name):
             continue
         # use consistent league name
-        player["league"]: str = league_name
         # only store statistics on players that have played
-        if not player.get("games").get("minutes_played") or 
-            player.get("games").get("minutes_played") == 0:
+        if (not player.get("statistics").get("games").get("minutes_played") or 
+            player.get("statistics").get("games").get("minutes_played") == 0):
             continue
+        # create uid
+        temp_player["league_id"] = player.get("league").get("id")
+        temp_player["league_name"] = league_name
+        temp_player["team_id"] = player.get("statistics").get("team").get("id")
+        temp_player["team_name"] = player.get("statistics").get("team").get("name")
+        temp_player["id"] = player.get("player").get("id")
         # if player league is current, create UID column 
-        player["uid"]: str = generate_uid(
-                                 player.get("player_id"),
-                                 player.get("team_id"),
-                                 player.get("league")
-                             )
+        temp_player["uid"] = generate_uid(
+                            temp_player.get("id"),
+                            temp_player.get("team_id"),
+                            temp_player.get("league")
+                        )
         # check for duplicates, only process most recent versions
-        if (player.get("uid") in filtered_players and 
-            player.get("games").get("minutes_played") <= 
-            filtered_players[player.get("uid")].get("minutes_played")):
+        if (temp_player.get("uid") in filtered_players and 
+            player.get("statistics").get("games").get("minutes_played") <= 
+            filtered_players[temp_player.get("uid")].get("minutes_played")):
             continue
-        # process player 
-        player: Dict[str, Any] = check_keys(
-                                    attributes,
-                                    process_stats(process_birthdate(process_height_weight(player)))
-                                 )
-        filtered_players[player.get("uid")]: Dict[str, Any] = player
+        # player 
+        player_info = player.get("player")
+        temp_player["name"] = player_info.get("name")
+        temp_player["firstname"] = player_info.get("firstname")
+        temp_player["lastname"] = player_info.get("lastname")
+        temp_player["age"] = player_info.get("age")
+        temp_player["nationality"] = player_info.get("nationality")
+        temp_player["height"], temp_player["weight"] = process_height_weight(
+                                                           player_info.get("height"),
+                                                           player_info.get("weight")
+                                                       )
+        temp_player["birth_date"] = process_birthdate(
+                                        player_info.get("birth").get("date")
+                                    )
+   
+        temp_player = process_stats(player, temp_player)
+        processed_player = check_keys(temp_player, attributes)
+        filtered_players[processed_player.get("uid")] = processed_player
     return filtered_players.values()
+
 

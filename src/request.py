@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-from typing import Type, Dict, Set, Any
+from typing import Type, Dict, Set, Any, Optional
 from requests import get
 from time import sleep
 from datetime import datetime
-from hashlib import md5
 from config import get_config_arg
 
 from process import process_leagues, process_teams, process_players
@@ -16,8 +15,8 @@ class Registry(type):
     _REGISTRY: Dict[str, Any] = dict()
 
     @classmethod
-    def __new__(cls, *args, **kwargs) -> Type[cls]:
-        new_class = super().__new__(cls, *args, **kwargs)
+    def __new__(cls, *args, **kwargs) -> Any:
+        new_class = super().__new__(*args, **kwargs)
         if new_class._REGISTER:
             cls._REGISTRY[new_class.__name__] = new_class
         return new_class
@@ -33,14 +32,15 @@ class Request(metaclass=Registry):
 
     # CLASS VARIABLES - change some of these to CLI arguments
     _REGISTER: bool = False
-    _API_URL: str = "https://api-football-v1.p.rapidapi.com/v2/"
-    _API_HOST: str = "api-football-v1.p.rapidapi.com"
-    _API_RATELIMIT_HEADER: str = "X-RateLimit-requests-Limit"
-    _API_RATELIMIT_REMAINING_HEADER: str = "X-RateLimit-requests-Remaining"
+    #_API_URL: str = "https://api-football-v1.p.rapidapi.com/v2/"
+    _API_URL: str = "https://api-football-beta.p.rapidapi.com/"
+    _API_HOST: str = "api-football-beta.p.rapidapi.com"
+    _API_RATELIMIT_HEADER: str = "x-ratelimit-requests-limit"
+    _API_RATELIMIT_REMAINING_HEADER: str = "x-ratelimit-requests-remaining"
     _RATELIMIT: Optional[int] = None
     _RATELIMIT_REMAINING: Optional[int] = None
-    _RATELIMIT_RESET: Optional[datetime] = None
-    
+    _RATELIMIT_RESET: Optional[float] = None
+
     def __init__(self) -> None:
         cls = self.__class__
         subscription_time = get_config_arg("subscription_time")
@@ -48,24 +48,29 @@ class Request(metaclass=Registry):
         token = get_config_arg("token")
         self.reset_hour: int = int(subscription_time.split(':')[0])
         self.reset_minute: int = int(subscription_time.split(':')[1])
+        self.reset_second: int = int(subscription_time.split(':')[2])
         self.current_season_long: str = current_season
-        self.current_season_short: str = current_season.split('-')[0]
+        self.current_season_short: int = current_season.split('-')[0]
         self.headers: Dict[str,str] = { 
             "x-rapidapi-key": token,
             "x-rapidapi-host": cls._API_HOST
         }
+        self.endpoint: str
+        self.foreign_key: int
+        self.params: Dict[str, int]
         
     def set_reset_time_day(self) -> None:
         """ Method to calculate reset time for daily ratelimit. """
         cls = self.__class__
         today = datetime.today()
         # If past reset time on current date, set reset time to tomorrow
-        if (today.hour > self.reset_hour or today.hour == self.reset_hour and 
-                today.minute >= self.reset_minute):
+        if (today.hour > self.reset_hour or (today.hour == self.reset_hour and 
+                today.minute >= self.reset_minute) or (today.hour == self.reset_hour
+                and today.minute == self.reset_minute and today.second >= self.reset_second)):
             reset_datetime = today.replace( 
                 hour = self.reset_hour, 
                 minute = self.reset_minute,
-                second = 0,
+                second = self.reset_second,
                 microsecond = 0 
             )
         # Set reset time to <reset_hour> <reset_minute> on current date
@@ -74,7 +79,7 @@ class Request(metaclass=Registry):
                 day = today.day + 1, 
                 hour = self.reset_hour, 
                 minute = self.reset_minute,
-                second = 0,
+                second = self.reset_second,
                 microsecond = 0
             )
         cls._RATELIMIT_RESET = reset_datetime.timestamp()
@@ -102,16 +107,17 @@ class Request(metaclass=Registry):
         if cls._RATELIMIT_REMAINING and cls._RATELIMIT_REMAINING == 0:
             sleep(cls._RATELIMIT_RESET - datetime.today().timestamp() + 1)
     
-    def make_call(self) -> Dict[str, Any]:
+    def make_call(self) -> Dict[str, Dict[str, Any]]:
         """ Method to make API call. """
         cls = self.__class__ 
         # View ratelimit before proceeding, sleep if needed
         self.get_ratelimit()
         # Make API request
         url = f"{cls._API_URL}{self.endpoint}" 
-        api_response = get(url, headers=self.headers)
+        api_response = get(url, headers=self.headers, params=self.params)
         # Update ratelimit
-        self.set_ratelimit(api_response.headers)
+        headers_lower = dict([(k.lower(),v) for k,v in dict(api_response.headers).items()])
+        self.set_ratelimit(headers_lower)
         # Deal with API response status code
         request_code = api_response.status_code
         if request_code == 429:
@@ -127,15 +133,14 @@ class Request(metaclass=Registry):
         return request_content 
 
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
-        response_type = str(self.__class__).split("Request")[0].lower()
+        response_type = self.__class__.__name__.lower().split("request")[0]
         process_func = eval(f"process_{response_type}")
-        return process_func(response_data, self.foreign_key)
+        return process_func(response_data.get("response"), self.foreign_key)
 
     def update(self) -> Dict[str, Any]:
         """ Method to gather, process, and store API data. """
         api_response = self.make_call()
-        response_data = api_response.get("api")
-        return self.process_response(response_data) 
+        return self.process_response(api_response) 
 
 
 class LeaguesRequest(Request):
@@ -145,8 +150,9 @@ class LeaguesRequest(Request):
 
     def __init__(self) -> None:
         super().__init__()
-        self.endpoint: str = f"leagues/season/{self.current_season_short}"
-        self.foreign_key: Optional[Dict[str,str]] = None
+        self.endpoint: str = "leagues"
+        self.foreign_key: Optional[int] = None
+        self.params: Dict[str, int] = {"season": self.current_season_short}
 
 
 class TeamsRequest(Request):
@@ -154,10 +160,14 @@ class TeamsRequest(Request):
     data through API requests regarding Teams data. """
     _REGISTER: bool = True
 
-    def __init__(self, league_id: str) -> None:
+    def __init__(self, league_id: int) -> None:
         super().__init__()        
-        self.endpoint: str = f"teams/league/{league_id}"
-        self.foreign_key: Dict[str, str] = league_id
+        self.endpoint: str = "teams"
+        self.foreign_key: int = league_id
+        self.params: Dict[str, int] = {
+            "league": league_id,
+            "season": self.current_season_short
+        }
 
 
 class PlayersRequest(Request):
@@ -165,8 +175,12 @@ class PlayersRequest(Request):
     data through API requests regarding Teams data. """    
     _REGISTER: bool = True
 
-    def __init__(self, team_id: str) -> None:
+    def __init__(self, team_id: int) -> None:
         super().__init__()        
-        self.endpoint: str = f"players/team/{team_id}/{self.current_season_long}"
-        self.foreign_key: Dict[str, str] = team_id
+        self.endpoint: str = "players"
+        self.foreign_key: int = team_id
+        self.params: Dict[str, int] = {
+            "team": team_id,
+            "season": self.current_season_short
+        }
 

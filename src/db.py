@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from orm import Leagues, Teams, Players, Base
-from sqlalchemy import and_
+from sqlalchemy import and_, create_engine
 from sqlalchemy.orm import sessionmaker, session, Query
 from sqlalchemy_utils import create_database, database_exists
 
@@ -18,22 +18,22 @@ def initialize_engine():
     Base.metadata.create_all(engine)
     return engine
 
-def query_database(engine):
-    """ Function for querying data from DB """
-    # initialize database connection
-    Session = sessionmaker(bind=engine) 
-    session = Session()
-    query_result = session.query(Players.firstname, Players.lastname, Players.position, Players.passes_accuracy).\
-        filter(and_(Players.minutes_played >= 900.0, Players.passes >= 500.0, Players.position == "midfielder")).\
-        order_by(Players.passes_accuracy)[::-1][:50]
-    #query_result = session.query(Players.firstname, Players.lastname, Players.team_id, Players.rating).\
-    #    filter(Players.minutes_played >= 350.0).\
-    #    order_by(Players.rating)[::-1][:25]
+#def query_database(engine):
+#    """ Function for querying data from DB """
+#    # initialize database connection
+#    Session = sessionmaker(bind=engine) 
+#    session = Session()
+#    query_result = session.query(Players.firstname, Players.lastname, Players.position, Players.passes_accuracy).\
+#        filter(and_(Players.minutes_played >= 900.0, Players.passes >= 500.0, Players.position == "midfielder")).\
+#        order_by(Players.passes_accuracy)[::-1][:50]
+#    #query_result = session.query(Players.firstname, Players.lastname, Players.team_id, Players.rating).\
+#    #    filter(Players.minutes_played >= 350.0).\
+#    #    order_by(Players.rating)[::-1][:25]
+#
+#    session.close()
+#    return query_result
 
-    session.close()
-    return query_result
-
-def update_data(engine, data):
+def update_table(engine, data):
     """ Function for initializing session with DB and updating existing Players rows"""
     for player in data:
         # initialize DB session
@@ -48,7 +48,7 @@ def update_data(engine, data):
             print("ERROR: Update Unsuccessful. A problem occurred while updating Players table.")
     session.close()
 
-def store_data(engine, data):
+def insert_into_table(engine, data):
     """ Function for initializing session with DB and inserting new rows"""
     for instance in data:
         # initialize DB session

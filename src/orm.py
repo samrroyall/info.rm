@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from datetime import datetime
+from datetime import datetime,date
 
 from sqlalchemy import Column, Integer, String, Date, Boolean, Float, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -29,22 +29,22 @@ Base = declarative_base(cls=BaseMixin)
 
 
 class Leagues(Base):
-    """ ORM Class defining attributes corresponding to columns in 'leagues' table. """
+    """ ORM Class defining attributes for leagues table. """
 
     _TYPES = {
-        "league_id": int,
+        "id": int,
         "name": str,
         "type": str,
         "country": str,
-        "season" int,
-        "season_start": datetime,
-        "season_end": datetime,
+        "season": int,
+        "season_start": date,
+        "season_end": date,
         "logo": str,
         "flag": str,
         "is_current": bool,
     }
 
-    league_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     name = Column(String)
     type = Column(String)
     country = Column(String)
@@ -61,31 +61,35 @@ class Leagues(Base):
 
 
 class Teams(Base):
-    """ ORM Class defining attributes corresponding to columns in 'teams' table."""
+    """ ORM Class defining attributes for teams table."""
 
     _TYPES = {
-        "team_id": int,
+        "id": int,
         "league_id": int,
         "league_name": str,
         "name": str,
         "logo": str,
         "founded": str,
+        "coach_name": str,
+        "coach_firstname": str,
+        "coach_lastname": str,
         "venue_name": str,
         "venue_city": str,
-        "country": str,
         "venue_capacity": int,
     }
 
 
-    team_id = Column(Integer, primary_key=True)
-    league_id = Column(Integer, ForeignKey("leagues.league_id"), nullable=False)
+    id = Column(Integer, primary_key=True)
+    league_id = Column(Integer, ForeignKey("leagues.id"), nullable=False)
     league_name = Column(String)
     name = Column(String)
     logo = Column(String)
     founded = Column(Integer)
+    coach_name = Column(String)
+    coach_firstname = Column(String)
+    coach_lastname = Column(String)
     venue_name = Column(String)
     venue_city = Column(String)
-    country = Column(String)
     venue_capacity = Column(Integer)
 
     def __repr__(self):
@@ -94,22 +98,21 @@ class Teams(Base):
 
 
 class Players(Base):
-    """ ORM Class defining attributes corresponding to columns in 'players' table. Players are identified
-    through a composite primary key made up by the combination of their player_id and league.
-    """
+    """ ORM Class defining attributes for players table. """
 
     _TYPES = {
         "uid": str,
-        "player_id": int,
-        "league": str,
+        "league_id": int,
+        "league_name": str,
         "team_id": int,
         "team_name": str,
+        "id": int,
         "name": str,
         "firstname": str,
         "lastname": str,
         "position": str,
         "age": int,
-        "birth_date": datetime,
+        "birth_date": date,
         "nationality": str,
         "height": str,
         "weight": str,
@@ -130,6 +133,7 @@ class Players(Base):
         "duels": float,
         "duels_won": float,
         "duels_won_pct": float,
+        "dribbles_past": float,
         "dribbles_attempted": float,
         "dribbles_succeeded": float,
         "dribbles_succeeded_pct": float,
@@ -143,21 +147,22 @@ class Players(Base):
         "penalties_committed": float,
         "penalties_success": float,
         "penalties_missed": float,
-        "pentlties_scored_pct": float,
+        "penalties_scored_pct": float,
         "penalties_saved": float,
-        "games_appearances": float,
         "minutes_played": float,
+        "games_appearances": float,
         "games_started": float,
+        "games_bench": float,
         "substitutions_in": float,
         "substitutions_out": float,
-        "games_bench": float,
     }
 
-    uid = Column(String, primary_key=True) # hash of player_id, team_id, league
-    player_id = Column(Integer)
-    league = Column(String)
-    team_id = Column(Integer, ForeignKey("teams.team_id"), nullable=False) 
+    uid = Column(String, primary_key=True) # hash of id, team_id, league_id
+    league_id = Column(Integer, ForeignKey("leagues.id"), nullable=False) 
+    league_name = Column(String)
+    team_id = Column(Integer, ForeignKey("teams.id"), nullable=False) 
     team_name = Column(String)
+    id = Column(Integer)
     name = Column(String)
     firstname = Column(String)
     lastname = Column(String)
@@ -190,6 +195,7 @@ class Players(Base):
     duels_won = Column(Float)
     duels_won_pct = Column(Float) # CALCULATE duels_won/duels
     # "dribbles": {"attempts":x,"success":y}
+    dribbles_past = Column(Float)
     dribbles_attempted = Column(Float)
     dribbles_succeeded = Column(Float)
     dribbles_succeeded_pct = Column(Float) 
@@ -206,7 +212,7 @@ class Players(Base):
     penalties_committed = Column(Float)
     penalties_success = Column(Float)
     penalties_missed = Column(Float)
-    pentlties_scored_pct = Column(Float)
+    penalties_scored_pct = Column(Float)
     penalties_saved = Column(Float)
     # "games": {"appearences":x,"minutes_played":y,"lineups":z} [sic]
     games_appearances = Column(Float)
