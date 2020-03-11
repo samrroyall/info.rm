@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
-
 from request import Request
 from orm import Leagues, Teams, Players
 from db import previously_inserted, query_database
@@ -53,10 +51,18 @@ def get_data(action, engine):
 def query_db(engine):
     """ Function for querying data from DB """
     # initialize database connection
-    count = 1
-    for n, t, s in query_database(engine):
-        print(f"{count}. {n} ({t})\t{s}")
+    query_result = query_database(engine)
+    max_name_length = max([len(n) for n,_,_ in query_result])
+
+    count = 0
+    rank = 0
+    prev_result = float("inf") 
+    for n, t, s in query_result:
         count += 1
+        if s < prev_result:
+            rank = count
+        prev_result = s
+        print(f"{(str(rank)+'.').ljust(4, ' ')}{n.ljust(max_name_length, ' ')} ({t})\t{s}")
     #for i, n in query_database(engine):
     #    print(f"{count}. {n} ({i})")
     #    count += 1

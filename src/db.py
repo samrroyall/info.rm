@@ -23,12 +23,18 @@ def query_database(engine):
     # initialize database connection
     Session = sessionmaker(bind=engine) 
     session = Session()
-    #query_result = session.query(Players.firstname, Players.lastname, Players.position, Players.passes_accuracy).\
-    #    filter(and_(Players.minutes_played >= 900.0, Players.passes >= 500.0, Players.position == "midfielder")).\
-    #    order_by(Players.passes_accuracy)[::-1][:50]
-    query_result = session.query(Players.name, Players.team_id, Players.goals).\
-        filter(Players.minutes_played >= 350.0).\
-        order_by(Players.goals)[::-1][:25]
+    query_result = session.query(
+            Players.name, 
+            Players.team_id, 
+            (Players.goals + Players.assists) / (Players.minutes_played / 90)
+        ).\
+        filter(
+            Players.minutes_played >= 900.0
+            #Players.league_name == "Premier League"
+        ).\
+        order_by(
+            (Players.goals + Players.assists) / (Players.minutes_played / 90)
+        )[::-1][:25]
     #query_result = session.query(Teams.id, Teams.name).all()
 
     session.close()
@@ -45,7 +51,7 @@ def update_table(engine, data):
         session.commit()
         print("INFO: Update Successful.")
     except:
-        print("ERROR: Update Unsuccessful. A problem occurred while updating Players table.")
+        print("ERROR: Update Unsuccessful.")
     return session
 
 def insert_into_table(engine, row):
@@ -61,7 +67,7 @@ def insert_into_table(engine, row):
         session.close()
         print("INFO: Insertion Successful.")
     except IntegrityError as ie:
-        print("ERROR: Insertion Unsuccessful. An attmempt to insert an existing row into the database was made.")
+        print("ERROR: An attmempt to insert an existing row into the database was made.")
         sys.exit(1)
     return session
 
