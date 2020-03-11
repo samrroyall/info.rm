@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 import pathlib
+import os.path
+
+def config_exists():
+    current_path = pathlib.Path(__file__).parent.absolute()
+    config_path = pathlib.PurePath.joinpath(current_path, "config.ini")
+    return pathlib.Path.exists(config_path)
 
 def read_config():
     """ Function for reading configuration information from config.ini """

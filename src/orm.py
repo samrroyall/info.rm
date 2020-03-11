@@ -57,7 +57,7 @@ class Leagues(Base):
 
     def __repr__(self):
         """ Instance to print class objects """
-        return f"<Leagues(league_id={self.league_id}, name={self.name}, country={self.country}, season={self.season}, ...)>"
+        return f"<Leagues(league_id={self.id}, name={self.name}, country={self.country}, season={self.season}, ...)>"
 
 
 class Teams(Base):
@@ -94,7 +94,7 @@ class Teams(Base):
 
     def __repr__(self):
         """ Instance to print class objects """
-        return f"<Teams(team_id={self.team_id}, league_id={self.league_id}, name={self.name}, country={self.country}, ...)>"
+        return f"<Teams(team_id={self.id}, league_id={self.league_id}, name={self.name}, country={self.country}, ...)>"
 
 
 class Players(Base):
@@ -225,5 +225,5 @@ class Players(Base):
 
     def __repr__(self):
         """ Instance to print class objects """
-        return f"""<Players(player_id={self.player_id}, firstname={self.firstname}, lastname={self.lastname}, team_id={self.team_id}, 
-                   league={self.league}, age={self.age}, position={self.position}, nationality={self.nationality}, ...)>"""
+        return f"""<Players(player_id={self.id}, name={self.name}, team_id={self.team_id}, league={self.league},
+                age={self.age}, position={self.position}, nationality={self.nationality}, ...)>"""

@@ -24,6 +24,7 @@ def initialize_parser():
         type = str,
         choices = [
             "setup",
+            "query_db",
             "insert_leagues",
             "insert_teams",
             "insert_players",
