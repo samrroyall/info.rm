@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block attacking_goals %}
-  <ul class="list-group list-group-flush">
+  <ul id="goalsTable" class="list-group list-group-flush">
     {% for row in query_result.get("attacking").get("goals")[:5] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
