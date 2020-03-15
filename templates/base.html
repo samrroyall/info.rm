@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- META TAGS -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- BOOTSTRAP STYLESHEET -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- JQUERY SCRIPTS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <title>info.rm - statistics on players in Europe's top five leagues</title>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <div class="border shadow p-3 mb-5 bg-white" style="position:relative; width:75%; margin-left:auto; margin-right:auto; min-width: 1000px; padding-top: 130px">
+      <nav class="navbar navbar-fixed-top navbar-light bg-light border" style="position:absolute; top:0; left:0; width:100%; margin-left:auto; margin-right:auto">
+        <!-- Logo -->
+        <a class="navbar-brand mb-0 h1" href="{{ url_for('all_leagues') }}">info.rm</a>
+        <!-- Search Bar -->
+        <form class="form-inline">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </nav>
+      <nav class="navbar navbar-light bg-light border" style="position: absolute; top:55px; left:0; width:100%; margin-left:auto; margin-right:auto">
+        <!-- All Leagues -->
+        <a class="nav-link" href="{{ url_for('all_leagues') }}">
+          All
+        </a>
+        <!-- Bundesliga -->
+        <a class="nav-link" href="{{ url_for('bundesliga') }}">
+          <img src="https://media.api-football.com/leagues/8.png" height="40px">
+        </a>
+        <!-- Ligue 1 -->
+        <a class="nav-link" href="{{ url_for('ligue_1') }}">
+          <img src="https://media.api-football.com/leagues/4.svg" height="40px">
+        </a>
+        <!-- Premier League -->
+        <a class="nav-link" href="{{ url_for('premier_league') }}">
+          <img src="https://media.api-football.com/leagues/2.png" height="40px">
+        </a>
+        <!-- All Leagues -->
+        <a class="nav-link" href="{{ url_for('la_liga') }}">
+          <img src="https://media.api-football.com/leagues/87.png" height="40px">
+        </a>
+        <!-- Serie A -->
+        <a class="nav-link" href="{{ url_for('serie_a') }}">
+          <img src="https://media.api-football.com/leagues/94.png" height="40px">
+        </a>
+      </nav>
+      <!-- Wrapper Container -->
+      <div class="container-fluid" style="padding-top: 130px">
+        <!-- Attacking Stats Container -->
+        <div style="padding-bottom: 30px">
+          <h4 class="display-6">Attacking Statistics</h4>
+          <hr class="my-4">
+          <div class="row">
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Goals</h5>
+              </div>
+              {% block attacking_goals %}{% endblock %}
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Assists</h5>
+              </div>
+            {% block attacking_assists %}{% endblock %}
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Shots on Target</h5>
+              </div>
+              {% block attacking_shots_on %}{% endblock %}              
+            </div>
+          </div>
+        </div>
+        <!-- Creation Stats Container -->
+        <div style="padding-bottom: 30px">
+          <h4 class="display-6">Creation Statistics</h4>
+          <hr class="my-4">
+          <div class="row">
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Key Passes</h5>
+              </div>
+              {% block creation_passes_key %}{% endblock %}
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Successful Dribbles</h5>
+              </div>
+              {% block creation_dribbles_succeeded %}{% endblock %}
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Passes Made</h5>
+              </div>
+              {% block creation_passes %}{% endblock %} 
+            </div>
+          </div>
+        </div>
+        <!-- Defending Stats Container -->
+        <div style="padding-bottom: 30px">
+          <h4 class="display-6">Defending Statistics</h4>
+          <hr class="my-4">
+          <div class="row">
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Tackles</h5>
+              </div>
+              {% block defending_tackles %}{% endblock %} 
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Interceptions</h5>
+              </div>
+              {% block defending_interceptions %}{% endblock %} 
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Blocks</h5>
+              </div>
+              {% block defending_blocks %}{% endblock %} 
+            </div>
+          </div>
+        </div>
+        <!-- GoalKeeping Stats Container -->
+        <div style="padding-bottom:30px">
+          <h4 class="display-6">Goalkeeping Statistics</h4>
+          <hr class="my-4">
+          <div class="row justify-content-center">
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Goals Conceded</h5>
+              </div>
+              {% block goalkeeping_goals_conceded %}{% endblock %} 
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title">Penalties Saved</h5>
+              </div>
+              {% block goalkeeping_penalties_saved %}{% endblock %} 
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
