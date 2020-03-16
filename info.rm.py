@@ -91,12 +91,20 @@ def dashboard_stats(league = None):
     query_result["goalkeeping"] = goalkeeping_stats(league)
     return query_result
 
+DASHBOARD_PAGES = {
+    "attacking": {
+        "goals": 1,
+        "assists": 1,
+        "shots_on": 1
+    }
+}
+
 
 info_rm = Flask(__name__)
 
 @info_rm.route("/")
 def all_leagues():
-    return render_template("dashboard.html", query_result=dashboard_stats())
+    return render_template("dashboard.html", query_result=dashboard_stats(), pages=DASHBOARD_PAGES)
 
 @info_rm.route("/bundesliga")
 def bundesliga():

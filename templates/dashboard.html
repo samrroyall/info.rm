@@ -1,32 +1,39 @@
 {% extends "base.html" %}
 
 {% block attacking_goals %}
-  <ul id="goalsTable" class="list-group list-group-flush">
-    {% for row in query_result.get("attacking").get("goals")[:5] %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+  <ul class="list-group list-group-flush">
+    {% for row in query_result.get("attacking").get("goals")[10 * (pages.get("attacking").get("goals") - 1):10 * pages.get("attacking").get("goals")] %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src="{{row.get('team_logo')}}" height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
-      </div>
-    </li>
+      </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
-        <div class="col-12 text-center">
-          <img src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}" height="25px">&nbsp&nbsp
-          <img src="{{ url_for('static', filename='icons/arrow-right-circle.svg') }}" height="25px">
+        <div class="col-12">
+          <nav class="nav justify-content-center">
+            <ul class="pagination pagination-md">
+              <li class="page-item disabled"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">4</a></li>
+              <li class="page-item"><a class="page-link" href="#">5</a></li>
+           </ul>
+          </nav>
         </div>
       </div>
     </li>
@@ -35,7 +42,7 @@
 
 {% block attacking_assists %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("attacking").get("assists")[:5] %}
+    {% for row in query_result.get("attacking").get("assists")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -68,7 +75,7 @@
 
 {% block attacking_shots_on %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("attacking").get("shots_on")[:5] %}
+    {% for row in query_result.get("attacking").get("shots_on")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -101,7 +108,7 @@
 
 {% block creation_passes_key %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("creation").get("passes_key")[:5] %}
+    {% for row in query_result.get("creation").get("passes_key")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -134,7 +141,7 @@
 
 {% block creation_dribbles_succeeded %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("creation").get("dribbles_succeeded")[:5] %}
+    {% for row in query_result.get("creation").get("dribbles_succeeded")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -167,7 +174,7 @@
 
 {% block creation_passes %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("creation").get("passes")[:5] %}
+    {% for row in query_result.get("creation").get("passes")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -200,7 +207,7 @@
 
 {% block defending_tackles %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("defending").get("tackles")[:5] %}
+    {% for row in query_result.get("defending").get("tackles")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -233,7 +240,7 @@
 
 {% block defending_interceptions %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("defending").get("interceptions")[:5] %}
+    {% for row in query_result.get("defending").get("interceptions")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -266,7 +273,7 @@
 
 {% block defending_blocks %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("defending").get("blocks")[:5] %}
+    {% for row in query_result.get("defending").get("blocks")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -299,7 +306,7 @@
 
 {% block goalkeeping_goals_conceded %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("goalkeeping").get("goals_conceded")[:5] %}
+    {% for row in query_result.get("goalkeeping").get("goals_conceded")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
@@ -332,7 +339,7 @@
 
 {% block goalkeeping_penalties_saved %}
   <ul class="list-group list-group-flush">
-    {% for row in query_result.get("goalkeeping").get("penalties_saved")[:5] %}
+    {% for row in query_result.get("goalkeeping").get("penalties_saved")[:10] %}
     <li class="list-group-item">
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-3 text-left float-left">
