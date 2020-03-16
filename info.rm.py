@@ -28,10 +28,10 @@ def dashboard_stmt(stat, league, desc = True, additional_filter = None):
     )
     return stmt
 
-def rank_result(query_result):
+def rank_result(query_result, desc=True):
     count = 0
     rank = 0
-    prev_result = float("inf") 
+    prev_result = float("inf") if desc == True else -1.0 * float("inf")
     for idx in range(len(query_result)):
         tup = query_result[idx]
         name = tup[0]
@@ -39,7 +39,9 @@ def rank_result(query_result):
         team_name = tup[2]
         team_logo = tup[3]
         count += 1
-        if stat < prev_result:
+        if desc == True and stat < prev_result:
+            rank = count
+        elif desc == False and stat > prev_result:
             rank = count
         prev_result = stat
         ranked_tup = {
@@ -78,9 +80,10 @@ def goalkeeping_stats(league = None):
     for stat in ["goals_conceded", "penalties_saved"]:
         if stat == "goals_conceded":
             stmt = dashboard_stmt(stat, league, False, ("players.position", "=", "Goalkeeper"))
+            query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db(), False)
         else:
             stmt = dashboard_stmt(stat, league, True, ("players.position", "=", "Goalkeeper"))
-        query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db())
+            query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db())
     return query_result
 
 def dashboard_stats(league = None):
@@ -91,40 +94,93 @@ def dashboard_stats(league = None):
     query_result["goalkeeping"] = goalkeeping_stats(league)
     return query_result
 
-DASHBOARD_PAGES = {
-    "attacking": {
-        "goals": 1,
-        "assists": 1,
-        "shots_on": 1
-    }
-}
+DASHBOARD_PAGES = dict()
 
+def reset_pages():
+    global DASHBOARD_PAGES
+    DASHBOARD_PAGES = {
+        "attacking": {
+            "goals": 1,
+            "assists": 1,
+            "shots_on": 1
+        },
+        "creation": {
+            "passes_key": 1,
+            "dribbles_succeeded": 1,
+            "passes": 1
+        },
+        "defending": {
+            "tackles": 1,
+            "interceptions": 1,
+            "blocks": 1
+        },
+        "goalkeeping": {
+            "goals_conceded": 1,
+            "penalties_saved": 1
+        }
+    }
 
 info_rm = Flask(__name__)
 
 @info_rm.route("/")
 def all_leagues():
+    reset_pages()
     return render_template("dashboard.html", query_result=dashboard_stats(), pages=DASHBOARD_PAGES)
+
+@info_rm.route("/<stat>/<substat>/<page>/<scrollPos>")
+def all_leagues_pages(stat, substat, page, scrollPos):
+    DASHBOARD_PAGES[stat][substat] = int(page)
+    return render_template("dashboard.html", query_result=dashboard_stats(), pages=DASHBOARD_PAGES, scrollPos=scrollPos)
 
 @info_rm.route("/bundesliga")
 def bundesliga():
-    return render_template("dashboard.html", query_result=dashboard_stats("Bundesliga 1"))
+    reset_pages()
+    return render_template("dashboard.html", query_result=dashboard_stats("Bundesliga 1"), pages=DASHBOARD_PAGES)
+
+@info_rm.route("/bundesliga/<stat>/<substat>/<page>/<scrollPos>")
+def bundesliga_pages(stat, substat, page, scrollPos):
+    DASHBOARD_PAGES[stat][substat] = int(page)
+    return render_template("dashboard.html", query_result=dashboard_stats("Bundesliga 1"), pages=DASHBOARD_PAGES, scrollPos=scrollPos)
 
 @info_rm.route("/ligue-1")
 def ligue_1():
-    return render_template("dashboard.html", query_result=dashboard_stats("Ligue 1"))
+    reset_pages()
+    return render_template("dashboard.html", query_result=dashboard_stats("Ligue 1"), pages=DASHBOARD_PAGES)
+
+@info_rm.route("/ligue-1/<stat>/<substat>/<page>/<scrollPos>")
+def ligue_1_pages(stat, substat, page, scrollPos):
+    DASHBOARD_PAGES[stat][substat] = int(page)
+    return render_template("dashboard.html", query_result=dashboard_stats("Ligue 1"), pages=DASHBOARD_PAGES, scrollPos=scrollPos)
 
 @info_rm.route("/la-liga")
 def la_liga():
-    return render_template("dashboard.html", query_result=dashboard_stats("Primera Division"))
+    reset_pages()
+    return render_template("dashboard.html", query_result=dashboard_stats("Primera Division"), pages=DASHBOARD_PAGES)
+
+@info_rm.route("/la-liga/<stat>/<substat>/<page>/<scrollPos>")
+def la_liga_pages(stat, substat, page, scrollPos):
+    DASHBOARD_PAGES[stat][substat] = int(page)
+    return render_template("dashboard.html", query_result=dashboard_stats("Primera Division"), pages=DASHBOARD_PAGES, scrollPos=scrollPos)
 
 @info_rm.route("/premier-league")
 def premier_league():
-    return render_template("dashboard.html", query_result=dashboard_stats("Premier League"))
+    reset_pages()
+    return render_template("dashboard.html", query_result=dashboard_stats("Premier League"), pages=DASHBOARD_PAGES)
+
+@info_rm.route("/premier-league/<stat>/<substat>/<page>/<scrollPos>")
+def premier_league_pages(stat, substat, page, scrollPos):
+    DASHBOARD_PAGES[stat][substat] = int(page)
+    return render_template("dashboard.html", query_result=dashboard_stats("Premier League"), pages=DASHBOARD_PAGES, scrollPos=scrollPos)
 
 @info_rm.route("/serie-a")
 def serie_a():
-    return render_template("dashboard.html", query_result=dashboard_stats("Serie A"))
+    reset_pages()
+    return render_template("dashboard.html", query_result=dashboard_stats("Serie A"), pages=DASHBOARD_PAGES)
+
+@info_rm.route("/serie-a/<stat>/<substat>/<page>/<scrollPos>")
+def serie_a_pages(stat, substat, page, scrollPos):
+    DASHBOARD_PAGES[stat][substat] = int(page)
+    return render_template("dashboard.html", query_result=dashboard_stats("Serie A"), pages=DASHBOARD_PAGES, scrollPos=scrollPos)
 
 if __name__ == "__main__":
     info_rm.run(debug=True)
