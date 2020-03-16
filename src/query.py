@@ -134,8 +134,8 @@ class Statement:
         self, 
         table_names: List[Tuple[str,str]], 
         select_fields: List[str], 
-        order_fields: Optional[List[str]], 
-        filter_fields: Optional[List[Tuple[List[Tuple[str,str,str]], str]]]
+        order_fields: Optional[List[str]] = None, 
+        filter_fields: Optional[List[Tuple[List[Tuple[str,str,str]], str]]] = None
     ) -> None:
         self.select_stmt = Select(select_fields, table_names)
         if order_fields:
@@ -172,4 +172,15 @@ class Query:
         connection.commit()
         connection.close()
         return query_result
+
+def get_max_minutes_played(db_path) -> float:
+    assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
+        "ERROR: invalid DB path supplied to Query."
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute("SELECT max(minutes_played) FROM players;")
+    query_result = cursor.fetchall()[0][0]
+    connection.commit()
+    connection.close()
+    return query_result
 

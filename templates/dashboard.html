@@ -2,12 +2,16 @@
 
 {% block attacking_goals %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("attacking").get("goals")
-      [10 * (pages.get("attacking").get("goals") - 1) : (10 * pages.get("attacking").get("goals"))]) %}
+    {% set pagemod = query_result.get("attacking").get("goals")|length % 10 %}
+    {% set pagediv = query_result.get("attacking").get("goals")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="attacking_goals_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("attacking").get("goals")[10 * (page - 1) : 10 * page]) %}
       <li class="list-group-item">
         <div class="row h-100 justify-content-center align-items-center">
           <div class="col-3 text-left float-left">
-            <img src="{{row.get('team_logo')}}" height="30px"/>
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
           <div class="col-6 text-left float-center">
             <div class="row">
@@ -22,23 +26,20 @@
           </div>
         </div>
       </li>
+      {% endfor %}
+      </div>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("attacking").get("goals") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/attacking/goals/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('attacking_goals_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -48,43 +49,44 @@
 
 {% block attacking_assists %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("attacking").get("assists")
-      [10 * (pages.get("attacking").get("assists") - 1) : (10 * pages.get("attacking").get("assists"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("attacking").get("assists")|length % 10 %}
+    {% set pagediv = query_result.get("attacking").get("assists")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="attacking_assists_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("attacking").get("assists")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("attacking").get("assists") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/attacking/assists/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('attacking_assists_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -94,43 +96,44 @@
 
 {% block attacking_shots_on %}
   <ul class="list-group list-group-flush">
-   {% for row in (query_result.get("attacking").get("shots_on")
-      [10 * (pages.get("attacking").get("shots_on") - 1) : (10 * pages.get("attacking").get("shots_on"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("attacking").get("shots_on")|length % 10 %}
+    {% set pagediv = query_result.get("attacking").get("shots_on")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="attacking_shots_on_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("attacking").get("shots_on")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("attacking").get("shots_on") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/attacking/shots_on/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('attacking_shots_on_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -140,43 +143,44 @@
 
 {% block creation_passes_key %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("creation").get("passes_key")
-      [10 * (pages.get("creation").get("passes_key") - 1) : (10 * pages.get("creation").get("passes_key"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("creation").get("passes_key")|length % 10 %}
+    {% set pagediv = query_result.get("creation").get("passes_key")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="creation_passes_key_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("creation").get("passes_key")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("creation").get("passes_key") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/creation/passes_key/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('creation_passes_key_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -186,43 +190,44 @@
 
 {% block creation_dribbles_succeeded %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("creation").get("dribbles_succeeded")
-      [10 * (pages.get("creation").get("dribbles_succeeded") - 1) : (10 * pages.get("creation").get("dribbles_succeeded"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("creation").get("dribbles_succeeded")|length % 10 %}
+    {% set pagediv = query_result.get("creation").get("dribbles_succeeded")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="creation_dribbles_succeeded_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("creation").get("dribbles_succeeded")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("creation").get("dribbles_succeeded") == i %}
-                  <li class="page-item disabled"><a class="page-link" href="#">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/creation/dribbles_succeeded/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('creation_dribbles_succeeded_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -232,43 +237,44 @@
 
 {% block creation_passes %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("creation").get("passes")
-      [10 * (pages.get("creation").get("passes") - 1) : (10 * pages.get("creation").get("passes"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("creation").get("passes")|length % 10 %}
+    {% set pagediv = query_result.get("creation").get("passes")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="creation_passes_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("creation").get("passes")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("creation").get("passes") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/creation/passes/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('creation_passes_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -278,43 +284,44 @@
 
 {% block defending_tackles %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("defending").get("tackles")
-      [10 * (pages.get("defending").get("tackles") - 1) : (10 * pages.get("defending").get("tackles"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("defending").get("tackles")|length % 10 %}
+    {% set pagediv = query_result.get("defending").get("tackles")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="defending_tackles_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("defending").get("tackles")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("defending").get("tackles") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/defending/tackles/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('defending_tackles_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -324,41 +331,42 @@
 
 {% block defending_interceptions %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("defending").get("interceptions")
-      [10 * (pages.get("defending").get("interceptions") - 1) : (10 * pages.get("defending").get("interceptions"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("defending").get("interceptions")|length % 10 %}
+    {% set pagediv = query_result.get("defending").get("interceptions")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="defending_interceptions_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("defending").get("interceptions")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("defending").get("interceptions") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/defending/interceptions/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('defending_interceptions_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
             </ul>
           </nav>
@@ -370,43 +378,44 @@
 
 {% block defending_blocks %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("defending").get("blocks")
-      [10 * (pages.get("defending").get("blocks") - 1) : (10 * pages.get("defending").get("blocks"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("defending").get("blocks")|length % 10 %}
+    {% set pagediv = query_result.get("defending").get("blocks")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="defending_blocks_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("defending").get("blocks")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("defending").get("blocks") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/defending/blocks/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('defending_blocks_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -416,43 +425,44 @@
 
 {% block goalkeeping_goals_conceded %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("goalkeeping").get("goals_conceded")
-      [10 * (pages.get("goalkeeping").get("goals_conceded") - 1) : (10 * pages.get("goalkeeping").get("goals_conceded"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("goalkeeping").get("goals_conceded")|length % 10 %}
+    {% set pagediv = query_result.get("goalkeeping").get("goals_conceded")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="goalkeeping_goals_conceded_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("goalkeeping").get("goals_conceded")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
     <li class="list-group-item">
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("goalkeeping").get("goals_conceded") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/goalkeeping/goals_conceded/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('goalkeeping_goals_conceded_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
@@ -462,43 +472,44 @@
 
 {% block goalkeeping_penalties_saved %}
   <ul class="list-group list-group-flush">
-    {% for row in (query_result.get("goalkeeping").get("penalties_saved")
-      [10 * (pages.get("goalkeeping").get("penalties_saved") - 1) : (10 * pages.get("goalkeeping").get("penalties_saved"))]) %}
-    <li class="list-group-item">
-      <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-3 text-left float-left">
-          <img src={{row.get("team_logo")}} height="30px"/>
-        </div>
-        <div class="col-6 text-left float-center">
-          <div class="row">
-            <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+    {% set pagemod = query_result.get("goalkeeping").get("penalties_saved")|length % 10 %}
+    {% set pagediv = query_result.get("goalkeeping").get("penalties_saved")|length // 10 %}
+    {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+    {% for page in range(1, num_pages + 1) %}
+      <div id="goalkeeping_penalties_saved_page_{{page}}" class="hidden">
+      {% for row in (query_result.get("goalkeeping").get("penalties_saved")[10 * (page - 1) : 10 * page]) %}
+      <li class="list-group-item">
+        <div class="row h-100 justify-content-center align-items-center">
+          <div class="col-3 text-left float-left">
+            <img src={{row.get("team_logo")}} height="30px"/>
           </div>
-          <div class="row">
-            {{row.get("team_name")}}
+          <div class="col-6 text-left float-center">
+            <div class="row">
+              <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+            </div>
+            <div class="row">
+              {{row.get("team_name")}}
+            </div>
+          </div>
+          <div class="col-3 text-right float-right">
+            <strong>{{row.get("stat")}}</strong>
           </div>
         </div>
-        <div class="col-3 text-right float-right">
-          <strong>{{row.get("stat")}}</strong>
-        </div>
+      </li>
+      {% endfor %}
       </div>
-    </li>
     {% endfor %}
-    <li class="list-group-item">
+    <li class="list-group-item">"
       <div class="row h-100">
         <div class="col-12">
           <nav class="nav justify-content-center">
             <ul class="pagination pagination-md">
-              {% for i in range(1,6) %}
-                {% if pages.get("goalkeeping").get("penalties_saved") == i %}
-                  <li class="page-item disabled"><a class="page-link">{{i}}</a></li>
-                {% else %}
-                  <li class="page-item" style="color: blue">
-                    <a class="page-link" onclick="location.href=location.href.split('/')[0]+
-                      '/goalkeeping/penalties_saved/'+{{i}}+'/'+$(window).scrollTop()">{{i}}</a>
-                  </li>
-                {% endif %}
+              {% for i in range(1, num_pages + 1) %}
+                <li class="page-item" style="color: blue">
+                  <a class="page-link" onclick="changePage('goalkeeping_penalties_saved_page_', {{i}})">{{i}}</a>
+                </li>
               {% endfor %}
-           </ul>
+            </ul>
           </nav>
         </div>
       </div>
