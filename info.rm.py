@@ -47,11 +47,11 @@ def rank_result(query_result, desc=True, stat_type="int"):
         team_name = tup[2]
         team_logo = tup[3]
         count += 1
-        if desc == True and stat < prev_result:
+        if desc == True and round(stat, 3) < prev_result:
             rank = count
-        elif desc == False and stat > prev_result:
+        elif desc == False and round(stat, 3) > prev_result:
             rank = count
-        prev_result = stat
+        prev_result = round(stat, 3)
         ranked_tup = {
             "rank": rank,
             "name": name,
@@ -69,11 +69,31 @@ def attacking_stats(league = None):
         query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db())
     return query_result
 
+def attacking_stats_per_90(league = None):
+    query_result = dict()
+    max_minutes_played = src.query.get_max_minutes_played(DB_PATH)
+    for stat in ["goals", "assists", "shots_on"]:
+        stmt = dashboard_stmt(f"{stat}/(players.minutes_played/90.0)", league, True,
+                   [("players.minutes_played", ">", str(max_minutes_played/3))]
+               )
+        query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db(), True, "float")
+    return query_result
+
 def creation_stats(league = None):
     query_result = dict()
     for stat in ["passes_key", "dribbles_succeeded", "passes"]:
         stmt = dashboard_stmt(stat, league)
         query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db())
+    return query_result
+
+def creation_stats_per_90(league = None):
+    query_result = dict()
+    max_minutes_played = src.query.get_max_minutes_played(DB_PATH)
+    for stat in ["passes_key", "dribbles_succeeded", "passes"]:
+        stmt = dashboard_stmt(f"{stat}/(players.minutes_played/90.0)", league, True,
+                   [("players.minutes_played", ">", str(max_minutes_played/3))]
+               )
+        query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db(), True, "float")
     return query_result
 
 def defending_stats(league = None):
@@ -83,16 +103,31 @@ def defending_stats(league = None):
         query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db())
     return query_result
 
-def goalkeeping_stats(league = None):
+def defending_stats_per_90(league = None):
     query_result = dict()
-    for stat in ["goals_conceded", "penalties_saved"]:
+    max_minutes_played = src.query.get_max_minutes_played(DB_PATH)
+    for stat in ["tackles", "interceptions", "blocks"]:
+        stmt = dashboard_stmt(f"{stat}/(players.minutes_played/90.0)", league, True, 
+                   [("players.minutes_played", ">", str(max_minutes_played/3))]
+               )
+        query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db(), True, "float")
+    return query_result
+
+def other_stats(league = None):
+    query_result = dict()
+    max_minutes_played = src.query.get_max_minutes_played(DB_PATH)
+    for stat in ["rating", "goals_conceded", "penalties_saved"]:
         if stat == "goals_conceded":
-            max_minutes_played = src.query.get_max_minutes_played(DB_PATH)
             stmt = dashboard_stmt(f"{stat}/(players.minutes_played/90.0)", league, False, [
                 ("players.minutes_played", ">", str(max_minutes_played/3)),
                 ("players.position", "=", "Goalkeeper")
             ])
             query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db(), False, "float")
+        elif stat == "rating":
+            stmt = dashboard_stmt(stat, league, True, 
+                   [("players.minutes_played", ">", str(max_minutes_played/3))]
+               )
+            query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db(), True, "float")
         else:
             stmt = dashboard_stmt(stat, league, True, [("players.position", "=", "Goalkeeper")])
             query_result[stat] = rank_result(src.query.Query(DB_PATH, stmt).query_db())
@@ -103,34 +138,66 @@ def dashboard_stats(league = None):
     query_result["attacking"] = attacking_stats(league)
     query_result["creation"] = creation_stats(league)
     query_result["defending"] = defending_stats(league)
-    query_result["goalkeeping"] = goalkeeping_stats(league)
+    query_result["other"] = other_stats(league)
+    return query_result
+
+def dashboard_stats_per_90(league = None):
+    query_result = dict()
+    query_result["attacking"] = attacking_stats_per_90(league)
+    query_result["creation"] = creation_stats_per_90(league)
+    query_result["defending"] = defending_stats_per_90(league)
+    query_result["other"] = other_stats(league)
     return query_result
 
 info_rm = Flask(__name__)
 
 @info_rm.route("/")
 def all_leagues():
-    return render_template("dashboard.html", query_result=dashboard_stats())
+    return render_template("dashboard.html", query_result=dashboard_stats(), per_90=False)
 
-@info_rm.route("/bundesliga")
+@info_rm.route("/per-90")
+def all_leagues_per_ninety():
+    return render_template("dashboard.html", query_result=dashboard_stats_per_90(), per_90=True)
+
+@info_rm.route("/bundesliga/")
 def bundesliga():
-    return render_template("dashboard.html", query_result=dashboard_stats("Bundesliga 1"))
+    return render_template("dashboard.html", query_result=dashboard_stats("Bundesliga 1"), per_90=False)
 
-@info_rm.route("/ligue-1")
+@info_rm.route("/bundesliga/per-90")
+def bundesliga_per_ninety():
+    return render_template("dashboard.html", query_result=dashboard_stats_per_90("Bundesliga 1"), per_90=True)
+
+@info_rm.route("/ligue-1/")
 def ligue_1():
-    return render_template("dashboard.html", query_result=dashboard_stats("Ligue 1"))
+    return render_template("dashboard.html", query_result=dashboard_stats("Ligue 1"), per_90=False)
 
-@info_rm.route("/la-liga")
+@info_rm.route("/ligue-1/per-90")
+def ligue_1_per_ninety():
+    return render_template("dashboard.html", query_result=dashboard_stats_per_90("Ligue 1"), per_90=True)
+
+@info_rm.route("/la-liga/")
 def la_liga():
-    return render_template("dashboard.html", query_result=dashboard_stats("Primera Division"))
+    return render_template("dashboard.html", query_result=dashboard_stats("Primera Division"), per_90=False)
 
-@info_rm.route("/premier-league")
+@info_rm.route("/la-liga/per-90")
+def la_liga_per_ninety():
+    return render_template("dashboard.html", query_result=dashboard_stats_per_90("Primera Division"), per_90=True)
+
+@info_rm.route("/premier-league/")
 def premier_league():
-    return render_template("dashboard.html", query_result=dashboard_stats("Premier League"))
+    return render_template("dashboard.html", query_result=dashboard_stats("Premier League"), per_90=False)
 
-@info_rm.route("/serie-a")
+@info_rm.route("/premier-league/per-90")
+def premier_league_per_ninety():
+    return render_template("dashboard.html", query_result=dashboard_stats_per_90("Premier League"), per_90=True)
+
+@info_rm.route("/serie-a/")
 def serie_a():
-    return render_template("dashboard.html", query_result=dashboard_stats("Serie A"))
+    return render_template("dashboard.html", query_result=dashboard_stats("Serie A"), per_90=False)
+
+@info_rm.route("/serie-a/per-90")
+def serie_a_per_ninety():
+    return render_template("dashboard.html", query_result=dashboard_stats_per_90("Serie A"), per_90=True)
 
 if __name__ == "__main__":
     info_rm.run(debug=True)

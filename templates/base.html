@@ -26,8 +26,9 @@
         $("div#defending_tackles_page_1").removeClass("hidden")
         $("div#defending_interceptions_page_1").removeClass("hidden")
         $("div#defending_blocks_page_1").removeClass("hidden")
-        $("div#goalkeeping_goals_conceded_page_1").removeClass("hidden")
-        $("div#goalkeeping_penalties_saved_page_1").removeClass("hidden")
+        $("div#other_rating_page_1").removeClass("hidden")
+        $("div#other_goals_conceded_page_1").removeClass("hidden")
+        $("div#other_penalties_saved_page_1").removeClass("hidden")
       });
     </script>
 
@@ -60,10 +61,6 @@
         </form>
       </nav>
       <nav class="navbar navbar-light bg-light border" style="position: absolute; top:55px; left:0; width:100%; margin-left:auto; margin-right:auto">
-        <!-- All Leagues -->
-        <a class="nav-link" href="{{ url_for('all_leagues') }}">
-          All
-        </a>
         <!-- Bundesliga -->
         <a class="nav-link" href="{{ url_for('bundesliga') }}">
           <img src="https://media.api-football.com/leagues/8.png" height="40px">
@@ -89,24 +86,35 @@
       <div class="container-fluid" style="padding-top: 130px">
         <!-- Attacking Stats Container -->
         <div style="padding-bottom: 30px">
+          <div style="text-align: center; padding-bottom: 15px; padding-top: 15px">
+            {% if per_90 == True %}
+              <button class="btn btn-dark btn-sm" onclick="location.href = location.href.split('per-90')[0]">
+                Overall Stats
+              </button>
+            {% else %}
+              <button class="btn btn-dark btn-sm" onclick="location.href = location.href.split('per-90')[0] + 'per-90'">
+                Per 90 Minutes Stats
+              </button>
+            {%endif%}
+          </div>
           <h4 class="display-6">Attacking Statistics</h4>
           <hr class="my-4">
           <div class="row">
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Goals</h5>
-                {% block attacking_goals %}{% endblock %}
+                  <h5 class="card-title" style="text-align: center">Goals</h5>
+                  {% block attacking_goals %}{% endblock %}
               </div>
             </div>
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Assists</h5>
+                <h5 class="card-title" style="text-align: center">Assists</h5>
                 {% block attacking_assists %}{% endblock %}
               </div>
             </div>
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Shots on Target</h5>
+                <h5 class="card-title" style="text-align: center">Shots on Target</h5>
                 {% block attacking_shots_on %}{% endblock %}
               </div>
             </div>
@@ -119,19 +127,19 @@
           <div class="row">
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Key Passes</h5>
+                <h5 class="card-title" style="text-align: center">Key Passes</h5>
                 {% block creation_passes_key %}{% endblock %}
               </div>
             </div>
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Successful Dribbles</h5>
+                <h5 class="card-title" style="text-align: center">Successful Dribbles</h5>
                 {% block creation_dribbles_succeeded %}{% endblock %}
               </div>
             </div>
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Passes Made</h5>
+                <h5 class="card-title" style="text-align: center">Passes Made</h5>
                 {% block creation_passes %}{% endblock %}
               </div>
             </div>
@@ -144,39 +152,45 @@
           <div class="row">
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Tackles</h5>
+                <h5 class="card-title" style="text-align: center">Tackles</h5>
                 {% block defending_tackles %}{% endblock %}
               </div>
             </div>
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Interceptions</h5>
+                <h5 class="card-title" style="text-align: center">Interceptions</h5>
                 {% block defending_interceptions %}{% endblock %}
               </div>
             </div>
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Blocks</h5>
+                <h5 class="card-title" style="text-align: center">Blocks</h5>
                 {% block defending_blocks %}{% endblock %}
               </div>
             </div>
           </div>
         </div>
-        <!-- GoalKeeping Stats Container -->
+        <!-- Other Stats Container -->
         <div style="padding-bottom:30px">
-          <h4 class="display-6">Goalkeeping Statistics</h4>
+          <h4 class="display-6">Other Statistics</h4>
           <hr class="my-4">
-          <div class="row justify-content-center">
-            <div class="card col-xs-4 col-sm-4 col-md-4 align-items-top d-flex" style="width: 18rem; font-size: x-small;">
+          <div class="row">
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Goals Conceded</h5>
-                {% block goalkeeping_goals_conceded %}{% endblock %}
+                <h5 class="card-title" style="text-align: center">Player Rating</h5>
+                {% block other_rating %}{% endblock %}
               </div>
             </div>
             <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
               <div class="card-body">
-                <h5 class="card-title">Penalties Saved</h5>
-                {% block goalkeeping_penalties_saved %}{% endblock %}
+                <h5 class="card-title" style="text-align: center">Avg Goals Conceded</h5>
+                {% block other_goals_conceded %}{% endblock %}
+              </div>
+            </div>
+            <div class="card col-xs-4 col-sm-4 col-md-4" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <h5 class="card-title" style="text-align: center">Penalties Saved</h5>
+                {% block other_penalties_saved %}{% endblock %}
               </div>
             </div>
           </div>
