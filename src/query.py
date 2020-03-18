@@ -117,7 +117,7 @@ class Select:
 
     def to_str(self) -> str:
         select_list = ", ".join(self.select_fields)
-        self.check_tables()
+        #self.check_tables()
         if len(self.table_names) == 1:
             query_string = f"SELECT {select_list} FROM {self.table_names[0]}"
         else:
@@ -173,12 +173,12 @@ class Query:
         connection.close()
         return query_result
 
-def get_max_minutes_played(db_path) -> float:
+def get_max(db_path: str, stat: str) -> float:
     assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
         "ERROR: invalid DB path supplied to Query."
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
-    cursor.execute("SELECT max(minutes_played) FROM players;")
+    cursor.execute(f"SELECT max({stat}) FROM players;")
     query_result = cursor.fetchall()[0][0]
     connection.commit()
     connection.close()

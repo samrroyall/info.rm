@@ -5,15 +5,21 @@
 <!-- Only show first page on page ready -->
 <script>
   $(document).ready(function() {
-    $("div#attacking_goals_page_1").removeClass("hidden")
-    $("div#attacking_assists_page_1").removeClass("hidden")
-    $("div#attacking_shots_on_page_1").removeClass("hidden")
-    $("div#creation_passes_key_page_1").removeClass("hidden")
-    $("div#creation_dribbles_succeeded_page_1").removeClass("hidden")
-    $("div#creation_passes_page_1").removeClass("hidden")
-    $("div#defending_tackles_page_1").removeClass("hidden")
-    $("div#defending_interceptions_page_1").removeClass("hidden")
-    $("div#defending_blocks_page_1").removeClass("hidden")
+    $("div#goal_goals_page_1").removeClass("hidden")
+    $("div#goal_assists_page_1").removeClass("hidden")
+    $("div#goal_goal_contributions_page_1").removeClass("hidden")
+    $("div#shot_shots_on_page_1").removeClass("hidden")
+    $("div#shot_shots_page_1").removeClass("hidden")
+    $("div#shot_goals_per_shot_page_1").removeClass("hidden")
+    $("div#pass_passes_key_page_1").removeClass("hidden")
+    $("div#pass_passes_page_1").removeClass("hidden")
+    $("div#pass_passes_accuracy_page_1").removeClass("hidden")
+    $("div#dribbling_dribbles_succeeded_page_1").removeClass("hidden")
+    $("div#dribbling_dribbles_attempted_page_1").removeClass("hidden")
+    $("div#dribbling_dribbles_succeeded_pct_page_1").removeClass("hidden")
+    $("div#defensive_tackles_page_1").removeClass("hidden")
+    $("div#defensive_interceptions_page_1").removeClass("hidden")
+    $("div#defensive_blocks_page_1").removeClass("hidden")
     $("div#other_rating_page_1").removeClass("hidden")
     $("div#other_goals_conceded_page_1").removeClass("hidden")
     $("div#other_penalties_saved_page_1").removeClass("hidden")
@@ -34,7 +40,8 @@
   }
 </script>
 
-{% set section_names = {"goals": "Goals","assists": "Assists","shots_on": "Shots On Target","passes_key": "Key Passes","dribbles_succeeded": "Successful Dribbles","passes": "Passes","tackles": "Tackles","interceptions": "Interceptions","blocks": "Blocks","rating": "Player Rating","goals_conceded": "Avg Goals Conceded","penalties_saved": "Penalties Saved"} %}
+{% set section_names = {"goals": "Goals","assists": "Assists","goal_contributions": "Goal Contributions","shots_on": "Shots On Target","shots": "Shots","goals_per_shot":  "Goals Per Shot","passes_key": "Key Passes","passes": "Passes","passes_accuracy": "Pass Accuracy","dribbles_succeeded": "Successful Dribbles","dribbles_attempted": "Attempted Dribbles","dribbles_succeeded_pct": "Dribble Success Rate","tackles": "Tackles","interceptions": "Interceptions","blocks": "Blocks","rating": "Player Rating","goals_conceded": "Avg Goals Conceded","penalties_saved": "Penalties Saved"} %}
+
 
 <!-- Per 90 Button -->
 <div style="text-align: center; padding-bottom: 15px; padding-top: 15px">
