@@ -91,13 +91,33 @@ class Select:
     def __init__(
             self, 
             select_fields: List[str],
-            table_names: List[Tuple[str,str]],
+            table_names: List[Tuple[str,str]], # table name and join parameter
         ) -> None:
         self.select_fields = select_fields
         assert len(table_names) > 0,\
             "ERROR: Statement class requires at least one table."
         assert len(table_names) < 3,\
             "ERROR: Statement class cannot take more than two tables."
+        self.check_tables(table_names)
+
+    def grab_columns(self, string: str) -> List[str]:
+        chars = ['/','*','+','-','(',')',' ']
+        result = []
+        temp_col = ""
+        for char in string:
+            if char not in chars:
+                temp_col += char
+            else:
+                if temp_col != "":
+                    result.append(temp_col)
+                    temp_col = ""
+        if temp_col != "":
+            result.append(temp_col)
+        return result
+
+    def check_tables(self, table_names: List[Tuple[str,str]]) -> None:
+        db_tables = ["players","teams","leagues"]
+        # handle tables
         if len(table_names) == 1:
             self.table_names = [table_names[0][0]]
         elif len(table_names) == 2:
@@ -105,19 +125,20 @@ class Select:
                 "ERROR: Cannot perform join on the same table."
             self.table_names = [table_names[0][0], table_names[1][0]]
             self.join_params = [table_names[0][1], table_names[1][1]]
-
-    def check_tables(self) -> None:
-        db_tables = ["leagues", "teams", "players"]
-        tables = self.table_names
-        for table in tables:
-            assert table in db_tables, "ERROR: Invalid table name supplied."
-        value_tables = list(set([column.split(".")[0] for column in self.select_fields]))
-        for table in value_tables:
-            assert table in tables, "ERROR: Invalid select param table name supplied"
+        for table in table_names:
+            assert table[0] in db_tables, "ERROR: Invalid table name supplied."
+        # handle columns 
+        for field in self.select_fields:
+            columns = self.grab_columns(field)
+            for column in columns:
+                table = column.split(".")[0]
+                col = column.split(".")[1]
+                if not table.isdecimal() or not col.isdecimal():
+                    assert "." in column and column.split(".")[0] in db_tables,\
+                        "ERROR: Invalid select param table name supplied"
 
     def to_str(self) -> str:
         select_list = ", ".join(self.select_fields)
-        #self.check_tables()
         if len(self.table_names) == 1:
             query_string = f"SELECT {select_list} FROM {self.table_names[0]}"
         else:

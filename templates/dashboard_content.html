@@ -44,16 +44,33 @@
 
 
 <!-- Per 90 Button -->
-<div style="text-align: center; padding-bottom: 15px; padding-top: 15px">
-  {% if per_90 == True %}
-    <button class="btn btn-dark btn-sm" onclick="location.href = location.href.split('per-90')[0]">
-      Overall Stats
-    </button>
-  {% else %}
-    <button class="btn btn-dark btn-sm" onclick="location.href = location.href.split('per-90')[0] + 'per-90'">
-      Per 90 Minutes Stats
-    </button>
-  {%endif%}
+<div class="row text-center justify-content-center" style="padding-bottom: 15px; padding-top: 15px">
+  <div class="col-xs-12 col-sm-12 col-md-12">
+    <h2>
+      {% if current_league == "top-5" %}
+        Dashboard
+      {% elif current_league == "bundesliga" %}
+        Bundesliga Dashboard
+      {% elif current_league == "ligue-1" %}
+        Ligue 1 Dashboard
+      {% elif current_league == "premier-league" %}
+        Premier League Dashboard
+      {% elif current_league == "la-liga" %}
+        La Liga Dashboard
+      {% elif current_league == "serie-a" %}
+        Serie A Dashboard
+      {% endif %}
+      {% if current_per90 %}
+        <a class="btn btn-dark btn-sm" role="button" href={{ url_for( 'dashboard', league=current_league ) }}>
+          Per 90 Minutes Stats
+        </a>
+      {% else %}
+        <a class="btn btn-dark btn-sm" role="button" href={{ url_for( 'dashboard_per90', league=current_league ) }}>
+          Overall Stats
+        </a>
+      {%endif%}
+    </h2>
+  </div>
 </div>
 
 {% for stat in query_result.keys() %}

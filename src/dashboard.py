@@ -178,7 +178,17 @@ def other_stats(league):
 ##########################
 ##########################
 
-def dashboard_stats(league = None, per_90 = False):
+LEAGUE_LOOKUP = {
+        "top-5": None,
+        "bundesliga": "Bundesliga 1",
+        "ligue-1": "Ligue 1",
+        "premier-league": "Premier League",
+        "la-liga": "Primera Division",
+        "serie-a": "Serie A"
+    }
+
+def dashboard_stats(league, per_90):
+    league = LEAGUE_LOOKUP.get(league)
     query_result = dict()
     query_result["goal"] = goals_stats(league, per_90)
     query_result["shot"] = shots_stats(league, per_90)
