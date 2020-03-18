@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- META TAGS -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- BOOTSTRAP STYLESHEET -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- JQUERY SCRIPTS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <!-- SELF-DEFINED CSS -->
+    <style> .hidden { display: none; } .mr-auto { margin-left: auto !important; } </style>
+
+    <title>info.rm - statistics on players in the top five leagues</title>
+  </head>
+    <body>
+    <!-- Navigation Bar -->
+    <div class="border shadow p-3 mb-5 bg-white" style="position:relative; width:75%; margin-left:auto; margin-right:auto; min-width: 1000px; padding-top: 130px">
+      <nav class="navbar navbar-fixed-top navbar-light bg-light border mr-auto" style="position:absolute; top:0; left:0; width:100%; margin-left:auto; margin-right:auto">
+        <!-- Logo -->
+        <a class="navbar-brand mb-0 h1" href="{{ url_for('all_leagues') }}">info.rm</a>
+        <!-- StatBuilder -->
+        <a class="nav-link text-left" href="#">
+          StatBuilder
+          <svg class="bi bi-tools" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M2 3l1-1 3.081 2.2a1 1 0 01.419.815v.07a1 1 0 00.293.708L12.5 11.5l.914-.305a1 1 0 011.023.242l3.356 3.356a1 1 0 010 1.414l-1.586 1.586a1 1 0 01-1.414 0l-3.356-3.356a1 1 0 01-.242-1.023l.305-.914-5.707-5.707a1 1 0 00-.707-.293h-.071a1 1 0 01-.814-.419L2 3zm11.354 9.646a.5.5 0 00-.708.708l3 3a.5.5 0 00.708-.708l-3-3z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M17.898 4.223a3.003 3.003 0 01-3.679 3.674L7.878 14.15a3 3 0 11-2.027-2.027l6.252-6.341a3 3 0 013.675-3.68l-2.142 2.142L14 6l1.757.364 2.141-2.141zm-13.37 9.019L5 13l.471.242.529.026.287.445.445.287.026.529L7 15l-.242.471-.026.529-.445.287-.287.445-.529.026L5 17l-.471-.242L4 16.732l-.287-.445L3.268 16l-.026-.529L3 15l.242-.471.026-.529.445-.287.287-.445.529-.026z" clip-rule="evenodd"/>
+          </svg>
+        </a>
+        <!-- Search Bar -->
+        <form class="form-inline">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </nav>
+      <nav class="navbar navbar-light bg-light border" style="position: absolute; top:55px; left:0; width:100%; margin-left:auto; margin-right:auto">
+        <!-- Bundesliga -->
+        <a class="nav-link" href="{{ url_for('bundesliga') }}">
+          <img src="https://media.api-football.com/leagues/8.png" height="40px">
+        </a>
+        <!-- Ligue 1 -->
+        <a class="nav-link" href="{{ url_for('ligue_1') }}">
+          <img src="https://media.api-football.com/leagues/4.svg" height="40px">
+        </a>
+        <!-- Premier League -->
+        <a class="nav-link" href="{{ url_for('premier_league') }}">
+          <img src="https://media.api-football.com/leagues/2.png" height="40px">
+        </a>
+        <!-- All Leagues -->
+        <a class="nav-link" href="{{ url_for('la_liga') }}">
+          <img src="https://media.api-football.com/leagues/87.png" height="40px">
+        </a>
+        <!-- Serie A -->
+        <a class="nav-link" href="{{ url_for('serie_a') }}">
+          <img src="https://media.api-football.com/leagues/94.png" height="40px">
+        </a>
+      </nav>
+      <!-- Wrapper Container -->
+      <div class="container-fluid" style="padding-top: 130px">
+
+        <script>
+          $(document).ready(function() {
+            // trigger custom stat dropdown 
+            $("#filter_button").click(function() {
+              if ($("#custom_stat").hasClass("hidden")) {
+                $("#custom_stat").removeClass("hidden");
+              } else {
+                $("#custom_stat").addClass("hidden");
+              }
+            });
+            // trigger filter value options
+            $("#filter_type").change(function() {
+              var val = $(this).val();
+              $("#filter_" + val + "_div").removeClass("hidden");
+            });
+            // update age value 
+            $("#age_op").change(function() {
+              var val = $(this).val();
+              if (val == "><") {
+                $("#age_input2_div").removeClass("hidden");
+              } else {
+                $("#age_input2_div").addClass("hidden");
+              }
+            });
+            $("#minutes_played_op").change(function() {
+              var val = $(this).val();
+              if (val == "><") {
+                $("#minutes_played_input2_div").removeClass("hidden");
+              } else {
+                $("#minutes_played_input2_div").addClass("hidden");
+              }
+            });
+            $("#stat_op").change(function() {
+              var val = $(this).val();
+              if (val == "><") {
+                $("#stat_input2_div").removeClass("hidden");
+              } else {
+                $("#stat_input2_div").addClass("hidden");
+              }
+            });
+          });
+        </script>
+
+        <div style="padding-bottom: 30px">
+          <h4 class="display-6">StatBuilder</h4>
+          <hr class="my-4">
+          <div class="row justify-content-center">
+            <div class="card col-xs-9 col-sm-9 col-md-9" style="width: 18rem; font-size: x-small;">
+              <div class="card-body">
+                <div class="card-title">
+                  <div class="text-center h4">
+                    Your Stat
+                    <div id="filter_button">
+                    <svg class="bi bi-filter" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M7.5 13a.5.5 0 01.5-.5h4a.5.5 0 010 1H8a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h8a.5.5 0 010 1H6a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h12a.5.5 0 010 1H4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+                    </svg>
+                    </div>
+                  </div>
+                  <div class="alert alert-light hidden" id="custom_stat" role="alert">
+                    <h4 class="alert-heading">Customize Your Stat</h4>
+                    <strong>Use the options below to generate your own custom statistic.</strong>
+                    <hr>
+                    <form>
+                      <!-- SELECT FIELDS -->
+                      <div class="form-group">
+                        <label for="select_field_1"><h5>Choose Stat to Show:</h5></label>
+                        <div  class="form-row justify-content-center">
+                          <div class="col-xs-5 col-sm-5 col-md-5">
+                            <select class="custom-select custom-select-sm" id="select_field_1">
+                              <!-- Attacking -->
+                              <option>Assists</option>
+                              <option>Successful Dribbles</option>
+                              <option>Successful Dribbles Percentage</option>
+                              <option>Attempted Dribbles</option>
+                              <option>Goals</option>
+                              <option>Shots</option>
+                              <option>Shots on Target</option>
+                              <option>Shots on Target Percentage</option>
+                              <option>Penalties Won</option>
+                              <option>Penalties Made</option>
+                              <option>Penalties Made Percentage</option>
+                              <option>Penalties Missed</option>
+                              <!-- Creation -->
+                              <option>Passes</option>
+                              <option>Pass Accuracy</option>
+                              <option>Key Passes</option>
+                              <!-- Defending -->
+                              <option>Blocks</option>
+                              <!-- Duels/Dribbles Past
+                              <option>Dribbles Past</option>
+                              <option>Duels</option>
+                              <option>Duels Won</option>
+                              <option>Duels Won Percentage</option>
+                              -->
+                              <option>Interceptions</option>
+                              <option>Tackles</option>
+                              <option>Penalties Committed</option>
+                              <!-- Other -->
+                              <option>Goals Conceded</option>
+                              <option>Player Rating</option>
+                              <option>Penalties Saved</option>
+                              <option>Red Cards</option>
+                              <option>Straight Red Cards</option>
+                              <option>Yellow Cards</option>
+                              <option>Second Yellow Cards</option>
+                            </select>
+                          </div>
+                          <div class="col-xs-2 col-sm-2 col-md-2">
+                            <select class="custom-select custom-select-sm" id="select_op">
+                              <option>None</option>
+                              <option>×</option>
+                              <option>÷</option>
+                              <option>+</option>
+                              <option>-</option>
+                            </select>
+                          </div>
+                          <div class="col-xs-5 col-sm-5 col-md-5">
+                            <select class="custom-select custom-select-sm" id="select_field_2">
+                              <option>None</option>
+                              <!-- Attacking -->
+                              <option>Assists</option>
+                              <option>Successful Dribbles</option>
+                              <option>Successful Dribbles Percentage</option>
+                              <option>Attempted Dribbles</option>
+                              <option>Goals</option>
+                              <option>Shots</option>
+                              <option>Shots on Target</option>
+                              <option>Shots on Target Percentage</option>
+                              <option>Penalties Won</option>
+                              <option>Penalties Made</option>
+                              <option>Penalties Made Percentage</option>
+                              <option>Penalties Missed</option>
+                              <!-- Creation -->
+                              <option>Passes</option>
+                              <option>Pass Accuracy</option>
+                              <option>Key Passes</option>
+                              <!-- Defending -->
+                              <option>Blocks</option>
+                              <!-- Duels/Dribbles Past
+                              <option>Dribbles Past</option>
+                              <option>Duels</option>
+                              <option>Duels Won</option>
+                              <option>Duels Won Percentage</option>
+                              -->
+                              <option>Interceptions</option>
+                              <option>Tackles</option>
+                              <option>Penalties Committed</option>
+                              <!-- Other -->
+                              <option>Goals Conceded</option>
+                              <option>Player Rating</option>
+                              <option>Penalties Saved</option>
+                              <option>Red Cards</option>
+                              <option>Straight Red Cards</option>
+                              <option>Yellow Cards</option>
+                              <option>Second Yellow Cards</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="custom-control custom-switch" style="font-size: 1.4em; font-height: 1.3em">
+                          <input type="checkbox" class="custom-control-input" id="select_per90_toggle">
+                          <label class="custom-control-label" for="select_per90_toggle">
+                            Per 90 Minutes
+                          </label>
+                        </div>
+                      </div>
+                      <!-- FILTER FIELDS -->
+                      <div class="form-group">
+                        <label for="select_field_1"><h5>Choose Filter Type:</h5></label>
+                        <div class="form-row">
+                          <div class="col-xs-2 col-sm-2 col-md-2">
+                            <select class="custom-select custom-select-sm" id="filter_type">
+                              <option value="">None</option>
+                              <option value="age">Age</option>
+                              <option value="club">Club</option>
+                              <option value="league">League</option>
+                              <option value="minutes_played">Minutes Played</option>
+                              <option value="nationality">Nationality</option>
+                              <option value="position">Position</option>
+                              <option value="stat">Stat</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!-- Filter Age -->
+                        <div class="hidden" id="filter_age_div" style="margin-top: 15px">
+                          <h6>Age:</h6>
+                          <div class="form-row">
+                            <div class="col-xs-2 col-sm-2 col-md-2">
+                              <select class="custom-select custom-select-sm" id="age_op">
+                                <option value="=">=</option>
+                                <option value="<"><</option>
+                                <option value=">">></option>
+                                <option value="><">Between</option>
+                              </select>
+                            </div>
+                            <div class="col-xs-1 col-sm-1 col-md-1">
+                              <input type="text" class="form-control text-center" id="age_input_1" value="" style="font-size: 1.15em">
+                            </div>
+                            <div class="col-xs-1 col-sm-1 col-md-1">
+                              <div class="hidden" id="age_input2_div">
+                                <input type="text" class="form-control text-center" id="age_input_2" value="" style="font-size: 1.15em">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Filter Club -->
+                        <div class="hidden" id="filter_club_div" style="margin-top: 15px">
+                          <h6>Club:</h6>
+                          <div class="form-row">
+                            <div class="col-xs-3 col-sm-3 col-md-3">
+                              <select class="custom-select custom-select-sm" id="club_league_select">
+                                <option value="Test">League Test</option>
+                              </select>
+                            </div>
+                            <div class="col-xs-3 col-sm-3 col-md-3">
+                              <select class="custom-select custom-select-sm" id="club_select">
+                                <option value="Test">Club Test</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Filter League -->
+                        <div class="hidden" id="filter_league_div" style="margin-top: 15px">
+                          <h6>League:</h6>
+                          <div class="form-row">
+                            <div class="col-xs-3 col-sm-3 col-md-3">
+                              <select class="custom-select custom-select-sm" id="league_select">
+                                <option value="Test">League Test</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Filter Minutes Played -->
+                        <div class="hidden" id="filter_minutes_played_div" style="margin-top: 15px">
+                          <h6>Minutes Played:</h6>
+                          <div class="form-row">
+                            <div class="col-xs-2 col-sm-2 col-md-2">
+                              <select class="custom-select custom-select-sm" id="minutes_played_op">
+                                <option value="=">=</option>
+                                <option value="<"><</option>
+                                <option value=">">></option>
+                                <option value="><">Between</option>
+                              </select>
+                            </div>
+                            <div class="col-xs-1 col-sm-1 col-md-1">
+                              <input type="text" class="form-control text-center" id="minutes_played_input_1" value="" style="font-size: 1.15em">
+                            </div>
+                            <div class="col-xs-1 col-sm-1 col-md-1">
+                              <div class="hidden" id="minutes_played_input2_div">
+                                <input type="text" class="form-control text-center" id="minutes_played_input_2" value="" style="font-size: 1.15em">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Filter Nationality -->
+                        <div class="hidden" id="filter_nationality_div" style="margin-top: 15px">
+                          <h6>League:</h6>
+                          <div class="form-row">
+                            <div class="col-xs-3 col-sm-3 col-md-3">
+                              <select class="custom-select custom-select-sm" id="nationality_select">
+                                <option value="Test">Nation Test</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Filter Position -->
+                        <div class="hidden" id="filter_position_div" style="margin-top: 15px">
+                          <h6>League:</h6>
+                          <div class="form-row">
+                            <div class="col-xs-3 col-sm-3 col-md-3">
+                              <select class="custom-select custom-select-sm" id="position_select">
+                                <option value="">None</option>
+                                <option value="Attacker">Attacker</option>
+                                <option value="Midfielder">Midfielder</option>
+                                <option value="Defender">Defender</option>
+                                <option value="Goalkeeper">Goalkeeper</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="hidden" id="filter_stat_div" style="margin-top: 15px">
+                        <h6>Stat:</h6>
+                        <div  class="form-row">
+                          <div class="col-xs-5 col-sm-5 col-md-5">
+                            <select class="custom-select custom-select-sm" id="stat_select">
+                              <!-- Attacking -->
+                              <option>Assists</option>
+                              <option>Successful Dribbles</option>
+                              <option>Successful Dribbles Percentage</option>
+                              <option>Attempted Dribbles</option>
+                              <option>Goals</option>
+                              <option>Shots</option>
+                              <option>Shots on Target</option>
+                              <option>Shots on Target Percentage</option>
+                              <option>Penalties Won</option>
+                              <option>Penalties Made</option>
+                              <option>Penalties Made Percentage</option>
+                              <option>Penalties Missed</option>
+                              <!-- Creation -->
+                              <option>Passes</option>
+                              <option>Pass Accuracy</option>
+                              <option>Key Passes</option>
+                              <!-- Defending -->
+                              <option>Blocks</option>
+                              <!-- Duels/Dribbles Past
+                              <option>Dribbles Past</option>
+                              <option>Duels</option>
+                              <option>Duels Won</option>
+                              <option>Duels Won Percentage</option>
+                              -->
+                              <option>Interceptions</option>
+                              <option>Tackles</option>
+                              <option>Penalties Committed</option>
+                              <!-- Other -->
+                              <option>Goals Conceded</option>
+                              <option>Player Rating</option>
+                              <option>Penalties Saved</option>
+                              <option>Red Cards</option>
+                              <option>Straight Red Cards</option>
+                              <option>Yellow Cards</option>
+                              <option>Second Yellow Cards</option>
+                            </select>
+                          </div>
+                          <div class="col-xs-2 col-sm-2 col-md-2">
+                            <select class="custom-select custom-select-sm" id="stat_op">
+                              <option value="=">=</option>
+                              <option value="<"><</option>
+                              <option value=">">></option>
+                              <option value="><">Between</option>
+                            </select>
+                          </div>
+                          <div class="col-xs-1 col-sm-1 col-md-1">
+                            <input type="text" class="form-control text-center" id="stat_input_1" value="" style="font-size: 1.15em">
+                          </div>
+                          <div class="col-xs-1 col-sm-1 col-md-1">
+                            <div class="hidden" id="stat_input2_div">
+                              <input type="text" class="form-control text-center" id="stat_input_2" value="" style="font-size: 1.15em">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- ORDER BY FIELDS -->
+                      <div class="form-group" style="margin-top: 15px">
+                        <label for="order_field_1"><h5>Choose Stat to Order By:</h5></label>
+                        <div  class="form-row">
+                          <div class="col-xs-5 col-sm-5 col-md-5">
+                            <select class="custom-select custom-select-sm" id="order_field_1">
+                              <!-- Attacking -->
+                              <option>Assists</option>
+                              <option>Successful Dribbles</option>
+                              <option>Successful Dribbles Percentage</option>
+                              <option>Attempted Dribbles</option>
+                              <option>Goals</option>
+                              <option>Shots</option>
+                              <option>Shots on Target</option>
+                              <option>Shots on Target Percentage</option>
+                              <option>Penalties Won</option>
+                              <option>Penalties Made</option>
+                              <option>Penalties Made Percentage</option>
+                              <option>Penalties Missed</option>
+                              <!-- Creation -->
+                              <option>Passes</option>
+                              <option>Pass Accuracy</option>
+                              <option>Key Passes</option>
+                              <!-- Defending -->
+                              <option>Blocks</option>
+                              <!-- Duels/Dribbles Past
+                              <option>Dribbles Past</option>
+                              <option>Duels</option>
+                              <option>Duels Won</option>
+                              <option>Duels Won Percentage</option>
+                              -->
+                              <option>Interceptions</option>
+                              <option>Tackles</option>
+                              <option>Penalties Committed</option>
+                              <!-- Other -->
+                              <option>Goals Conceded</option>
+                              <option>Player Rating</option>
+                              <option>Penalties Saved</option>
+                              <option>Red Cards</option>
+                              <option>Straight Red Cards</option>
+                              <option>Yellow Cards</option>
+                              <option>Second Yellow Cards</option>
+                            </select>
+                          </div>
+                          <div class="col-xs-2 col-sm-2 col-md-2">
+                            <select class="custom-select custom-select-sm" id="order_op">
+                              <option>None</option>
+                              <option>×</option>
+                              <option>÷</option>
+                              <option>+</option>
+                              <option>-</option>
+                            </select>
+                          </div>
+                          <div class="col-xs-5 col-sm-5 col-md-5">
+                            <select class="custom-select custom-select-sm" id="order_field_2">
+                              <option>None</option>
+                              <!-- Attacking -->
+                              <option>Assists</option>
+                              <option>Successful Dribbles</option>
+                              <option>Successful Dribbles Percentage</option>
+                              <option>Attempted Dribbles</option>
+                              <option>Goals</option>
+                              <option>Shots</option>
+                              <option>Shots on Target</option>
+                              <option>Shots on Target Percentage</option>
+                              <option>Penalties Won</option>
+                              <option>Penalties Made</option>
+                              <option>Penalties Made Percentage</option>
+                              <option>Penalties Missed</option>
+                              <!-- Creation -->
+                              <option>Passes</option>
+                              <option>Pass Accuracy</option>
+                              <option>Key Passes</option>
+                              <!-- Defending -->
+                              <option>Blocks</option>
+                              <!-- Duels/Dribbles Past
+                              <option>Dribbles Past</option>
+                              <option>Duels</option>
+                              <option>Duels Won</option>
+                              <option>Duels Won Percentage</option>
+                              -->
+                              <option>Interceptions</option>
+                              <option>Tackles</option>
+                              <option>Penalties Committed</option>
+                              <!-- Other -->
+                              <option>Goals Conceded</option>
+                              <option>Player Rating</option>
+                              <option>Penalties Saved</option>
+                              <option>Red Cards</option>
+                              <option>Straight Red Cards</option>
+                              <option>Yellow Cards</option>
+                              <option>Second Yellow Cards</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="col-xs-3 col-sm-3 col-md-3">
+                            <div class="custom-control custom-switch" style="font-size: 1.4em; font-height: 1.3em">
+                              <input type="checkbox" class="custom-control-input" id="order_per90_toggle">
+                              <label class="custom-control-label" for="order_per90_toggle">
+                                Per 90 Minutes
+                              </label>
+                            </div>
+                          </div>
+                          <div class="col-xs-3 col-sm-3 col-md-3">
+                            <div class="custom-control custom-switch" style="font-size: 1.4em; font-height: 1.3em">
+                              <input type="checkbox" class="custom-control-input" id="asc_toggle">
+                              <label class="custom-control-label" for="asc_toggle">
+                                Low to High
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+                  <li class="list-group-item"></li>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
