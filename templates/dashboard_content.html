@@ -2,30 +2,6 @@
 
 {% block content %}
 
-<!-- Only show first page on page ready -->
-<script>
-  $(document).ready(function() {
-    $("div#goal_goals_page_1").removeClass("hidden")
-    $("div#goal_assists_page_1").removeClass("hidden")
-    $("div#goal_goal_contributions_page_1").removeClass("hidden")
-    $("div#shot_shots_on_page_1").removeClass("hidden")
-    $("div#shot_shots_page_1").removeClass("hidden")
-    $("div#shot_goals_per_shot_page_1").removeClass("hidden")
-    $("div#pass_passes_key_page_1").removeClass("hidden")
-    $("div#pass_passes_page_1").removeClass("hidden")
-    $("div#pass_passes_accuracy_page_1").removeClass("hidden")
-    $("div#dribbling_dribbles_succeeded_page_1").removeClass("hidden")
-    $("div#dribbling_dribbles_attempted_page_1").removeClass("hidden")
-    $("div#dribbling_dribbles_succeeded_pct_page_1").removeClass("hidden")
-    $("div#defensive_tackles_page_1").removeClass("hidden")
-    $("div#defensive_interceptions_page_1").removeClass("hidden")
-    $("div#defensive_blocks_page_1").removeClass("hidden")
-    $("div#other_rating_page_1").removeClass("hidden")
-    $("div#other_goals_conceded_page_1").removeClass("hidden")
-    $("div#other_penalties_saved_page_1").removeClass("hidden")
-  });
-</script>
-
 <!-- Change page -->
 <script>
   function changePage(idPrefix, pageNo) {
@@ -88,7 +64,11 @@
             {% set pagediv = query_result.get(stat).get(substat)|length // 10 %}
             {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
             {% for page in range(1, num_pages + 1) %}
-              <div id="{{stat}}_{{substat}}_page_{{page}}" class="hidden">
+              {% if page == 1 %}
+                <div id="{{stat}}_{{substat}}_page_{{page}}">
+              {% else %}
+                <div id="{{stat}}_{{substat}}_page_{{page}}" class="hidden">
+              {% endif %}
               {% for row in (query_result.get(stat).get(substat)[10 * (page - 1) : 10 * page]) %}
               <li class="list-group-item">
                 <div class="row h-100 justify-content-center align-items-center">

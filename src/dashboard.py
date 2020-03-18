@@ -39,7 +39,11 @@ def rank_result(query_result, desc=True, stat_type="int"):
     prev_result = float("inf") if desc == True else -1.0 * float("inf")
     for idx in range(len(query_result)):
         tup = query_result[idx]
-        name = tup[0]
+        split_name = tup[0].split(" ")
+        if len(split_name) == 2 and len(split_name[0]) > 2:
+            name = split_name[0][0] + ". " + split_name[1]
+        else:
+            name = tup[0]
         stat = float(tup[1])
         team_name = tup[2]
         team_logo = tup[3]

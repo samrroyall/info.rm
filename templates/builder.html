@@ -11,6 +11,18 @@
           $("#custom_stat").addClass("hidden");
         }
       });
+      // add select option 
+      {% for i in range(1,4) %}
+        $("#select_plus_{{i}}").click(function() {
+          if ($("#select_div_{{i + 1}}").hasClass("hidden")) {
+            $("#select_div_{{i + 1}}").removeClass("hidden");
+            $("#select_per90_toggle_{{i + 1}}").removeClass("hidden");
+          } else {
+            $("#select_div_{{i + 1}}").addClass("hidden");
+            $("#select_per90_toggle_{{i + 1}}").addClass("hidden");
+          }
+        });
+      {% endfor %}
       // trigger filter value options
       $("#filter_type").change(function() {
         var val = $(this).val();
@@ -42,8 +54,26 @@
         }
       });
     });
+    // change page
+    function changePage(idPrefix, pageNo) {
+      var i = 1;
+      for (; i < 6; i++) {
+        if (i == pageNo) {
+          $("div#" + idPrefix + i.toString()).removeClass("hidden");
+        } else {
+          $("div#" + idPrefix + i.toString()).addClass("hidden");
+        }
+      }
+    }
   </script>
 
+{% set stats = ["Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Made","Penalties Made Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Straight Red Cards","Yellow Cards","Second Yellow Cards"] %}
+<!-- Duels/Dribbles Past
+<option>Dribbles Past</option>
+<option>Duels</option>
+<option>Duels Won</option>
+<option>Duels Won Percentage</option>
+-->
   <div style="padding-bottom: 30px">
     <div class="mr-auto ml-auto text-center h2" style="padding-bottom: 15px; padding-top: 15px">
       StatBuilder
@@ -65,108 +95,65 @@
               <strong>Use the options below to generate your own custom statistic.</strong>
               <hr>
               <form>
+
                 <!-- SELECT FIELDS -->
                 <div class="form-group">
-                  <label for="select_field_1"><h5>Choose Stat to Show:</h5></label>
-                  <div  class="form-row justify-content-center">
-                    <div class="col-xs-5 col-sm-5 col-md-5">
-                      <select class="custom-select custom-select-sm" id="select_field_1">
-                        <!-- Attacking -->
-                        <option>Assists</option>
-                        <option>Successful Dribbles</option>
-                        <option>Successful Dribbles Percentage</option>
-                        <option>Attempted Dribbles</option>
-                        <option>Goals</option>
-                        <option>Shots</option>
-                        <option>Shots on Target</option>
-                        <option>Shots on Target Percentage</option>
-                        <option>Penalties Won</option>
-                        <option>Penalties Made</option>
-                        <option>Penalties Made Percentage</option>
-                        <option>Penalties Missed</option>
-                        <!-- Creation -->
-                        <option>Passes</option>
-                        <option>Pass Accuracy</option>
-                        <option>Key Passes</option>
-                        <!-- Defending -->
-                        <option>Blocks</option>
-                        <!-- Duels/Dribbles Past
-                        <option>Dribbles Past</option>
-                        <option>Duels</option>
-                        <option>Duels Won</option>
-                        <option>Duels Won Percentage</option>
-                        -->
-                        <option>Interceptions</option>
-                        <option>Tackles</option>
-                        <option>Penalties Committed</option>
-                        <!-- Other -->
-                        <option>Goals Conceded</option>
-                        <option>Player Rating</option>
-                        <option>Penalties Saved</option>
-                        <option>Red Cards</option>
-                        <option>Straight Red Cards</option>
-                        <option>Yellow Cards</option>
-                        <option>Second Yellow Cards</option>
-                      </select>
-                    </div>
-                    <div class="col-xs-2 col-sm-2 col-md-2">
-                      <select class="custom-select custom-select-sm" id="select_op">
-                        <option>None</option>
-                        <option>×</option>
-                        <option>÷</option>
-                        <option>+</option>
-                        <option>-</option>
-                      </select>
-                    </div>
-                    <div class="col-xs-5 col-sm-5 col-md-5">
-                      <select class="custom-select custom-select-sm" id="select_field_2">
-                        <option>None</option>
-                        <!-- Attacking -->
-                        <option>Assists</option>
-                        <option>Successful Dribbles</option>
-                        <option>Successful Dribbles Percentage</option>
-                        <option>Attempted Dribbles</option>
-                        <option>Goals</option>
-                        <option>Shots</option>
-                        <option>Shots on Target</option>
-                        <option>Shots on Target Percentage</option>
-                        <option>Penalties Won</option>
-                        <option>Penalties Made</option>
-                        <option>Penalties Made Percentage</option>
-                        <option>Penalties Missed</option>
-                        <!-- Creation -->
-                        <option>Passes</option>
-                        <option>Pass Accuracy</option>
-                        <option>Key Passes</option>
-                        <!-- Defending -->
-                        <option>Blocks</option>
-                        <!-- Duels/Dribbles Past
-                        <option>Dribbles Past</option>
-                        <option>Duels</option>
-                        <option>Duels Won</option>
-                        <option>Duels Won Percentage</option>
-                        -->
-                        <option>Interceptions</option>
-                        <option>Tackles</option>
-                        <option>Penalties Committed</option>
-                        <!-- Other -->
-                        <option>Goals Conceded</option>
-                        <option>Player Rating</option>
-                        <option>Penalties Saved</option>
-                        <option>Red Cards</option>
-                        <option>Straight Red Cards</option>
-                        <option>Yellow Cards</option>
-                        <option>Second Yellow Cards</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="custom-control custom-switch" style="font-size: 1.4em; font-height: 1.3em">
-                    <input type="checkbox" class="custom-control-input" id="select_per90_toggle">
-                    <label class="custom-control-label" for="select_per90_toggle">
-                      Per 90 Minutes
-                    </label>
-                  </div>
+                  <label for="select_field_1_1"><h5>Choose Stat to Show:</h5></label>
+                  {% for select_row in range(1,5) %}
+                    {% if select_row != 1 %}
+                      <div  class="form-row justify-content-left hidden" id="select_div_{{select_row}}">
+                    {% else %}
+                      <div  class="form-row justify-content-left" id="select_div_{{select_row}}">
+                    {% endif %}
+                      <div class="col-xs-4 col-sm-4 col-md-4">
+                        <select class="custom-select custom-select-sm" id="select_field_1_{{select_row}}">
+                        {% for stat in stats %}
+                          <option>{{stat}}</option>
+                        {% endfor %}
+                        </select>
+                      </div>
+                      <div class="col-xs-2 col-sm-2 col-md-2">
+                        <select class="custom-select custom-select-sm" id="select_op_{{select_row}}">
+                          <option>None</option>
+                          <option>×</option>
+                          <option>÷</option>
+                          <option>+</option>
+                          <option>-</option>
+                        </select>
+                      </div>
+                      <div class="col-xs-4 col-sm-4 col-md-4">
+                        <select class="custom-select custom-select-sm" id="select_field_2_{{select_row}}">
+                          {% for stat in stats %}
+                            <option>{{stat}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      {% if select_row < 4 %}
+                        <div class="col-xs-1 col-sm-1 col-md-1">
+                          <div id="select_plus_{{select_row}}">
+                            <svg class="bi bi-plus" width="4em" height="4em" viewBox="0 3 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                               <path fill-rule="evenodd" d="M10 5.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H6a.5.5 0 010-1h3.5V6a.5.5 0 01.5-.5z" clip-rule="evenodd"/>
+                               <path fill-rule="evenodd" d="M9.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-3.5V14a.5.5 0 01-1 0v-4z" clip-rule="evenodd"/>
+                             </svg>
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="col-xs-1 col-sm-1 col-md-1">
+                        </div>
+                      {% endif %}
                 </div>
+                    {% if select_row != 1 %}
+                      <div class="custom-control custom-switch hidden" id="select_per90_toggle_{{select_row}}" style="font-size: 1.4em; font-height: 1.3em">
+                    {% else %}
+                      <div class="custom-control custom-switch" id="select_per90_toggle_{{select_row}}" style="font-size: 1.4em; font-height: 1.3em">
+                    {% endif %}
+                        <input type="checkbox" class="custom-control-input">
+                        <label class="custom-control-label" for="select_per90_toggle_{{select_row}}">
+                          Per 90 Minutes
+                        </label>
+                      </div>
+                  {% endfor %}
+
                 <!-- FILTER FIELDS -->
                 <div class="form-group">
                   <label for="select_field_1"><h5>Choose Filter Type:</h5></label>
@@ -184,6 +171,7 @@
                       </select>
                     </div>
                   </div>
+
                   <!-- Filter Age -->
                   <div class="hidden" id="filter_age_div" style="margin-top: 15px">
                     <h6>Age:</h6>
@@ -206,6 +194,7 @@
                       </div>
                     </div>
                   </div>
+
                   <!-- Filter Club -->
                   <div class="hidden" id="filter_club_div" style="margin-top: 15px">
                     <h6>Club:</h6>
@@ -222,6 +211,7 @@
                       </div>
                     </div>
                   </div>
+
                   <!-- Filter League -->
                   <div class="hidden" id="filter_league_div" style="margin-top: 15px">
                     <h6>League:</h6>
@@ -233,6 +223,7 @@
                       </div>
                     </div>
                   </div>
+
                   <!-- Filter Minutes Played -->
                   <div class="hidden" id="filter_minutes_played_div" style="margin-top: 15px">
                     <h6>Minutes Played:</h6>
@@ -255,6 +246,7 @@
                       </div>
                     </div>
                   </div>
+
                   <!-- Filter Nationality -->
                   <div class="hidden" id="filter_nationality_div" style="margin-top: 15px">
                     <h6>League:</h6>
@@ -266,6 +258,7 @@
                       </div>
                     </div>
                   </div>
+
                   <!-- Filter Position -->
                   <div class="hidden" id="filter_position_div" style="margin-top: 15px">
                     <h6>League:</h6>
@@ -282,47 +275,16 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- Filter Stat -->
                 <div class="hidden" id="filter_stat_div" style="margin-top: 15px">
                   <h6>Stat:</h6>
                   <div  class="form-row">
                     <div class="col-xs-5 col-sm-5 col-md-5">
                       <select class="custom-select custom-select-sm" id="stat_select">
-                        <!-- Attacking -->
-                        <option>Assists</option>
-                        <option>Successful Dribbles</option>
-                        <option>Successful Dribbles Percentage</option>
-                        <option>Attempted Dribbles</option>
-                        <option>Goals</option>
-                        <option>Shots</option>
-                        <option>Shots on Target</option>
-                        <option>Shots on Target Percentage</option>
-                        <option>Penalties Won</option>
-                        <option>Penalties Made</option>
-                        <option>Penalties Made Percentage</option>
-                        <option>Penalties Missed</option>
-                        <!-- Creation -->
-                        <option>Passes</option>
-                        <option>Pass Accuracy</option>
-                        <option>Key Passes</option>
-                        <!-- Defending -->
-                        <option>Blocks</option>
-                        <!-- Duels/Dribbles Past
-                        <option>Dribbles Past</option>
-                        <option>Duels</option>
-                        <option>Duels Won</option>
-                        <option>Duels Won Percentage</option>
-                        -->
-                        <option>Interceptions</option>
-                        <option>Tackles</option>
-                        <option>Penalties Committed</option>
-                        <!-- Other -->
-                        <option>Goals Conceded</option>
-                        <option>Player Rating</option>
-                        <option>Penalties Saved</option>
-                        <option>Red Cards</option>
-                        <option>Straight Red Cards</option>
-                        <option>Yellow Cards</option>
-                        <option>Second Yellow Cards</option>
+                        {% for stat in stats %}
+                          <option>{{stat}}</option>
+                        {% endfor %}
                       </select>
                     </div>
                     <div class="col-xs-2 col-sm-2 col-md-2">
@@ -343,48 +305,16 @@
                     </div>
                   </div>
                 </div>
+
                 <!-- ORDER BY FIELDS -->
                 <div class="form-group" style="margin-top: 15px">
                   <label for="order_field_1"><h5>Choose Stat to Order By:</h5></label>
                   <div  class="form-row">
                     <div class="col-xs-5 col-sm-5 col-md-5">
                       <select class="custom-select custom-select-sm" id="order_field_1">
-                        <!-- Attacking -->
-                        <option>Assists</option>
-                        <option>Successful Dribbles</option>
-                        <option>Successful Dribbles Percentage</option>
-                        <option>Attempted Dribbles</option>
-                        <option>Goals</option>
-                        <option>Shots</option>
-                        <option>Shots on Target</option>
-                        <option>Shots on Target Percentage</option>
-                        <option>Penalties Won</option>
-                        <option>Penalties Made</option>
-                        <option>Penalties Made Percentage</option>
-                        <option>Penalties Missed</option>
-                        <!-- Creation -->
-                        <option>Passes</option>
-                        <option>Pass Accuracy</option>
-                        <option>Key Passes</option>
-                        <!-- Defending -->
-                        <option>Blocks</option>
-                        <!-- Duels/Dribbles Past
-                        <option>Dribbles Past</option>
-                        <option>Duels</option>
-                        <option>Duels Won</option>
-                        <option>Duels Won Percentage</option>
-                        -->
-                        <option>Interceptions</option>
-                        <option>Tackles</option>
-                        <option>Penalties Committed</option>
-                        <!-- Other -->
-                        <option>Goals Conceded</option>
-                        <option>Player Rating</option>
-                        <option>Penalties Saved</option>
-                        <option>Red Cards</option>
-                        <option>Straight Red Cards</option>
-                        <option>Yellow Cards</option>
-                        <option>Second Yellow Cards</option>
+                        {% for stat in stats %}
+                          <option>{{stat}}</option>
+                        {% endfor %}
                       </select>
                     </div>
                     <div class="col-xs-2 col-sm-2 col-md-2">
@@ -398,48 +328,14 @@
                     </div>
                     <div class="col-xs-5 col-sm-5 col-md-5">
                       <select class="custom-select custom-select-sm" id="order_field_2">
-                        <option>None</option>
-                        <!-- Attacking -->
-                        <option>Assists</option>
-                        <option>Successful Dribbles</option>
-                        <option>Successful Dribbles Percentage</option>
-                        <option>Attempted Dribbles</option>
-                        <option>Goals</option>
-                        <option>Shots</option>
-                        <option>Shots on Target</option>
-                        <option>Shots on Target Percentage</option>
-                        <option>Penalties Won</option>
-                        <option>Penalties Made</option>
-                        <option>Penalties Made Percentage</option>
-                        <option>Penalties Missed</option>
-                        <!-- Creation -->
-                        <option>Passes</option>
-                        <option>Pass Accuracy</option>
-                        <option>Key Passes</option>
-                        <!-- Defending -->
-                        <option>Blocks</option>
-                        <!-- Duels/Dribbles Past
-                        <option>Dribbles Past</option>
-                        <option>Duels</option>
-                        <option>Duels Won</option>
-                        <option>Duels Won Percentage</option>
-                        -->
-                        <option>Interceptions</option>
-                        <option>Tackles</option>
-                        <option>Penalties Committed</option>
-                        <!-- Other -->
-                        <option>Goals Conceded</option>
-                        <option>Player Rating</option>
-                        <option>Penalties Saved</option>
-                        <option>Red Cards</option>
-                        <option>Straight Red Cards</option>
-                        <option>Yellow Cards</option>
-                        <option>Second Yellow Cards</option>
+                        {% for stat in stats %}
+                          <option>{{stat}}</option>
+                        {% endfor %}
                       </select>
                     </div>
                   </div>
                   <div class="form-row">
-                    <div class="col-xs-3 col-sm-3 col-md-3">
+                    <div class="col-xs-2 col-sm-2 col-md-2">
                       <div class="custom-control custom-switch" style="font-size: 1.4em; font-height: 1.3em">
                         <input type="checkbox" class="custom-control-input" id="order_per90_toggle">
                         <label class="custom-control-label" for="order_per90_toggle">
@@ -447,7 +343,7 @@
                         </label>
                       </div>
                     </div>
-                    <div class="col-xs-3 col-sm-3 col-md-3">
+                    <div class="col-xs-2 col-sm-2 col-md-2">
                       <div class="custom-control custom-switch" style="font-size: 1.4em; font-height: 1.3em">
                         <input type="checkbox" class="custom-control-input" id="asc_toggle">
                         <label class="custom-control-label" for="asc_toggle">
@@ -460,18 +356,70 @@
               </form>
             </div>
           </div>
+
+          <!-- Card Contents -->
           <ul class="list-group list-group-flush">
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item"></li>
+              {% set header = query_result.get('header')[3:] %}
+              <li class="list-group-item">
+                <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-xs-2 col-sm-2 col-lg-2">
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-lg-2">
+                    </div>
+                  {% for column in header %}
+                    <div class="col-xs-2 col-sm-2 col-lg-2 text-center h6">
+                      {{column.split('.')[1].capitalize()}}
+                    </div>
+                  {% endfor %}
+                </div>
+              </li>
+            {% for page in range(1, 6) %}
+              {% if page == 1 %}
+                <div id="builder_page_{{page}}">
+              {% else %}
+                <div id="builder_page_{{page}}" class="hidden">
+              {% endif %}
+              {% for row in (query_result.get('data')[10 * (page - 1) : 10 * page]) %}
+              <li class="list-group-item">
+                <div class="row h-100 align-items-center">
+                  <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
+                    <img src={{row.get("team_logo")}} height="30px"/>
+                  </div>
+                  <div class="col-xs-2 col-sm-2 col-lg-2 text-left">
+                    <div class="row">
+                      <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+                    </div>
+                    <div class="row">
+                      {{row.get("team_name")}}
+                    </div>
+                  </div>
+                  {% for stat in row.get('stats')%}
+                  <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
+                    <strong>{{stat}}</strong>
+                  </div>
+                  {% endfor %}
+                </div>
+              </li>
+              {% endfor %}
+              </div>
+            {% endfor %}
+            <li class="list-group-item">
+              <div class="row h-100">
+                <div class="col-12">
+                  <nav class="nav justify-content-center">
+                    <ul class="pagination pagination-md">
+                      {% for i in range(1, 6) %}
+                        <li class="page-item" style="color: blue">
+                          <a class="page-link" onclick="changePage('builder_page_', {{i}})">{{i}}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <!-- End Card Contents -->
         </div>
       </div>
     </div>

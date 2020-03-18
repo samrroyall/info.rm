@@ -3,6 +3,7 @@
 from flask import Flask, render_template
 
 import src.dashboard
+import src.builder
 
 info_rm = Flask(__name__)
 
@@ -26,7 +27,7 @@ def dashboard_per90(league):
 
 @info_rm.route("/builder")
 def builder():
-    return render_template("builder.html")
+    return render_template("builder.html", query_result = src.builder.default_stats())
 
 if __name__ == "__main__":
     info_rm.run(debug=True)

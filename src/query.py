@@ -60,7 +60,7 @@ class FilterList:
     ) -> None:
         cls = self.__class__
         filters, logical_operator = properties
-        assert logical_operator in cls._LOPS, \
+        assert len(filters) == 1 or logical_operator in cls._LOPS, \
             f"ERROR: FilterList accepts following operators: {str(cls._LOPS)[1:-1]}"
         self.logical_operator = logical_operator
         self.filters = [ Filter(filter_tuple) for filter_tuple in filters ]
@@ -100,21 +100,6 @@ class Select:
             "ERROR: Statement class cannot take more than two tables."
         self.check_tables(table_names)
 
-    def grab_columns(self, string: str) -> List[str]:
-        chars = ['/','*','+','-','(',')',' ']
-        result = []
-        temp_col = ""
-        for char in string:
-            if char not in chars:
-                temp_col += char
-            else:
-                if temp_col != "":
-                    result.append(temp_col)
-                    temp_col = ""
-        if temp_col != "":
-            result.append(temp_col)
-        return result
-
     def check_tables(self, table_names: List[Tuple[str,str]]) -> None:
         db_tables = ["players","teams","leagues"]
         # handle tables
@@ -127,15 +112,6 @@ class Select:
             self.join_params = [table_names[0][1], table_names[1][1]]
         for table in table_names:
             assert table[0] in db_tables, "ERROR: Invalid table name supplied."
-        # handle columns 
-        for field in self.select_fields:
-            columns = self.grab_columns(field)
-            for column in columns:
-                table = column.split(".")[0]
-                col = column.split(".")[1]
-                if not table.isdecimal() or not col.isdecimal():
-                    assert "." in column and column.split(".")[0] in db_tables,\
-                        "ERROR: Invalid select param table name supplied"
 
     def to_str(self) -> str:
         select_list = ", ".join(self.select_fields)
@@ -155,7 +131,7 @@ class Statement:
         self, 
         table_names: List[Tuple[str,str]], 
         select_fields: List[str], 
-        order_fields: Optional[List[str]] = None, 
+        order_fields: Optional[List[Tuple[List[str], bool]]] = None, 
         filter_fields: Optional[List[Tuple[List[Tuple[str,str,str]], str]]] = None
     ) -> None:
         self.select_stmt = Select(select_fields, table_names)
@@ -193,6 +169,37 @@ class Query:
         connection.commit()
         connection.close()
         return query_result
+
+##########################
+#### Public Functions ####
+##########################
+
+def check_col(col):
+    if "." not in col:
+        return False
+    else:
+        table = col.split(".")[0]
+        col = col.split(".")[1]
+        if table.isdecimal() and col.isdecimal():
+            return False
+    return True
+
+def grab_columns(string: str) -> List[str]:
+        chars = ['/','*','+','-','(',')',' ']
+        result = []
+        temp_col = ""
+        for char in string:
+            if char not in chars:
+                temp_col += char
+            else:
+                if temp_col != "":
+                    if check_col(temp_col):
+                        result.append(temp_col)
+                    temp_col = ""
+        if temp_col != "":
+            if check_col(temp_col):
+                result.append(temp_col)
+        return result
 
 def get_max(db_path: str, stat: str) -> float:
     assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
