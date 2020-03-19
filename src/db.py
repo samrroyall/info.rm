@@ -18,29 +18,7 @@ def initialize_engine():
     Base.metadata.create_all(engine)
     return engine
 
-def query_database(engine):
-    """ Function for querying data from DB """
-    # initialize database connection
-    Session = sessionmaker(bind=engine) 
-    session = Session()
-    query_result = session.query(
-            Players.name, 
-            Players.team_id, 
-            (Players.goals + Players.assists) / (Players.minutes_played / 90)
-        ).\
-        filter(
-            Players.minutes_played >= 900.0
-            #Players.league_name == "Premier League"
-        ).\
-        order_by(
-            (Players.goals + Players.assists) / (Players.minutes_played / 90)
-        )[::-1][:25]
-    #query_result = session.query(Teams.id, Teams.name).all()
-
-    session.close()
-    return query_result
-
-def update_table(engine, data):
+def update_table(engine, player):
     """ Function for initializing session with DB and updating existing Players rows"""
     # initialize DB session
     Session = sessionmaker(bind=engine) 
@@ -48,19 +26,19 @@ def update_table(engine, data):
     # update database tables with api response data
     try:
         session.query(Players).filter(Players.uid == player.get("uid")).update(player)
-        session.commit()
         print("INFO: Update Successful.")
     except:
         print("ERROR: Update Unsuccessful.")
+        sys.exit(1)
     return session
 
-def insert_into_table(engine, row):
+def insert_into_table(engine, data):
     """ Function for initializing session with DB and inserting new rows"""
     # initialize DB session
     Session = sessionmaker(bind=engine) 
     session = Session()
     # add ORM instances from api_response to session
-    session.add(row)
+    session.add(data)
     # insert api response data into database tables
     try:
         session.commit()

@@ -225,5 +225,5 @@ class Players(Base):
 
     def __repr__(self):
         """ Instance to print class objects """
-        return f"""<Players(player_id={self.id}, name={self.name}, team_id={self.team_id}, league={self.league},
+        return f"""<Players(player_id={self.id}, name={self.name}, team_id={self.team_id}, league={self.league_name},
                 age={self.age}, position={self.position}, nationality={self.nationality}, ...)>"""

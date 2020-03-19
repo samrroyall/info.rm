@@ -2,7 +2,7 @@
 
 from request import Request
 from orm import Leagues, Teams, Players
-from db import previously_inserted, query_database
+from db import previously_inserted
 from config import set_config_arg, get_config_arg, write_config, config_exists
 
 #from sqlalchemy import and_, update
@@ -27,9 +27,9 @@ def get_data(action, engine):
         id_type = "league_ids" if endpoint == "teams" else "team_ids"
         assert get_config_arg(id_type), \
             f"ERROR: Required IDs not present for {action} procedure."
-        ids = eval(get_config_arg(id_type)).keys()
+        ids = eval(get_config_arg(id_type))
         # make requests
-        for id in ids:
+        for id in ids.keys():
             if action_type == "insert":
                 # ensure data has not been previously inserted into database
                 assert not previously_inserted(engine, action, id), \
@@ -42,32 +42,13 @@ def get_data(action, engine):
             if result.get("ids"):
                 response_ids.update(result.get("ids"))
             processed_data += result.get("processed_data")
+            print("INFO: Response for {0} Obtained Successfully.".\
+                    format(ids.get(id).get("team_name")))
     # update config.ini with new IDs
     if len(response_ids) > 0:
         config_arg = f"{endpoint[:-1]}_ids"
         set_config_arg(config_arg, response_ids)
     return processed_data
-
-def query_db(engine):
-    """ Function for querying data from DB """
-    # initialize database connection
-    query_result = query_database(engine)
-    max_name_length = max([len(n) for n,_,_ in query_result])
-
-    count = 0
-    rank = 0
-    prev_result = float("inf") 
-    for n, t, s in query_result:
-        count += 1
-        if s < prev_result:
-            rank = count
-        prev_result = s
-        print(f"{(str(rank)+'.').ljust(4, ' ')}{n.ljust(max_name_length, ' ')} ({t})\t{s}")
-    #for i, n in query_database(engine):
-    #    print(f"{count}. {n} ({i})")
-    #    count += 1
-
-        
 
 def setup(config_args):
     """ Function for writing CLI arguments to config file.
