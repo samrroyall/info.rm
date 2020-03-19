@@ -1,92 +1,142 @@
 import os
 import pathlib
 
-from .query import Query, Statement, get_max, grab_columns
+from .query import Query, get_max, get_column, get_by
+from .web_query import stmt, rank
 
 file_path = pathlib.Path(__file__).parent.absolute()
 DB_PATH = os.path.join(str(file_path), "../db/info.rm.db")
-default_select_fields = ["teams.logo", "players.name", "teams.name"]
-join_params = {
-        "players": "team_id",
-        "teams": "id",
-    }
-floats = [
-        "players.rating",
-        "players.shots_on_pct",
-        "players.passes_accuracy",
-        "players.duels_won_pct",
-        "players.dribbles_succeeded_pct",
-        "players.penalties_scored_pct"
-    ]
 
-def dashboard_stmt(select_fields, filter_fields, order_fields):
-    select_fields = default_select_fields + select_fields
-    table_names = []
-    for sel_field in select_fields:
-        for field in grab_columns(sel_field):
-            table_names.append((
-                    field.split(".")[0],
-                    join_params.get(field.split(".")[0])
-                ))
-    table_names = list(set(table_names))
-    stmt = Statement(
-        table_names = table_names,
-        select_fields = select_fields,
-        filter_fields = filter_fields,
-        order_fields = order_fields
-    )
-    return stmt
+leagues = get_column(DB_PATH, "name", "leagues")
+clubs_dict = get_by(DB_PATH, "name", "teams", "league_name", "name", "leagues")
+clubs = clubs_dict.values()
+nations = get_column(DB_PATH, "nationality", "players")
 
-def rank_result(query_result, fields, order_by_field, desc=True):
-    count = 0
-    rank = 0
-    prev_result = float("inf") if desc == True else -1.0 * float("inf")
-    fields = default_select_fields + fields
-    ranked_result = { "header": fields, "data": []}
-    for idx in range(len(query_result)):
-        tup = query_result[idx]
+########################
+##### FORM INPUTS ######
+########################
 
-        # handle defaults
-        split_name = tup[1].split(" ")
-        if len(split_name) == 2 and len(split_name[0]) > 2:
-            name = split_name[0][0] + ". " + split_name[1]
-        else:
-            name = tup[1]
-        team_logo = tup[0]
-        team_name = tup[2]
+lops = ["+","-","*","/"]
+cops = ["<",">","=","><"]
+positions = ["Attacker", "Midfielder", "Defender", "Goalkeeper"]
+stats = {
+    "Assists": "players.assists",
+    "Successful_Dribbles": "players.dribbles_succeeded",
+    "Successful_Dribbles_Percentage": "players.dribbles_succeeded_pct",
+    "Attempted Dribbles": "players.dribbles_attempted",
+    "Goals": "players.goals",
+    "Shots": "players.shots",
+    "Shots_on_Target": "players.shots_on",
+    "Shots_on_Target_Percentage": "players.shots_on_pct",
+    "Penalties_Won": "players.penalties_won",
+    "Penalties_Scored": "players.penalties_success",
+    "Penalties_Scored_Percentage": "players.penalties_scored_pct",
+    "Penalties_Missed": "players.penalties_missed",
+    "Passes": "players.passes",
+    "Pass_Accuracy": "players.passes_accuracy",
+    "Key_Passes": "players.passes_key",
+    "Blocks": "players.blocks",
+    "Interceptions": "players.interceptions",
+    "Tackles": "players.tackles",
+    "Penalties_Committed": "players.penalties_committed",
+    "Goals_Conceded": "players.goals_conceded",
+    "Player_Rating": "players.rating",
+    "Penalties_Saved": "players.penalties_saved",
+    "Red_Cards": "players.cards_red",
+    "Straight_Red_Cards": "players.cards_straight_red",
+    "Yellow_Cards": "players.cards_yellow",
+    "Second_Yellow_Cards": "players.cards_second_yellow"
+}
 
-        # handle stats
-        stats = []
-        for stat_idx in range(3,len(fields)):
-            stat = tup[stat_idx]
-            if fields[stat_idx] in floats:
-                value = round(float(tup[stat_idx]), 2)
+##############################
+##### HELPER FUNCTIONS #######
+##############################
+
+def check_input_value(input, type):
+    if type == "stats":
+        # int or float
+        if not input.isdecimal():
+            split = input.split(".")
+            if not split[0].isdecimal() or not split[1].isdecimal():
+                return False
+        return True
+
+def check_cop_values(cop, input_one, input_two):
+    if cop not in cops:
+        return []
+    # check first input, handles empty case
+    if not check_input_value(input_one, "stats"):
+        return []
+    if cop == "><":
+        # check second input, handles empty case
+        if not check_input_value(input_two, "stats"):
+            return []
+        # ensure first input is smaller
+        if float(input_one) >= float(input_two):
+            return []
+        return [input_one, input_two]
+    else:
+        return [input_one]
+
+
+def get_stat_values(form_data_dict, type = "select"):
+    values = []
+    if type == "order":
+        length = 1
+    else:
+        length = 4
+    for i in range(1,length + 1):
+        # check values 
+        if type == "select":
+            field_one = form_data_dict[f"select_field1_{i}"]
+            field_two = form_data_dict[f"select_field2_{i}"]
+            lop = form_data_dict[f"select_op_{i}"]
+            per90 = False if f"select_per90_toggle_{i}" not in form_data.keys() else True
+        if type == "order":
+            field_one = form_data_dict["order_field1"]
+            field_two = form_data_dict["order_field2"]
+            lop = form_data_dict["order_op"]
+            per90 = False if "order_per90_toggle" not in form_data.keys() else True
+            desc = True if "asc_toggle" not in form_data.keys() else False
+        if type == "filter":
+            field_one = form_data_dict[f"stat_field1_{i}"]
+            field_two = form_data_dict[f"stat_field2_{i}"]
+            lop = form_data_dict[f"stat_lop_{i}"]
+            input_one = form_data_dict[f"stat_input1_{i}"]
+            input_two = form_data_dict[f"stat_input2_{i}"]
+            cop = form_data_dict[f"stat_cop_{i}"]
+            per90 = False if f"stat_per90_toggle_{i}" not in form_data.keys() else True
+
+        if field_one not in stats.keys():
+            continue
+        elif lop != "None" and lop not in lops:
+            continue
+        else: 
+            if field_two in stats.keys() and lop != "None":
+                select_string = "{stats.get(field_one)}{lop}{stats.get(field_two)}"
             else:
-                value = round(float(tup[stat_idx]))
-            stats.append(value)
+                select_string = stats.get(field_one)
+            if per90: 
+                select_string = f"({select_string})/(players.minutes_played/90.0)"
+            select_string = f"{stats.get(field_one)}{lop}{stats.get(field_two)}"
+            if type == "select":
+                values.append(select_string)
+            elif type == "order":
+                values = [([select_string], desc)]
+            elif type == "filter":
+                cop_values = check_cop_values(cop, input_one, input_two)
+                if len(cop_values) == 0:
+                    continue
+                elif len(cop_values) == 2:
+                    values.append( (select_string, ">", input_one) )
+                    values.append( (select_string, "<", input_two) )
+                elif len(cop_values) == 1:
+                    values.append( (select_string, cop, input_one) )
+    return values
 
-        assert order_by_field in fields,\
-            "ERROR: invalid order_by_field supplied"
-        order_by_idx = fields.index(order_by_field)
-        order_by_stat = float(tup[order_by_idx])
-        # rank
-        count += 1
-        if desc == True and round(order_by_stat, 3) < prev_result:
-            rank = count
-        elif desc == False and round(order_by_stat, 3) > prev_result:
-            rank = count
-        prev_result = round(order_by_stat, 3)
-
-        # return
-        ranked_tup = {
-            "rank": rank,
-            "name": name,
-            "team_name": team_name,
-            "team_logo": team_logo,
-            "stats":  stats
-        }
-        ranked_result["data"].append(ranked_tup)
-    return ranked_result
+#############################
+##### QUERY FUNCTIONS #######
+#############################
 
 def default_stats():
     select_fields = [
@@ -100,8 +150,65 @@ def default_stats():
         ([("players.minutes_played",">",str(max_minutes_played/3))],"")
     ]
     order_fields = (["players.rating"], True)
-    query_result = Query(DB_PATH, dashboard_stmt(select_fields, filter_fields, order_fields)).query_db()
-    ranked_result = rank_result(query_result, select_fields, "players.rating")
-    return ranked_result
+    query_result = Query(DB_PATH, stmt(select_fields, filter_fields, order_fields)).query_db()
+    ranked_result = rank(query_result, select_fields, "players.rating")
+    return ranked_result, leagues, clubs_dict, nations
 
+def custom_stats(form_data, leagues, clubs, nations):
+    form_data_dict = dict()
+
+    # move form data into dict
+    for field, value in form_data:
+        form_data_dict[field] = value
+
+    # get select values
+    select_fields = get_stat_values(form_data_dict, "select")
+
+    # get filter values
+    filter_fields = []
+
+    # get age and minutes_played values
+    for key in ["age", "minutes_played"]:
+        cop = form_data_dict[f"{key}_op"]
+        input_one = form_data_dict[f"{key}_input1"]
+        input_two = form_data_dict[f"{key}_input2"]
+        key_string = f"players.{key}" 
+        cop_values = check_cop_values(cop, input_one, input_two)
+        if len(cop_values) == 2:
+            filter_fields.append( (key_string, ">", input_one) )
+            filter_fields.append( (key_string, "<", input_two) )
+        elif len(cop_values) == 1:
+            filter_fields.append( (key_string, cop, input_one) )
+
+    # get club, league, nationality, position values
+    for key in ["club", "league", "nationality", "position"]:
+        value = form_data_dict[f"{key}_select"]
+        if key == "position" and value in positions:
+            key_string = "players.position"
+        elif key == "league" and value in leagues:
+            key_string = "leagues.name"
+        elif key == "club" and value in clubs:
+            key_string = "teams.name"
+        elif key == "nationality" and value in nations:
+            key_string = "players.nationality"
+        filter_fields.append(key_string, "=", value)
+
+    # get filter by stats
+    filter_fields.append(get_stat_values(form_data_dict, "filter"))
+
+    # finalize filter fields
+    filter_fields = [(filter_fields, "AND")]
+
+    # get order_by values
+    order_fields = get_stat_values(form_data_dict, "order")
+    if len(order_fields) == 0:
+        order_by_stat = select_fields[0]
+        order_fields = [([order_by_stat], True)]
+    else:
+        order_by_stat = order_fields[0][0][0]
+
+    # make query
+    query_result = Query(DB_PATH, stmt(select_fields, filter_fields, order_fields)).query_db()
+    ranked_result = rank(query_result, select_fields, order_by_stat)
+    return ranked_result, leagues, clubs_dict, nations
 

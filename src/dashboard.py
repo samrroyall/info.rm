@@ -67,7 +67,7 @@ def rank_result(query_result, desc=True, stat_type="int"):
 ##### Query Helpers  #####
 ##########################
 
-def goals_stats(league, per_90):
+def scoring_stats(league, per_90):
     query_result = dict()
     max_minutes_played = get_max(DB_PATH,"players.minutes_played")
     for stat in ["goals", "assists", "goal_contributions"]:
@@ -82,7 +82,7 @@ def goals_stats(league, per_90):
             query_result[stat] = rank_result(Query(DB_PATH, stmt).query_db())
     return query_result
 
-def shots_stats(league, per_90):
+def shooting_stats(league, per_90):
     query_result = dict()
     max_minutes_played = get_max(DB_PATH,"players.minutes_played")
     max_shots = get_max(DB_PATH,"players.shots")
@@ -104,7 +104,7 @@ def shots_stats(league, per_90):
                 query_result[stat] = rank_result(Query(DB_PATH, stmt).query_db())
     return query_result
 
-def passes_stats(league, per_90):
+def passing_stats(league, per_90):
     query_result = dict()
     max_minutes_played = get_max(DB_PATH,"players.minutes_played")
     max_passes = get_max(DB_PATH,"players.passes")
@@ -124,7 +124,7 @@ def passes_stats(league, per_90):
             query_result[stat] = rank_result(Query(DB_PATH, stmt).query_db())
     return query_result
 
-def dribbles_stats(league, per_90):
+def dribbling_stats(league, per_90):
     query_result = dict()
     max_minutes_played = get_max(DB_PATH,"players.minutes_played")
     max_dribbles_attempted = get_max(DB_PATH,"players.dribbles_attempted")
@@ -194,10 +194,10 @@ LEAGUE_LOOKUP = {
 def dashboard_stats(league, per_90):
     league = LEAGUE_LOOKUP.get(league)
     query_result = dict()
-    query_result["goal"] = goals_stats(league, per_90)
-    query_result["shot"] = shots_stats(league, per_90)
-    query_result["pass"] = passes_stats(league, per_90)
-    query_result["dribbling"] = dribbles_stats(league, per_90)
-    query_result["defensive"] = defending_stats(league, per_90)
+    query_result["scoring"] = scoring_stats(league, per_90)
+    query_result["shooting"] = shooting_stats(league, per_90)
+    query_result["passing"] = passing_stats(league, per_90)
+    query_result["dribbling"] = dribbling_stats(league, per_90)
+    query_result["defending"] = defending_stats(league, per_90)
     query_result["other"] = other_stats(league)
     return query_result

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 import src.dashboard
 import src.builder
@@ -27,7 +27,13 @@ def dashboard_per90(league):
 
 @info_rm.route("/builder")
 def builder():
-    return render_template("builder.html", query_result = src.builder.default_stats())
+    default_query_result, leagues, clubs, nations = src.builder.default_stats()
+    return render_template("builder.html", query_result=default_query_result, leagues=leagues, clubs=clubs, nations=nations)
+
+@info_rm.route("/builder/custom-stat", methods=["POST"])
+def custom_stat():
+    query_result, leagues, clubs, nations = src.builder.custom_stats(request.form)
+    return render_template("builder.html", query_result=query_result, leagues=leagues, clubs=clubs, nations=nations)
 
 if __name__ == "__main__":
     info_rm.run(debug=True)
