@@ -1,7 +1,7 @@
 import os
 import pathlib
 
-from .query import Query, get_max, get_column, get_by
+from .query import Query, get_max, get_column, get_by, grab_columns
 from .web_query import stmt, rank
 
 file_path = pathlib.Path(__file__).parent.absolute()
@@ -62,7 +62,7 @@ def check_input_value(input, type):
         # int or float
         if not input.isdecimal():
             split = input.split(".")
-            if not split[0].isdecimal() or not split[1].isdecimal():
+            if not (split[0].isdecimal() or not split[1].isdecimal()) and input[0] != ".":
                 return False
         return True
 
@@ -115,7 +115,7 @@ def get_stat_values(form_data_dict, type = "select"):
             continue
         else: 
             if field_two in stats.keys() and lop in lops:
-                select_string = "{stats.get(field_one)}{lop}{stats.get(field_two)}"
+                select_string = f"{stats.get(field_one)}{lop}{stats.get(field_two)}"
             elif field_two not in stats.keys() and lop == "None":
                 select_string = stats.get(field_one)
             else:

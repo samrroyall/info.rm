@@ -18,37 +18,47 @@ class Filter:
         field, operator, value = properties
         assert operator in cls._OPS, \
             f"ERROR: Filter accepts following operations: {str(cls._OPS)[1:-1]}."
-        assert len(field.split(".")) == 2, \
-            "ERROR: Field table not specified."
-        self.field, self.operator, self.value = self.check_properties(field, operator, value)
+        self.field, self.operator, self.value = self.check_tables_values(field, operator, value)
 
-    def check_properties(self, field, operator, value) -> None:
-        table_strings = ["leagues", "teams", "players"]
-        leagues = [league.split(",")[0] for league in eval(get_config_arg("leagues"))]
-        field_table = field.split(".")[0]
-        field_name = field.split(".")[1]
-        assert field_table in table_strings, \
-            "ERROR: Field table is incorrect."
-        expected_value_type = eval(field_table.capitalize())().get_type(field_name)
-        if expected_value_type == str:
-            if field_name == "league_name":
-                assert value in leagues, "ERROR: Invalid league name sent."
-            else:
-                assert value.isalpha(), "ERROR: Field value is incorrect."
-            value = f"\'{value}\'"
-        elif expected_value_type == int:
-            assert value.isdecimal(), "ERROR: Field value is incorrect."
-        elif expected_value_type == float:
-            if value.isdecimal():
-                value += ".0"
-            else:
-                assert len(value.split(".")) == 2, "ERROR: Field value is incorrect."
-            for half in value.split("."):
-                assert half.isdecimal(), "ERROR: Field value is incorrect."
-        elif expected_value_type == bool:
-            assert value == "true" or value == "false", \
-                "ERROR: Field value is incorrect."
+    def check_tables_values(self, field, operator, value):
+        db_tables = ["players","teams","leagues"]
+        column = grab_columns(field)[0]
+        split_column = column.split(".")
+        table_name = split_column[0]
+        column_name = split_column[1]
+        # check table
+        assert table_name in db_tables, "ERROR: Invalid table name supplied."
+        # check field
+        orm_class = eval(table_name.capitalize())
+        orm_schema = orm_class._TYPES
+        assert column_name in orm_schema.keys(),\
+            "ERROR: Invalid column name supplied."
+        # check value
+        expected_value = str(orm_schema.get(column_name)).split("'")[1]
+        if expected_value == "str":
+            expected_chars = [" ","."]
+            for char in value:
+                if char not in expected_chars and\
+                    (not char.isalpha() or not char.isdecimal):
+                    assert False, "ERROR: Invalid string value supplied."
+            value = f"\"{value}\""
+        elif expected_value == "int":
+            if "." in value:
+                split_value = value.split(".")
+                assert int(split_value[1]) == 0,\
+                    "ERROR: Invalid int value supplied."
+                value = split_value[0]
+            assert value.isdecimal(), "ERROR: Invalid int value supplied."
+        elif expected_value == "float":
+            if value[0] == ".":
+                value = "0" + value
+            elif value.isdecimal():
+                value = value + ".0"
+            split_value = value.split(".")
+            assert split_value[0].isdecimal() and split_value[1].isdecimal(),\
+                "ERROR: Invalid float value supplied."
         return field, operator, value
+
 
     def to_str(self) -> str:
         return f"{self.field} {self.operator} {self.value}"

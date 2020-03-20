@@ -3,87 +3,8 @@
 
   <style> .toggle { font-size: 1.4em; font-height: 1.3em } </style>
   <script>
-    $(document).ready(function() {
-      // trigger custom stat dropdown
-      $("#filter_button").click(function() {
-        if ($("#custom_stat").hasClass("hidden")) {
-          $("#custom_stat").removeClass("hidden");
-        } else {
-          $("#custom_stat").addClass("hidden");
-        }
-      });
-      // add select option 
-      {% for i in range(1,4) %}
-        $("#select_plus_{{i}}").click(function() {
-          if ($("#select_div_{{i + 1}}").hasClass("hidden")) {
-            $("#select_div_{{i + 1}}").removeClass("hidden");
-            $("#select_per90_toggle_div_{{i + 1}}").removeClass("hidden");
-          } else {
-            $("#select_div_{{i + 1}}").addClass("hidden");
-            $("#select_per90_toggle_div_{{i + 1}}").addClass("hidden");
-          }
-        });
-      {% endfor %}
-      // add filter by stat option
-      {% for i in range(1,4) %}
-        $("#stat_plus_{{i}}").click(function() {
-          if ($("#stat_div_{{i + 1}}").hasClass("hidden")) {
-            $("#stat_div_{{i + 1}}").removeClass("hidden");
-            $("#stat_expression_{{i + 1}}").removeClass("hidden");
-            $("#stat_per90_toggle_div_{{i + 1}}").removeClass("hidden");
-          } else {
-            $("#stat_div_{{i + 1}}").addClass("hidden");
-            $("#stat_expression_{{i + 1}}").addClass("hidden");
-            $("#stat_per90_toggle_div_{{i + 1}}").addClass("hidden");
-          }
-        });
-      {% endfor %}
-      // trigger filter value options
-      $("#filter_type").change(function() {
-        var val = $(this).val();
-        if (val == "None") {
-          {% for key in ["age","club","league","minutes_played","nationality","position","stat"] %}
-            $("#filter_{{key}}_div").addClass("hidden");
-          {% endfor %}
-        } else {
-          $("#filter_" + val + "_div").removeClass("hidden");
-        }
-      });
-      // update age value
-      $("#age_op").change(function() {
-        var val = $(this).val();
-        if (val == "><") {
-          $("#age_input2_div").removeClass("hidden");
-        } else {
-          $("#age_input2_div").addClass("hidden");
-        }
-      });
-      $("#minutes_played_op").change(function() {
-        var val = $(this).val();
-        if (val == "><") {
-          $("#minutes_played_input2_div").removeClass("hidden");
-        } else {
-          $("#minutes_played_input2_div").addClass("hidden");
-        }
-      });
-      $("#stat_op").change(function() {
-        var val = $(this).val();
-        if (val == "><") {
-          $("#stat_input2_div").removeClass("hidden");
-        } else {
-          $("#stat_input2_div").addClass("hidden");
-        }
-      });
-      {% for i in range(1,5) %}
-        $("#stat_cop_{{i}}").change(function() {
-          var val = $(this).val();
-          if (val == "><") {
-            $("#stat_input2_div_{{i}}").removeClass("hidden");
-          } else {
-            $("#stat_input2_div_{{i}}").addClass("hidden");
-          }
-        });
-      {% endfor %}
+    $(document).ready( function () {
+    // league to club action 
       $("#club_league_select").change(function() {
         {% for league in leagues %}
           $("#club_{{league.replace(' ','_')}}_select_div").addClass("hidden");
@@ -93,26 +14,8 @@
         $("#club_" + val.replace(" ","_") + "_select_div").removeClass("hidden");
       });
     });
-    // change page
-    function changePage(idPrefix, pageNo) {
-      var i = 1;
-      for (; i < 6; i++) {
-        if (i == pageNo) {
-          $("div#" + idPrefix + i.toString()).removeClass("hidden");
-        } else {
-          $("div#" + idPrefix + i.toString()).addClass("hidden");
-        }
-      }
-    }
   </script>
 
-{% set stats = ["None","Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Straight Red Cards","Yellow Cards","Second Yellow Cards"] %}
-<!-- Duels/Dribbles Past
-<option>Dribbles Past</option>
-<option>Duels</option>
-<option>Duels Won</option>
-<option>Duels Won Percentage</option>
--->
   <div style="padding-bottom: 30px">
     <div class="mr-auto ml-auto text-center h2" style="padding-bottom: 15px; padding-top: 15px">
       StatBuilder
@@ -127,358 +30,8 @@
                 <img src="{{ url_for('static', filename='filter.svg') }}" height="20px">
               </div>
             </div>
-            <!-- Customization Dropdown -->
-            <div class="alert alert-light hidden" id="custom_stat" role="alert">
-              <h4 class="alert-heading">Customize Your Stat</h4>
-              <strong>Use the options below to generate your own custom statistic.</strong>
-              <hr>
-              <form action="{{ url_for('custom_stat') }}" method="post">
-
-                <!-- SELECT FIELDS -->
-                <div class="form-group">
-                  <label for="select_field_1_1"><h5>Choose Stat to Show:</h5></label>
-                  {% for select_row in range(1,5) %}
-                    {% if select_row != 1 %}
-                      <div  class="form-row justify-content-left hidden" id="select_div_{{select_row}}">
-                    {% else %}
-                      <div  class="form-row justify-content-left" id="select_div_{{select_row}}">
-                    {% endif %}
-                      <div class="col-xs-4 col-sm-4 col-md-4">
-                        <select class="custom-select custom-select-sm" name="select_field1_{{select_row}}">
-                          {% for stat in stats %}
-                            <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                      <div class="col-xs-2 col-sm-2 col-md-2">
-                        <select class="custom-select custom-select-sm" name="select_op_{{select_row}}">
-                          <option>None</option>
-                          <option value="*">×</option>
-                          <option value="/">÷</option>
-                          <option>+</option>
-                          <option>-</option>
-                        </select>
-                      </div>
-                      <div class="col-xs-4 col-sm-4 col-md-4">
-                        <select class="custom-select custom-select-sm" name="select_field2_{{select_row}}">
-                          {% for stat in stats %}
-                            <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                      {% if select_row < 4 %}
-                        <div class="col-xs-1 col-sm-1 col-md-1">
-                          <div id="select_plus_{{select_row}}">
-                            <img src="{{ url_for('static', filename='plus.svg') }}" height="30px">
-                          </div>
-                        </div>
-                      {% else %}
-                        <div class="col-xs-1 col-sm-1 col-md-1">
-                        </div>
-                      {% endif %}
-                      </div>
-                    <!-- Per 90 Button -->
-                    {% if select_row != 1 %}
-                      <div class="custom-control custom-switch toggle hidden" id="select_per90_toggle_div_{{select_row}}" >
-                    {% else %}
-                      <div class="custom-control custom-switch toggle" id="select_per90_toggle_div_{{select_row}}" >
-                    {% endif %}
-                        <input type="checkbox" class="custom-control-input" id="select_per90_toggle_{{select_row}}" 
-                          name="select_per90_toggle_{{select_row}}">
-                        <label class="custom-control-label" for="select_per90_toggle_{{select_row}}">
-                          Per 90 Minutes
-                        </label>
-                      </div>
-                  {% endfor %}
-
-                <!-- FILTER FIELDS -->
-                <div class="form-group">
-                  <label for="select_field_1"><h5>Choose Filter Types:</h5></label>
-                  <div class="form-row">
-                    <div class="col-xs-3 col-sm-3 col-md-3">
-                      <select class="custom-select custom-select-sm" id="filter_type">
-                        <option>None</option>
-                        <option value="age">Age</option>
-                        <option value="club">Club</option>
-                        <option value="league">League</option>
-                        <option value="minutes_played">Minutes Played</option>
-                        <option value="nationality">Nationality</option>
-                        <option value="position">Position</option>
-                        <option value="stat">Stat</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- Filter Age -->
-                  <div class="hidden" id="filter_age_div" style="margin-top: 15px">
-                    <h6>Age:</h6>
-                    <div class="form-row">
-                      <div class="col-xs-2 col-sm-2 col-md-2">
-                        <select class="custom-select custom-select-sm" id="age_op" name="age_op">
-                          <option>None</option>
-                          <option>=</option>
-                          <option><</option>
-                          <option>></option>
-                          <option value="><">Between</option>
-                        </select>
-                      </div>
-                      <div class="col-xs-1 col-sm-1 col-md-1">
-                        <input type="text" class="form-control text-center" name="age_input1" value="" style="font-size: 1.15em">
-                      </div>
-                      <div class="col-xs-1 col-sm-1 col-md-1">
-                        <div class="hidden" id="age_input2_div">
-                          <input type="text" class="form-control text-center" name="age_input2" value="" style="font-size: 1.15em">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Filter Club -->
-                  <div class="hidden" id="filter_club_div" style="margin-top: 15px">
-                    <h6>Club:</h6>
-                    <div class="form-row">
-                      <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm" id="club_league_select"
-                          name="club_league_select" value="">
-                          <option>None</option>
-                          {% for league in leagues %}
-                            <option>{{league}}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                      <div class="col-xs-3 col-sm-3 col-md-3 hidden" id="club_select_div">
-                      {% for league in leagues %}
-                        <div id="club_{{league.replace(' ','_')}}_select_div">
-                          <select class="custom-select custom-select-sm" name="club_select">
-                            <option>None</option>
-                            {% for club in clubs.get(league) %}
-                              <option>{{club}}</option>
-                            {% endfor %}
-                          </select>
-                        </div>
-                      {% endfor %}
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Filter League -->
-                  <div class="hidden" id="filter_league_div" style="margin-top: 15px">
-                    <h6>League:</h6>
-                    <div class="form-row">
-                      <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm" name="league_select">
-                        <option>None</option>
-                        {% for league in leagues %}
-                          <option>{{league}}</option>
-                        {% endfor %}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Filter Minutes Played -->
-                  <div class="hidden" id="filter_minutes_played_div" style="margin-top: 15px">
-                    <h6>Minutes Played:</h6>
-                    <div class="form-row">
-                      <div class="col-xs-2 col-sm-2 col-md-2">
-                        <select class="custom-select custom-select-sm" id="minutes_played_op" 
-                          name="minutes_played_op">
-                          <option>None</option>
-                          <option>=</option>
-                          <option><</option>
-                          <option>></option>
-                          <option value="><">Between</option>
-                        </select>
-                      </div>
-                      <div class="col-xs-2 col-sm-2 col-md-2">
-                        <input type="text" class="form-control text-center" name="minutes_played_input1" 
-                          value="" style="font-size: 1.15em">
-                      </div>
-                      <div class="col-xs-2 col-sm-2 col-md-2">
-                        <div class="hidden" id="minutes_played_input2_div">
-                          <input type="text" class="form-control text-center" name="minutes_played_input2"
-                            value="" style="font-size: 1.15em">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Filter Nationality -->
-                  <div class="hidden" id="filter_nationality_div" style="margin-top: 15px">
-                    <h6>Nation:</h6>
-                    <div class="form-row">
-                      <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm" name="nationality_select">
-                          <option>None</option>
-                          {% for nation in nations %}
-                            <option>{{nation}}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Filter Position -->
-                  <div class="hidden" id="filter_position_div" style="margin-top: 15px">
-                    <h6>Position:</h6>
-                    <div class="form-row">
-                      <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm" name="position_select">
-                          <option>None</option>
-                          <option>Attacker</option>
-                          <option>Midfielder</option>
-                          <option>Defender</option>
-                          <option>Goalkeeper</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Filter Stat -->
-                <div class="hidden" id="filter_stat_div" style="margin-top: 15px">
-                  <h6>Stats:</h6>
-                  {% for filter_row in range(1,5) %}
-                    {% if filter_row != 1 %}
-                      <div  class="form-row justify-content-left hidden" id="stat_div_{{filter_row}}">
-                    {% else %}
-                      <div  class="form-row justify-content-left" id="stat_div_{{filter_row}}">
-                    {% endif %}
-                      <div class="col-xs-4 col-sm-4 col-md-4">
-                        <select class="custom-select custom-select-sm" name="stat_field1_{{filter_row}}">
-                        {% for stat in stats %}
-                          <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
-                        {% endfor %}
-                        </select>
-                      </div>
-                      <div class="col-xs-2 col-sm-2 col-md-2">
-                        <select class="custom-select custom-select-sm" name="stat_lop_{{filter_row}}">
-                          <option>None</option>
-                          <option>×</option>
-                          <option>÷</option>
-                          <option>+</option>
-                          <option>-</option>
-                        </select>
-                      </div>
-                      <div class="col-xs-4 col-sm-4 col-md-4">
-                        <select class="custom-select custom-select-sm" name="stat_field2_{{filter_row}}">
-                          {% for stat in stats %}
-                            <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                      {% if filter_row < 4 %}
-                        <div class="col-xs-1 col-sm-1 col-md-1">
-                          <div id="stat_plus_{{filter_row}}">
-                            <img src="{{ url_for('static', filename='plus.svg') }}" height="25px">
-                          </div>
-                        </div>
-                      {% else %}
-                        <div class="col-xs-1 col-sm-1 col-md-1">
-                        </div>
-                      {% endif %}
-                      </div>
-                    <!-- Logical Expression -->
-                    {% if filter_row != 1 %}
-                      <div  class="form-row hidden" id="stat_expression_{{filter_row}}">
-                    {% else %}
-                      <div  class="form-row" id="stat_expression_{{filter_row}}">
-                    {% endif %}
-                        <div class="col-xs-2 col-sm-2 col-md-2">
-                          <select class="custom-select custom-select-sm" id="stat_cop_{{filter_row}}" 
-                            name="stat_cop_{{filter_row}}">
-                            <option>None</option>
-                            <option>=</option>
-                            <option><</option>
-                            <option>></option>
-                            <option value="><">Between</option>
-                          </select>
-                        </div>
-                        <div class="col-xs-2 col-sm-2 col-md-2">
-                          <input type="text" class="form-control text-center" name="stat_input1_{{filter_row}}"
-                            value="" style="font-size: 1.15em">
-                        </div>
-                        <div class="col-xs-2 col-sm-2 col-md-2">
-                          <div class="hidden" id="stat_input2_div_{{filter_row}}">
-                            <input type="text" class="form-control text-center" name="stat_input2_{{filter_row}}"
-                              value="" style="font-size: 1.15em">
-                          </div>
-                        </div>
-                      </div>
-                    <!-- Per 90 Button -->
-                    {% if filter_row != 1 %}
-                      <div class="custom-control custom-switch toggle hidden" id="stat_per90_toggle_div_{{filter_row}}" >
-                    {% else %}
-                      <div class="custom-control custom-switch toggle" id="stat_per90_toggle_div_{{filter_row}}">
-                    {% endif %}
-                        <input type="checkbox" class="custom-control-input" id="stat_per90_toggle_{{filter_row}}"
-                          name="stat_per90_toggle_{{filter_row}}">
-                        <label class="custom-control-label" for="stat_per90_toggle_{{filter_row}}">
-                          Per 90 Minutes
-                        </label>
-                      </div>
-                  {% endfor %}
-                </div>
-                  
-
-                <!-- ORDER BY FIELDS -->
-                <div class="form-group" style="margin-top: 15px">
-                  <label for="order_field1"><h5>Choose Stat to Order By:</h5></label>
-                  <div  class="form-row">
-                    <div class="col-xs-5 col-sm-5 col-md-5">
-                      <select class="custom-select custom-select-sm" id="order_field1" name="order_field1">
-                        {% for stat in stats %}
-                          <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
-                        {% endfor %}
-                      </select>
-                    </div>
-                    <div class="col-xs-2 col-sm-2 col-md-2">
-                      <select class="custom-select custom-select-sm" name="order_op">
-                        <option>None</option>
-                        <option value="*">×</option>
-                        <option value="/">÷</option>
-                        <option>+</option>
-                        <option>-</option>
-                      </select>
-                    </div>
-                    <div class="col-xs-5 col-sm-5 col-md-5">
-                      <select class="custom-select custom-select-sm" id="order_field2" name="order_field2">
-                        {% for stat in stats %}
-                          <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
-                        {% endfor %}
-                      </select>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="col-xs-3 col-sm-3 col-md-3">
-                      <div class="custom-control custom-switch toggle">
-                        <input type="checkbox" class="custom-control-input" name="order_per90_toggle"
-                          id="order_per90_toggle">
-                        <label class="custom-control-label" for="order_per90_toggle">
-                          Per 90 Minutes
-                        </label>
-                      </div>
-                    </div>
-                    <div class="col-xs-3 col-sm-3 col-md-3">
-                      <div class="custom-control custom-switch toggle">
-                        <input type="checkbox" class="custom-control-input" name="asc_toggle"
-                          id="asc_toggle">
-                        <label class="custom-control-label" for="asc_toggle">
-                          Low to High
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-row text-center justify-content-center" style="padding-top: 15px">
-                    <div class="col-xs-3 col-sm-3 col-md-3">
-                    <button class="btn btn-sm btn-dark" type="submit">Generate Stat</button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
+            {% block customize %}{% endblock %}
           </div>
-          <!-- End Customization Dropdown -->
 
           <!-- Card Contents -->
           <ul class="list-group list-group-flush">
@@ -492,8 +45,8 @@
                   {% for i in range(4) %}
                     {% if i < (header|length) %}
                       {% set column = header[i] %}
-                      <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
-                        {{column.split('.')[1].capitalize()}}
+                      <script>getColumnName("{{column}}", "custom_stat_heading_{{i}}")</script>
+                      <div class="col-xs-2 col-sm-2 col-lg-2 text-center" id="custom_stat_heading_{{i}}">
                       </div>
                     {% else %}
                       <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
@@ -507,9 +60,9 @@
             {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
             {% for page in range(1, num_pages + 1) %}
               {% if page == 1 %}
-                <div id="builder_page_{{page}}">
+                <div id="stats_builder_page_{{page}}">
               {% else %}
-                <div id="builder_page_{{page}}" class="hidden">
+                <div id="stats_builder_page_{{page}}" class="hidden">
               {% endif %}
               {% for row in (query_result.get('data')[10 * (page - 1) : 10 * page]) %}
               <li class="list-group-item">
@@ -519,7 +72,7 @@
                   </div>
                   <div class="col-xs-2 col-sm-2 col-lg-2 text-left">
                     <div class="row">
-                      <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
+                      <strong>{{row.get("rank")}}.&nbsp{{row.get("name")}}</strong>
                     </div>
                     <div class="row">
                       {{row.get("team_name")}}
@@ -541,8 +94,12 @@
                   <nav class="nav justify-content-center">
                     <ul class="pagination pagination-md">
                       {% for i in range(1, num_pages + 1) %}
-                        <li class="page-item" style="color: blue">
-                          <a class="page-link" onclick="changePage('builder_page_', {{i}})">{{i}}</a>
+                        {% if i == 1 %}
+                          <li class="page-item text-primary active" id="stats_builder_pagination_{{i}}">
+                        {% else %}
+                          <li class="page-item text-primary" id="stats_builder_pagination_{{i}}">
+                        {% endif %}
+                          <a class="page-link" onclick="changePage('stats','builder', {{i}})">{{i}}</a>
                         </li>
                       {% endfor %}
                     </ul>
@@ -552,6 +109,7 @@
             </li>
           </ul>
           <!-- End Card Contents -->
+
         </div>
       </div>
     </div>

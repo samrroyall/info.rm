@@ -14,16 +14,20 @@ def stmt(select_fields, filter_fields, order_field):
     table_names = []
     fields = []
     if len(filter_fields) > 0:
-        filter_columns = filter_fields[0][0]
-        fields += filter_columns
+        for filter_field in filter_fields[0][0]:
+            filter_column = filter_field[0]
+            fields.append(filter_column)
     fields += select_fields
     for sel_field in fields:
-        for field in grab_columns(sel_field):
+        columns = grab_columns(sel_field)
+        for column in columns:
+            table = column.split(".")[0]
             table_names.append((
-                    field.split(".")[0],
-                    join_params.get(field.split(".")[0])
+                    table,
+                    join_params.get(table)
                 ))
     table_names = list(set(table_names))
+
     if len(filter_fields) == 0:
         stmt = Statement(
             table_names = table_names,
