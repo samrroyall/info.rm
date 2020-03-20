@@ -32,7 +32,8 @@ def builder():
 
 @info_rm.route("/builder/custom-stat", methods=["POST"])
 def custom_stat():
-    query_result, leagues, clubs, nations = src.builder.custom_stats(request.form)
+    form_data = list(request.form.items())
+    query_result, leagues, clubs, nations = src.builder.custom_stats(form_data)
     return render_template("builder.html", query_result=query_result, leagues=leagues, clubs=clubs, nations=nations)
 
 if __name__ == "__main__":

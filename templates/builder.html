@@ -41,7 +41,13 @@
       // trigger filter value options
       $("#filter_type").change(function() {
         var val = $(this).val();
-        $("#filter_" + val + "_div").removeClass("hidden");
+        if (val == "None") {
+          {% for key in ["age","club","league","minutes_played","nationality","position","stat"] %}
+            $("#filter_{{key}}_div").addClass("hidden");
+          {% endfor %}
+        } else {
+          $("#filter_" + val + "_div").removeClass("hidden");
+        }
       });
       // update age value
       $("#age_op").change(function() {
@@ -78,7 +84,14 @@
           }
         });
       {% endfor %}
-
+      $("#club_league_select").change(function() {
+        {% for league in leagues %}
+          $("#club_{{league.replace(' ','_')}}_select_div").addClass("hidden");
+        {% endfor %}
+        var val = $(this).val();
+        $("#club_select_div").removeClass("hidden");
+        $("#club_" + val.replace(" ","_") + "_select_div").removeClass("hidden");
+      });
     });
     // change page
     function changePage(idPrefix, pageNo) {
@@ -138,7 +151,8 @@
                         </select>
                       </div>
                       <div class="col-xs-2 col-sm-2 col-md-2">
-                        <select class="custom-select custom-select-sm" name="select_op_{{select_row}}" value="None">
+                        <select class="custom-select custom-select-sm" name="select_op_{{select_row}}">
+                          <option>None</option>
                           <option value="*">×</option>
                           <option value="/">÷</option>
                           <option>+</option>
@@ -182,7 +196,8 @@
                   <label for="select_field_1"><h5>Choose Filter Types:</h5></label>
                   <div class="form-row">
                     <div class="col-xs-3 col-sm-3 col-md-3">
-                      <select class="custom-select custom-select-sm" id="filter_type" value="None">
+                      <select class="custom-select custom-select-sm" id="filter_type">
+                        <option>None</option>
                         <option value="age">Age</option>
                         <option value="club">Club</option>
                         <option value="league">League</option>
@@ -199,7 +214,8 @@
                     <h6>Age:</h6>
                     <div class="form-row">
                       <div class="col-xs-2 col-sm-2 col-md-2">
-                        <select class="custom-select custom-select-sm" id="age_op" name="age_op" value="None">
+                        <select class="custom-select custom-select-sm" id="age_op" name="age_op">
+                          <option>None</option>
                           <option>=</option>
                           <option><</option>
                           <option>></option>
@@ -222,17 +238,25 @@
                     <h6>Club:</h6>
                     <div class="form-row">
                       <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm" name="club_league_select" value="None">
+                        <select class="custom-select custom-select-sm" id="club_league_select"
+                          name="club_league_select" value="">
+                          <option>None</option>
                           {% for league in leagues %}
                             <option>{{league}}</option>
                           {% endfor %}
                         </select>
                       </div>
-                      <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm hidden" name="club_select" value="None">
-                          <option>Test</option>
-                          <!-- REVISIT -->
-                        </select>
+                      <div class="col-xs-3 col-sm-3 col-md-3 hidden" id="club_select_div">
+                      {% for league in leagues %}
+                        <div id="club_{{league.replace(' ','_')}}_select_div">
+                          <select class="custom-select custom-select-sm" name="club_select">
+                            <option>None</option>
+                            {% for club in clubs.get(league) %}
+                              <option>{{club}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      {% endfor %}
                       </div>
                     </div>
                   </div>
@@ -242,7 +266,8 @@
                     <h6>League:</h6>
                     <div class="form-row">
                       <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm" name="league_select" value="None">
+                        <select class="custom-select custom-select-sm" name="league_select">
+                        <option>None</option>
                         {% for league in leagues %}
                           <option>{{league}}</option>
                         {% endfor %}
@@ -257,7 +282,8 @@
                     <div class="form-row">
                       <div class="col-xs-2 col-sm-2 col-md-2">
                         <select class="custom-select custom-select-sm" id="minutes_played_op" 
-                          name="minutes_played_op" value="None">
+                          name="minutes_played_op">
+                          <option>None</option>
                           <option>=</option>
                           <option><</option>
                           <option>></option>
@@ -282,8 +308,9 @@
                     <h6>Nation:</h6>
                     <div class="form-row">
                       <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm" name="nationality_select" value="None">
-                          {% for nation in nations }}
+                        <select class="custom-select custom-select-sm" name="nationality_select">
+                          <option>None</option>
+                          {% for nation in nations %}
                             <option>{{nation}}</option>
                           {% endfor %}
                         </select>
@@ -296,7 +323,8 @@
                     <h6>Position:</h6>
                     <div class="form-row">
                       <div class="col-xs-3 col-sm-3 col-md-3">
-                        <select class="custom-select custom-select-sm" name="position_select" value="None">
+                        <select class="custom-select custom-select-sm" name="position_select">
+                          <option>None</option>
                           <option>Attacker</option>
                           <option>Midfielder</option>
                           <option>Defender</option>
@@ -308,7 +336,7 @@
                 </div>
 
                 <!-- Filter Stat -->
-                <div class="hidden" id="stat_div" style="margin-top: 15px">
+                <div class="hidden" id="filter_stat_div" style="margin-top: 15px">
                   <h6>Stats:</h6>
                   {% for filter_row in range(1,5) %}
                     {% if filter_row != 1 %}
@@ -319,12 +347,13 @@
                       <div class="col-xs-4 col-sm-4 col-md-4">
                         <select class="custom-select custom-select-sm" name="stat_field1_{{filter_row}}">
                         {% for stat in stats %}
-                          <option>{{stat.replace(' ','_')}}</option>
+                          <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
                         {% endfor %}
                         </select>
                       </div>
                       <div class="col-xs-2 col-sm-2 col-md-2">
-                        <select class="custom-select custom-select-sm" name="stat_lop_{{filter_row}}" value="None">
+                        <select class="custom-select custom-select-sm" name="stat_lop_{{filter_row}}">
+                          <option>None</option>
                           <option>×</option>
                           <option>÷</option>
                           <option>+</option>
@@ -334,7 +363,7 @@
                       <div class="col-xs-4 col-sm-4 col-md-4">
                         <select class="custom-select custom-select-sm" name="stat_field2_{{filter_row}}">
                           {% for stat in stats %}
-                            <option>{{stat.replace(' ','_')}}</option>
+                            <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
                           {% endfor %}
                         </select>
                       </div>
@@ -357,7 +386,8 @@
                     {% endif %}
                         <div class="col-xs-2 col-sm-2 col-md-2">
                           <select class="custom-select custom-select-sm" id="stat_cop_{{filter_row}}" 
-                            name="stat_cop_{{filter_row}}" value="None">
+                            name="stat_cop_{{filter_row}}">
+                            <option>None</option>
                             <option>=</option>
                             <option><</option>
                             <option>></option>
@@ -393,17 +423,18 @@
 
                 <!-- ORDER BY FIELDS -->
                 <div class="form-group" style="margin-top: 15px">
-                  <label for="order_field_1"><h5>Choose Stat to Order By:</h5></label>
+                  <label for="order_field1"><h5>Choose Stat to Order By:</h5></label>
                   <div  class="form-row">
                     <div class="col-xs-5 col-sm-5 col-md-5">
-                      <select class="custom-select custom-select-sm" name="order_field1">
+                      <select class="custom-select custom-select-sm" id="order_field1" name="order_field1">
                         {% for stat in stats %}
-                          <option>{{stat}}</option>
+                          <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
                         {% endfor %}
                       </select>
                     </div>
                     <div class="col-xs-2 col-sm-2 col-md-2">
-                      <select class="custom-select custom-select-sm" name="order_op" value="None">
+                      <select class="custom-select custom-select-sm" name="order_op">
+                        <option>None</option>
                         <option value="*">×</option>
                         <option value="/">÷</option>
                         <option>+</option>
@@ -411,9 +442,9 @@
                       </select>
                     </div>
                     <div class="col-xs-5 col-sm-5 col-md-5">
-                      <select class="custom-select custom-select-sm" name="order_field2">
+                      <select class="custom-select custom-select-sm" id="order_field2" name="order_field2">
                         {% for stat in stats %}
-                          <option>{{stat}}</option>
+                          <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
                         {% endfor %}
                       </select>
                     </div>
@@ -450,7 +481,6 @@
           <!-- End Customization Dropdown -->
 
           <!-- Card Contents -->
-          
           <ul class="list-group list-group-flush">
               {% set header = query_result.get('header')[3:] %}
               <li class="list-group-item">
@@ -459,14 +489,23 @@
                     </div>
                     <div class="col-xs-2 col-sm-2 col-lg-2">
                     </div>
-                  {% for column in header %}
-                    <div class="col-xs-2 col-sm-2 col-lg-2 text-center h6">
-                      {{column.split('.')[1].capitalize()}}
-                    </div>
+                  {% for i in range(4) %}
+                    {% if i < (header|length) %}
+                      {% set column = header[i] %}
+                      <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
+                        {{column.split('.')[1].capitalize()}}
+                      </div>
+                    {% else %}
+                      <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
+                      </div>
+                    {% endif %}
                   {% endfor %}
                 </div>
               </li>
-            {% for page in range(1, 6) %}
+            {% set pagemod = query_result.get('data')|length % 10 %}
+            {% set pagediv = query_result.get('data')|length // 10 %}
+            {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+            {% for page in range(1, num_pages + 1) %}
               {% if page == 1 %}
                 <div id="builder_page_{{page}}">
               {% else %}
@@ -501,7 +540,7 @@
                 <div class="col-12">
                   <nav class="nav justify-content-center">
                     <ul class="pagination pagination-md">
-                      {% for i in range(1, 6) %}
+                      {% for i in range(1, num_pages + 1) %}
                         <li class="page-item" style="color: blue">
                           <a class="page-link" onclick="changePage('builder_page_', {{i}})">{{i}}</a>
                         </li>

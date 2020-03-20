@@ -7,14 +7,9 @@ join_params = {
     }
 floats = [
         "players.rating",
-        "players.shots_on_pct",
-        "players.passes_accuracy",
-        "players.duels_won_pct",
-        "players.dribbles_succeeded_pct",
-        "players.penalties_scored_pct"
     ]
 
-def stmt(select_fields, filter_fields, order_fields):
+def stmt(select_fields, filter_fields, order_field):
     select_fields = default_select_fields + select_fields
     table_names = []
     fields = []
@@ -33,16 +28,23 @@ def stmt(select_fields, filter_fields, order_fields):
         stmt = Statement(
             table_names = table_names,
             select_fields = select_fields,
-            order_fields = order_fields
+            order_field = order_field
         )
     else:
         stmt = Statement(
             table_names = table_names,
             select_fields = select_fields,
             filter_fields = filter_fields,
-            order_fields = order_fields
+            order_field = order_field
         )
     return stmt
+
+def field_logical(field):
+    lops = ["/","*","+","-"]
+    for lop in lops:
+        if lop in field:
+            return True
+    return False
 
 def rank(query_result, fields, order_by_field, desc=True):
     count = 0
@@ -66,14 +68,14 @@ def rank(query_result, fields, order_by_field, desc=True):
         stats = []
         for stat_idx in range(3,len(fields)):
             stat = tup[stat_idx]
-            if fields[stat_idx] in floats:
+            if fields[stat_idx] in floats or field_logical(fields[stat_idx]):
                 value = round(float(tup[stat_idx]), 2)
             else:
                 value = round(float(tup[stat_idx]))
             stats.append(value)
 
         assert order_by_field in fields,\
-            "ERROR: invalid order_by_field supplied"
+            f"ERROR: invalid order_by_field supplied {order_by_field}"
         order_by_idx = fields.index(order_by_field)
         order_by_stat = float(tup[order_by_idx])
         # rank

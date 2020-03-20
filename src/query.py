@@ -39,7 +39,10 @@ class Filter:
         elif expected_value_type == int:
             assert value.isdecimal(), "ERROR: Field value is incorrect."
         elif expected_value_type == float:
-            assert len(value.split(".")) == 2, "ERROR: Field value is incorrect."
+            if value.isdecimal():
+                value += ".0"
+            else:
+                assert len(value.split(".")) == 2, "ERROR: Field value is incorrect."
             for half in value.split("."):
                 assert half.isdecimal(), "ERROR: Field value is incorrect."
         elif expected_value_type == bool:
@@ -74,12 +77,12 @@ class Order:
 
     def __init__(
             self, 
-            order_fields: Tuple[List[str], bool]
+            order_field: Tuple[List[str], bool]
         ) -> None:
-        self.order_fields, self.desc = order_fields
+        self.order_field, self.desc = order_field
 
     def to_str(self) -> str:
-        order_list = ", ".join(self.order_fields)
+        order_list = ", ".join(self.order_field)
         query_string = f" ORDER BY {order_list}"
         if self.desc:
             query_string += " DESC"
@@ -131,12 +134,12 @@ class Statement:
         self, 
         table_names: List[Tuple[str,str]], 
         select_fields: List[str], 
-        order_fields: List[Tuple[List[str], bool]], 
+        order_field: Tuple[List[str], bool], 
         filter_fields: Optional[List[Tuple[List[Tuple[str,str,str]], str]]] = None
     ) -> None:
         self.select_stmt = Select(select_fields, table_names)
-        if order_fields:
-            self.order_fields = Order(order_fields)
+        if order_field:
+            self.order_field = Order(order_field)
         if filter_fields:
             self.filter_fields = [ FilterList(field) for field in filter_fields ]
 
@@ -145,8 +148,8 @@ class Statement:
         if hasattr(self, "filter_fields"):
             filter_string = " AND ".join([ f"({filter.to_str()})" for filter in self.filter_fields ])
             query_string += f" WHERE {filter_string}"
-        if hasattr(self, "order_fields"):
-            query_string += f" {self.order_fields.to_str()}"
+        if hasattr(self, "order_field"):
+            query_string += f" {self.order_field.to_str()}"
         return f"{query_string};"
 
 
@@ -224,26 +227,25 @@ def get_by(
         "ERROR: invalid DB path supplied to Query."
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
-
     result = dict() 
     cursor.execute(f"SELECT DISTINCT {col2} FROM {table2};")
-    values = cursor.fetchall()[0]
+    values = [tup[0] for tup in cursor.fetchall()]
     connection.commit()
     for value in values:
-        query_string = f"SELECT DISTINCT {col1} FROM {table1} WHERE {where_param} = {value};"
+        query_string = f"SELECT DISTINCT {col1} FROM {table1} WHERE {where_param}=\"{value}\";"
         cursor.execute(query_string)
-        result[value] = cursor.fetchall()[0]
+        result[value] = [tup[0] for tup in cursor.fetchall()]
         connection.commit()
     connection.close()
-    return query_result
+    return result
 
 def get_column(db_path: str, col: str, table: str) -> List[str]:
     assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
         "ERROR: invalid DB path supplied to Query."
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
-    cursor.execute(f"SELECT {col} FROM {table};")
-    query_result = cursor.fetchall()[0]
+    cursor.execute(f"SELECT DISTINCT {col} FROM {table};")
+    query_result = [tup[0] for tup in cursor.fetchall()]
     connection.commit()
     connection.close()
     return query_result

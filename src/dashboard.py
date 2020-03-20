@@ -23,13 +23,13 @@ def dashboard_stmt(stat, league, desc = True, additional_filter = None):
             table_names = [("players", "team_id"), ("teams", "id")], 
             select_fields = ["players.name", stat, "teams.name", "teams.logo"],
             filter_fields = filter_list,
-            order_fields = ([stat], desc)
+            order_field = ([stat], desc)
         )
     else:
         stmt = Statement(
             table_names = [("players", "team_id"), ("teams", "id")], 
             select_fields = ["players.name", stat, "teams.name", "teams.logo"],
-            order_fields = ([stat], desc)
+            order_field = ([stat], desc)
         )
     return stmt
 
