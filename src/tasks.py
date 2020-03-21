@@ -15,12 +15,12 @@ def get_data(action, engine):
     request_type = Request.get_registry().get(f"{endpoint.capitalize()}Request")
 
     response_ids = dict()
-    processed_data = []
+    processed_data = dict()
     # league requests do not require ids from prior calls
     if endpoint == "leagues":
         result = request_type().update()
         response_ids = result.get("ids")
-        processed_data += result.get("processed_data")
+        processed_data.update(result)
     # player and team requests do not require ids from prior calls
     elif endpoint == "teams" or endpoint == "players":
         # get ids
@@ -38,16 +38,27 @@ def get_data(action, engine):
                 # ensure data has been previously inserted into database
                 assert previously_inserted(engine, action, id), \
                     "ERROR: Attempt to update data not present in DB stopped."
-            result = request_type(id).update()
-            if result.get("ids"):
-                response_ids.update(result.get("ids"))
-            processed_data += result.get("processed_data")
-            print("INFO: Response for {0} Obtained Successfully.".\
+
+            if endpoint == "players":
+                result = request_type(id, processed_data).update()
+                print("INFO: Response for {0} Obtained Successfully.".\
                     format(ids.get(id).get("team_name")))
+                processed_data.update(result)
+            elif endpoint == "teams":
+                result = request_type(id).update()
+                response_ids.update(result.get("ids"))
+                if processed_data.get("processed_data") is None:
+                    processed_data["processed_data"] = result.get("processed_data")
+                else:
+                    processed_data["processed_data"] += result.get("processed_data")
+                
     # update config.ini with new IDs
-    if len(response_ids) > 0:
+    if endpoint == "players": 
+        processed_data = processed_data.values()
+    else:
         config_arg = f"{endpoint[:-1]}_ids"
         set_config_arg(config_arg, response_ids)
+        processed_data = processed_data.get("processed_data")
     return processed_data
 
 def setup(config_args):

@@ -38,9 +38,9 @@ class Filter:
         if expected_value == "str":
             expected_chars = [" ","."]
             for char in value:
-                if char not in expected_chars and\
-                    (not char.isalpha() or not char.isdecimal):
-                    assert False, "ERROR: Invalid string value supplied."
+                if (char not in expected_chars and
+                    (not char.isalpha() and not char.isdecimal)):
+                    assert False, f"ERROR: Invalid string value supplied. {value}"
             value = f"\"{value}\""
         elif expected_value == "int":
             if "." in value:

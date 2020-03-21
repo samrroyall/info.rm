@@ -25,7 +25,7 @@ def update_table(engine, player):
     session = Session()
     # update database tables with api response data
     try:
-        session.query(Players).filter(Players.uid == player.get("uid")).update(player)
+        session.query(Players).filter(Players.id == player.get("id")).update(player)
         print("INFO: Update Successful.")
     except:
         print("ERROR: Update Unsuccessful.")
@@ -46,6 +46,7 @@ def insert_into_table(engine, data):
         print("INFO: Insertion Successful.")
     except IntegrityError as ie:
         print("ERROR: An attmempt to insert an existing row into the database was made.")
+        print("MESSAGE: ", ie)
         sys.exit(1)
     return session
 
@@ -65,7 +66,7 @@ def previously_inserted(engine, action, id):
     elif sub_action == "players":
         # check if tables in DB
         if engine.has_table("Players") and engine.has_table("Teams"):
-            query_result = session.query(Players.uid).\
+            query_result = session.query(Players.id).\
                     filter( Players.team_id == id )
     if query_result and len(list(query_result)) > 0:
         return True # matching DB rows were found

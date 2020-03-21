@@ -101,7 +101,6 @@ class Players(Base):
     """ ORM Class defining attributes for players table. """
 
     _TYPES = {
-        "uid": str,
         "league_id": int,
         "league_name": str,
         "team_id": int,
@@ -157,12 +156,11 @@ class Players(Base):
         "substitutions_out": float,
     }
 
-    uid = Column(String, primary_key=True) # hash of id, team_id, league_id
+    id = Column(Integer, primary_key=True) # hash of id, team_id, league_id
     league_id = Column(Integer, ForeignKey("leagues.id"), nullable=False) 
     league_name = Column(String)
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=False) 
     team_name = Column(String)
-    id = Column(Integer)
     name = Column(String)
     firstname = Column(String)
     lastname = Column(String)

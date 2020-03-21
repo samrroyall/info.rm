@@ -18,10 +18,6 @@ def get_alternative_league(league_name):
     else:
         return None
 
-def generate_uid(player_id, team_id, league):
-    uid_string = f"{player_id}{team_id}{league}"
-    return md5(uid_string.encode()).hexdigest()
-
 def process_height_weight(height, weight):
     if height: 
         height_in = float(height.split(" ")[0]) * 0.393701
@@ -231,7 +227,7 @@ def process_teams(teams, league_id):
         }
     return {"ids":team_ids,"processed_data":teams}
 
-def process_players(players, team_id):
+def process_players(players, team_id, filtered_players, request_instance):
     """ Function to process the API response regarding player data. """
     config_values = eval(get_config_arg("team_ids")).get(team_id)
     league_name = config_values.get("league_name")
@@ -239,7 +235,6 @@ def process_players(players, team_id):
     orm_class = Players
     attributes = getattr(orm_class, "_TYPES")
 
-    filtered_players = dict()
     for idx in range(len(players)):
         player = players[idx]
         # check player
@@ -251,34 +246,44 @@ def process_players(players, team_id):
         for stats in player_stats:
             temp_player = dict()
             temp_league_name = stats.get("league").get("name")
-            if temp_league_name != league_name and (not alt_league_name or 
+            if temp_league_name != league_name and (alt_league_name is None or 
                 temp_league_name != alt_league_name):
                 continue
             # use consistent league name
             # only store statistics on players that have played
             if (not stats.get("games").get("minutes") or 
-                stats.get("games").get("minutes") == 0):
+                float(stats.get("games").get("minutes")) == 0.0):
                 continue
-            # create uid
+
+            temp_player["id"] = player.get("player").get("id")
             temp_player["league_id"] = stats.get("league").get("id")
             temp_player["league_name"] = league_name
             temp_player["team_id"] = stats.get("team").get("id")
             temp_player["team_name"] = stats.get("team").get("name")
-            temp_player["id"] = player.get("player").get("id")
-            # if player league is current, create UID column 
-            temp_player["uid"] = generate_uid(
-                                temp_player.get("id"),
-                                temp_player.get("team_id"),
-                                temp_player.get("league")
-                            )
             # check for duplicates, only process most recent versions
-            if (temp_player.get("uid") in filtered_players and 
-                stats.get("games").get("minutes") <= 
-                filtered_players[temp_player.get("uid")].get("minutes_played")):
-                continue
+            if temp_player.get("id") in filtered_players.keys() :
+                # find most recent transfered-to-club
+                api_response = request_instance.make_call("transfers",{"player": temp_player.get("id")})
+                player_transfers = api_response.get("response")[0].\
+                                                       get("transfers")
+                most_recent_transfer_date = None
+                most_recent_team_id = None
+                for transfer in player_transfers:
+                    transfer_date = datetime.strptime(transfer.get("date"),"%Y-%m-%d").date()
+                    if most_recent_transfer_date is None or transfer_date > most_recent_transfer_date:
+                        most_recent_transfer_date = transfer_date
+                        most_recent_team_id = transfer.get("teams").get("in").get("id")
+                # if we already have the most recent version, don't process
+                filtered_players_team_id = int(filtered_players.get(temp_player.get("id")).\
+                                                                get("team_id"))
+                if filtered_players_team_id == most_recent_team_id:
+                    continue
+                # if this isn't the most recent version, don't process
+                elif int(temp_player.get("team_id")) != most_recent_team_id:
+                    continue
             # player 
             player_info = player.get("player")
-            temp_player["name"] = player_info.get("name")
+            temp_player["name"] = player_info.get("name").replace("&apos;","'")
             temp_player["firstname"] = player_info.get("firstname")
             temp_player["lastname"] = player_info.get("lastname")
             temp_player["age"] = player_info.get("age")
@@ -292,7 +297,7 @@ def process_players(players, team_id):
                                         )
             temp_player = process_stats(stats, temp_player)
             processed_player = check_keys(temp_player, attributes)
-            filtered_players[processed_player.get("uid")] = processed_player
-    return {"ids": [], "processed_data": filtered_players.values()}
+            filtered_players[processed_player.get("id")] = processed_player
+    return filtered_players
 
 

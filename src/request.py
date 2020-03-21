@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from typing import Type, Dict, Set, Any, Optional
+from typing import Type, Dict, Set, Any, Optional, List, Tuple
 from requests import get
 from time import sleep
 from datetime import datetime
@@ -107,14 +107,18 @@ class Request(metaclass=Registry):
         if cls._RATELIMIT_REMAINING and cls._RATELIMIT_REMAINING == 0:
             sleep(cls._RATELIMIT_RESET - datetime.today().timestamp() + 1)
     
-    def make_call(self) -> Dict[str, Dict[str, Any]]:
+    def make_call(self, endpoint = None, params = None) -> Dict[str, Dict[str, Any]]:
         """ Method to make API call. """
         cls = self.__class__ 
         # View ratelimit before proceeding, sleep if needed
         self.get_ratelimit()
         # Make API request
-        url = f"{cls._API_URL}{self.endpoint}" 
-        api_response = get(url, headers=self.headers, params=self.params)
+        if endpoint and params:
+          url = f"{cls._API_URL}{endpoint}" 
+          api_response = get(url, headers=self.headers, params=params)
+        else:
+          url = f"{cls._API_URL}{self.endpoint}" 
+          api_response = get(url, headers=self.headers, params=self.params)
         # Update ratelimit
         headers_lower = dict([(k.lower(),v) for k,v in dict(api_response.headers).items()])
         self.set_ratelimit(headers_lower)
@@ -135,13 +139,15 @@ class Request(metaclass=Registry):
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
         response_type = self.__class__.__name__.lower().split("request")[0]
         process_func = eval(f"process_{response_type}")
-        return process_func(response_data.get("response"), self.foreign_key)
+        if hasattr(self, "processed_data"):
+            return process_func(response_data.get("response"), self.foreign_key, self.processed_data, self)
+        else:
+            return process_func(response_data.get("response"), self.foreign_key)
 
     def update(self) -> Dict[str, Any]:
         """ Method to gather, process, and store API data. """
         api_response = self.make_call()
         return self.process_response(api_response) 
-
 
 class LeaguesRequest(Request):
     """ Class defining methods used during the collection and processing of 
@@ -175,7 +181,7 @@ class PlayersRequest(Request):
     data through API requests regarding Teams data. """    
     _REGISTER: bool = True
 
-    def __init__(self, team_id: int) -> None:
+    def __init__(self, team_id: int, processed_data: Dict[str, Any]) -> None:
         super().__init__()        
         self.endpoint: str = "players"
         self.foreign_key: int = team_id
@@ -183,4 +189,5 @@ class PlayersRequest(Request):
             "team": team_id,
             "season": self.current_season_short
         }
+        self.processed_data = processed_data
 
