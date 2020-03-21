@@ -13,7 +13,7 @@ def stmt(select_fields, filter_fields, order_field):
     select_fields = default_select_fields + select_fields
     table_names = []
     fields = []
-    if len(filter_fields) > 0:
+    if filter_fields is not None:
         for filter_field in filter_fields[0][0]:
             filter_column = filter_field[0]
             fields.append(filter_column)
@@ -28,19 +28,12 @@ def stmt(select_fields, filter_fields, order_field):
                 ))
     table_names = list(set(table_names))
 
-    if len(filter_fields) == 0:
-        stmt = Statement(
-            table_names = table_names,
-            select_fields = select_fields,
-            order_field = order_field
-        )
-    else:
-        stmt = Statement(
-            table_names = table_names,
-            select_fields = select_fields,
-            filter_fields = filter_fields,
-            order_field = order_field
-        )
+    stmt = Statement(
+        table_names = table_names,
+        select_fields = select_fields,
+        filter_fields = filter_fields,
+        order_field = order_field
+    )
     return stmt
 
 def field_logical(field):
@@ -73,7 +66,7 @@ def rank(query_result, fields, order_by_field, desc=True):
         for stat_idx in range(3,len(fields)):
             stat = tup[stat_idx]
             if fields[stat_idx] in floats or field_logical(fields[stat_idx]):
-                value = round(float(tup[stat_idx]), 2)
+                value = str(round(float(tup[stat_idx]), 2)).ljust(4,"0")
             else:
                 value = round(float(tup[stat_idx]))
             stats.append(value)
@@ -92,7 +85,7 @@ def rank(query_result, fields, order_by_field, desc=True):
 
         # return
         ranked_tup = {
-            "rank": rank,
+            "rank": (str(rank) + ".").ljust(3," "),
             "name": name,
             "team_name": team_name,
             "team_logo": team_logo,

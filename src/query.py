@@ -150,7 +150,7 @@ class Statement:
         self.select_stmt = Select(select_fields, table_names)
         if order_field:
             self.order_field = Order(order_field)
-        if filter_fields:
+        if filter_fields is not None:
             self.filter_fields = [ FilterList(field) for field in filter_fields ]
 
     def to_str(self) -> str:

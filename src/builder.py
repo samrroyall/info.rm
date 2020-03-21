@@ -204,7 +204,10 @@ def custom_stats(form_data):
         filter_fields += stat_values
 
     # finalize filter fields
-    filter_fields = [(filter_fields, "AND")]
+    if len(filter_fields) > 0:
+        filter_fields = [(filter_fields, "AND")]
+    else:
+        filter_fields = None
 
     # get order_by values
     order_field = get_stat_values(form_data_dict, "order")

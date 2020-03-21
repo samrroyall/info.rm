@@ -24,10 +24,12 @@
       <div class="card col-xs-9 col-sm-9 col-md-9" style="width: 18rem; font-size: x-small;">
         <div class="card-body">
           <div class="card-title">
-            <div class="text-center h4">
+            <div class="text-center h4 text-secondary">
               Your Stat
               <div id="filter_button">
-                <img src="{{ url_for('static', filename='filter.svg') }}" height="20px">
+                <svg class="bi bi-filter" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M6 10.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+                </svg>              
               </div>
             </div>
             {% block customize %}{% endblock %}
@@ -45,8 +47,13 @@
                   {% for i in range(4) %}
                     {% if i < (header|length) %}
                       {% set column = header[i] %}
-                      <script>getColumnName("{{column}}", "custom_stat_heading_{{i}}")</script>
-                      <div class="col-xs-2 col-sm-2 col-lg-2 text-center" id="custom_stat_heading_{{i}}">
+                      <script>
+                        $(document).ready( function() {
+                          getColumnName("{{column}}", "custom_stat_heading_{{i}}")();
+                        });
+                      </script>
+                      <div class="col-xs-2 col-sm-2 col-lg-2 text-center text-success">
+                        <strong id="custom_stat_heading_{{i}}">''</strong>
                       </div>
                     {% else %}
                       <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
@@ -72,7 +79,7 @@
                   </div>
                   <div class="col-xs-2 col-sm-2 col-lg-2 text-left">
                     <div class="row">
-                      <strong>{{row.get("rank")}}.&nbsp{{row.get("name")}}</strong>
+                      <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
                     </div>
                     <div class="row">
                       {{row.get("team_name")}}

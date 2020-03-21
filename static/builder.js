@@ -134,6 +134,21 @@ $(document).ready(function() {
   });
 });
 
+function getColumnAbbrev(col1, lop, col2) {
+  var lookup = { shots: "Shots", shots_on: "SoT", shots_on_pct: "SoT %", goals: "Goals", goals_conceded: "GC", assists: "Assists", passes: "Passes", passes_key: "KP", passes_accuracy: "PA", tackles: "Tackles", blocks: "Blocks", interceptions: "I", duels: "TDu", duels_won: "DuW", duels_won_pct: "DuW %", dribbles_past: "DuP", dribbles_attempted: "DrA", dribbles_succeeded: "DrS",  dribbles_succeeded_pct: "DrS %", fouls_drawn: "FW", fouls_committed: "FC", cards_yellow: "YC", cards_red: "RC", cards_second_yellow: "SeY", cards_straight_red: "StR", penalties_won: "PW", penalties_committed: "PC.", penalties_success: "PSc", penalties_missed: "PM", penalties_scored_pct: "PSc %", penalties_saved: "PSa", minutes_played: "MP", games_appearances: "GA", games_started: "GS", games_bench: "GB", substitutions_in: "SI", substitutions_out: "SO"};
+  var cols;
+  if (lop) {
+    cols = [col1, col2];
+  } else {
+    cols = [col1];
+  }
+
+  for (i=0; i < cols.length; i++) {
+    cols[i] = lookup[cols[i]];
+  }
+  return cols.join(" " + lop + " ");
+}
+
 function getColumnName(statName, idName) {
   const lops = ["*","/","+","-"];
   // deal with per 90
@@ -153,36 +168,25 @@ function getColumnName(statName, idName) {
   }
   // check for logical operators
   var col_lop = "";
-  var cols;
+  var cols = ["",""];
   for (const lop of lops) {
     if (tempStatName.includes(lop)) {
-      cols = tempStatName.split(lop);
+      var split_col = tempStatName.split(lop);
+      cols[0] = split_col[0].split(".")[1]
+      cols[1] = split_col[1].split(".")[1]
       col_lop = lop;
       break;
     }
   }
   if (col_lop == "") {
-    cols = [tempStatName];
+    cols[0] = tempStatName.split(".")[1];
   }
 
-  // get new column name
-  var result;
-  if (cols.length == 1 && per90 == false) {
-    // check length of column and underscores 
-    if (cols[0].length <= 10) {
-      result = cols[0];
-    } else {
-      result = cols[0].charAt(0).toUpperCase() + cols[0].substring(1,10) + ".";
-    }
-  } else if (cols.length == 2) {
-    // get first char 
-    result = cols[0][0].toUpperCase() + col_lop + cols[1][0].toUpperCase();
-  }
+  var result = getColumnAbbrev(cols[0], col_lop, cols[1]); 
   if (per90 == true) {
-    result = result + "/90";
+    result += " (/90)";
   }
 
-  document.getElementById(idName).innerHTML = result;
-
+  $("#" + idName).text(result);
 }
 

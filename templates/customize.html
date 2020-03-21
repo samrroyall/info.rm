@@ -19,7 +19,9 @@
 
     <!-- SELECT FIELDS -->
     <div class="form-group">
-      <label for="select_field_1_1"><h5>Choose Stat to Show:</h5></label>
+      <label for="select_field_1_1"><h5>Choose Stat to Show:</h5>
+        <p><strong>Tip: This is the only required field!</strong></p>
+      </label>
       {% for select_row in range(1,5) %}
         {% if select_row != 1 %}
           <div  class="form-row justify-content-left hidden" id="select_div_{{select_row}}">
@@ -265,9 +267,9 @@
           </div>
         <!-- Logical Expression -->
         {% if filter_row != 1 %}
-          <div  class="form-row hidden" id="stat_expression_{{filter_row}}">
+          <div  class="form-row hidden" id="stat_expression_{{filter_row}}" style="margin-top: 5px">
         {% else %}
-          <div  class="form-row" id="stat_expression_{{filter_row}}">
+          <div  class="form-row" id="stat_expression_{{filter_row}}" style="margin-top: 5px">
         {% endif %}
             <div class="col-xs-2 col-sm-2 col-md-2">
               <select class="custom-select custom-select-sm" id="stat_cop_{{filter_row}}" 
@@ -307,7 +309,9 @@
       
     <!-- ORDER BY FIELDS -->
     <div class="form-group" style="margin-top: 15px">
-      <label for="order_field1"><h5>Choose Stat to Order By:</h5></label>
+      <label for="order_field1"><h5>Choose Stat to Order By:</h5>
+        <p><strong>Tip: Must be one of your selected stats! (The default is your first selected stat.)</strong></p>
+      </label>
       <div  class="form-row">
         <div class="col-xs-5 col-sm-5 col-md-5">
           <select class="custom-select custom-select-sm" id="order_field1" name="order_field1">
