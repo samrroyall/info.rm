@@ -4,44 +4,94 @@
 
 {% set section_names = {"goals": "Goals","assists": "Assists","goal_contributions": "Goal Contributions","shots_on": "Shots On Target","shots": "Shots","goals_per_shot":  "Goals Per Shot","passes_key": "Key Passes","passes": "Passes","passes_accuracy": "Pass Accuracy","dribbles_succeeded": "Successful Dribbles","dribbles_attempted": "Attempted Dribbles","dribbles_succeeded_pct": "Dribble Success Rate","tackles": "Tackles","interceptions": "Interceptions","blocks": "Blocks","rating": "Player Rating","goals_conceded": "Avg. Goals Conceded","penalties_saved": "Penalties Saved"} %}
 
+<script>
+  $(document).ready( function() {
+    {% for stat in query_result.keys() %}
+      {% for _ in query_result.get(stat).keys() %}
+        {% set card_num = loop.index - 1 %}
+        $("#{{stat}}_prev_{{card_num}}").on( "click", function() {
+          $("#{{stat}}_card_{{card_num}}").addClass("hidden");
+          $("#{{stat}}_prev_{{card_num}}").addClass("hidden");
+          $("#{{stat}}_next_{{card_num}}").addClass("hidden");
+          {% if card_num != 0 %}
+            $("#{{stat}}_card_{{card_num - 1}}").removeClass("hidden");
+            $("#{{stat}}_prev_{{card_num - 1}}").removeClass("hidden");
+            $("#{{stat}}_next_{{card_num - 1}}").removeClass("hidden");
+          {% else %}
+            $("#{{stat}}_card_2").removeClass("hidden");
+            $("#{{stat}}_prev_2").removeClass("hidden");
+            $("#{{stat}}_next_2").removeClass("hidden");
+          {% endif %}
+        });
+        $("#{{stat}}_next_{{card_num}}").on( "click", function() {
+          $("#{{stat}}_card_{{card_num}}").addClass("hidden");
+          $("#{{stat}}_next_{{card_num}}").addClass("hidden");
+          $("#{{stat}}_prev_{{card_num}}").addClass("hidden");
+          {% if card_num != 2 %}
+            $("#{{stat}}_card_{{card_num + 1}}").removeClass("hidden");
+            $("#{{stat}}_next_{{card_num + 1}}").removeClass("hidden");
+            $("#{{stat}}_prev_{{card_num + 1}}").removeClass("hidden");
+          {% else %}
+            $("#{{stat}}_card_0").removeClass("hidden");
+            $("#{{stat}}_next_0").removeClass("hidden");
+            $("#{{stat}}_prev_0").removeClass("hidden");
+          {% endif %}
+        });
+      {% endfor %}
+    {% endfor %}
+    $(function () {var split_loc = window.location.href.split("/");
+    if (split_loc[split_loc.length - 1] == "per-90") {
+      $("#main_per90_toggle").prop("checked", true);
+      $("#main_per90_toggle_label").toggleClass("text-secondary text-primary");
+    }
+    });
+  });
+  $(function() {
+    $("#main_per90_toggle").change(function () {
+      $("#main_per90_toggle_label").toggleClass("text-secondary text-primary");
+      var split_loc = window.location.href.split("/");
+      if (split_loc[split_loc.length - 1] == "per-90") {
+        window.location.href = window.location.href.split("/per-90")[0];
+      } else {
+        window.location.href = window.location.href + "/per-90";
+      }
+    });
+  });
+</script>
 
-<!-- Per 90 Button -->
-<div class="row text-center justify-content-center" style="padding-bottom: 0px; padding-top: 30px">
-  <div class="col-xs-12 col-sm-12 col-md-12">
-    <h2>
-      {% if current_league == "top-5" %}
-        Dashboard
-      {% elif current_league == "bundesliga" %}
-        Bundesliga Dashboard
-      {% elif current_league == "ligue-1" %}
-        Ligue 1 Dashboard
-      {% elif current_league == "premier-league" %}
-        Premier League Dashboard
-      {% elif current_league == "la-liga" %}
-        La Liga Dashboard
-      {% elif current_league == "serie-a" %}
-        Serie A Dashboard
-      {% endif %}
-      {% if current_per90 %}
-        <a class="btn btn-dark btn-sm" role="button" href={{ url_for( 'dashboard', league=current_league ) }}>
-          Per 90 Minutes Stats
-        </a>
-      {% else %}
-        <a class="btn btn-dark btn-sm" role="button" href={{ url_for( 'dashboard_per90', league=current_league ) }}>
-          Overall Stats
-        </a>
-      {%endif%}
-    </h2>
-  </div>
+<div class="custom-control custom-switch" style="padding-top: 1%">
+  <input type="checkbox" class="custom-control-input" id="main_per90_toggle">
+  <label class="custom-control-label text-secondary align-self-center" for="main_per90_toggle"
+    id="main_per90_toggle_label" style="font-size: .7em; line-height: 2em;">
+    <strong>Per 90</strong>
+  </label>
 </div>
 
-<hr class="my-4">
 {% for stat in query_result.keys() %}
-  <div style="padding-bottom: 30px">
-    <h6 class="display-6 text-center text-success" style="padding-bottom: 10px">{{stat.upper()}}</h6>
+  <div style="padding-bottom: 5%">
+    <h6 class="display-6 text-center text-success">{{stat.upper()}}</h6>
     <div class="row justify-content-center">
     {% for substat in query_result.get(stat).keys() %}
-      <div class="card col-xs-12 col-sm-12 col-md-12 col-lg-4" style="width: 18rem; font-size: x-small;">
+      {% set card_num = loop.index - 1 %}
+      {% if card_num == 0 %}
+        <!-- Prev Button -->
+        <div class="col-1 align-self-center text-right" id="{{stat}}_prev_{{card_num}}" style="padding-right: .7%">
+          <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="card col-xs-3 card col-sm-10 col-md-10 col-lg-10" id="{{stat}}_card_{{card_num}}"
+          style="font-size: x-small;">
+      {% else %}
+        <!-- Prev Button Hidden -->
+        <div class="col-1 align-self-center text-right hidden" id="{{stat}}_prev_{{card_num}}" style="padding-right: .7%">
+          <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="card col-xs-3 card col-sm-10 col-md-10 col-lg-10 hidden" id="{{stat}}_card_{{card_num}}"
+          style="font-size: x-small;">
+      {% endif %}
         <div class="card-body">
           <h6 class="card-title text-center text-secondary">
             {{section_names.get(substat)}}
@@ -50,7 +100,7 @@
           <ul class="list-group list-group-flush">
             {% set pagemod = query_result.get(stat).get(substat)|length % 10 %}
             {% set pagediv = query_result.get(stat).get(substat)|length // 10 %}
-            {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+            {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %}
             {% for page in range(1, num_pages + 1) %}
               {% if page == 1 %}
                 <div id="{{stat}}_{{substat}}_page_{{page}}">
@@ -61,14 +111,14 @@
               <li class="list-group-item">
                 <div class="row h-100 justify-content-center align-items-center">
                   <div class="col-3 text-center float-left">
-                    <img src={{row.get("team_logo")}} height="30px"/>
+                    <img class="team_logo" src={{row.get("team_logo")}}>
                   </div>
                   <div class="col-6 text-left float-center">
                     <div class="row">
                       <strong>{{row.get("rank")}}. {{row.get("name")}}</strong>
                     </div>
                     <div class="row">
-                      {{row.get("team_name")}}
+                      <fine>{{row.get("team_name")}}</fine>
                     </div>
                   </div>
                   <div class="col-3 text-center float-right">
@@ -104,10 +154,24 @@
           <!-- End Card Contents -->
         </div>
       </div>
+      <!-- Next Button -->
+      {% if card_num == 0 %}
+        <div class="col-1 align-self-center text-left" id="{{stat}}_next_{{card_num}}" style="padding-left: .7%">
+          <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+      {% else %}
+        <div class="col-1 align-self-center text-left hidden" id="{{stat}}_next_{{card_num}}" style="padding-left: .7%">
+          <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+      {% endif %}
+      <!-- End of Next Button -->
     {% endfor %}
     </div>
   </div>
 {% endfor %}
 
 {% endblock %}
-

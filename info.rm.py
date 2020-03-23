@@ -1,29 +1,38 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 import src.dashboard
 import src.builder
 
 info_rm = Flask(__name__)
 
+leagues = ["premier-league", "serie-a", "ligue-1", "la-liga", "bundesliga", "top-5"]
+
 @info_rm.route("/")
 def home():
-    return dashboard(league="top-5")
+    return redirect(url_for("dashboard", league="top-5"))
 
 
 @info_rm.route("/<league>")
 def dashboard(league, per_90 = False):
-    return render_template(
+    if league in leagues:
+        return render_template(
                     "dashboard_content.html", 
                     query_result = src.dashboard.dashboard_stats(league, per_90), 
                     current_league = league, 
                     current_per90 = per_90
                 )
+    else:
+        return redirect(url_for("home"))
 
 @info_rm.route("/<league>/per-90")
 def dashboard_per90(league):
-    return dashboard(league=league, per_90=True)
+    print("league", league)
+    if league in leagues:
+        return dashboard(league=league, per_90=True)
+    else:
+        return redirect(url_for("home"))
 
 @info_rm.route("/builder")
 def builder():

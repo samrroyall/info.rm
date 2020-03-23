@@ -10,11 +10,22 @@
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    <!-- SELF-DEFINED JS --> 
+    <!-- SELF-DEFINED JS -->
     <script type="text/javascript" src="{{ url_for('static', filename='builder.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='dashboard.js') }}"></script>
-    <!-- SELF-DEFINED CSS --> 
-    <style> .hidden { display: none; } .card { min-width: 300px; } </style>
+    <!-- SELF-DEFINED CSS -->
+    <style> 
+      .hidden { display: none; } 
+
+      .navbar-brand { font-size: calc(70% + .3vw + .5vh) } 
+      .nav-item { font-size: calc(60% + .10vw + .10vh) } 
+
+      h6 { font-size: calc(50% + .3vw + .3vh) } 
+      fine { font-size: calc(60% + .10vw + .10vh) } 
+
+      .team_logo { height: 23px; }
+      .league_logo { height: 25px; }
+    </style>
 
     <title>info.rm - statistics on players in the top five leagues</title>
   </head>
@@ -22,69 +33,58 @@
     <!-- Navigation Bar -->
     <div class="mr-auto ml-auto bg-white" style="position:relative; max-width: 1000px">
       <div class="border shadow mr-auto ml-auto bg-white" id="content_wrapper" style="position:absolute; top:0; left:0; width:100%">
-        <nav class="navbar navbar-light bg-light border navbar-expand-lg">
+        <nav class="navbar navbar-fixed-top navbar-light bg-light border navbar-expand-lg">
           <!-- Logo -->
           <a class="navbar-brand text-success" href="{{ url_for('home') }}">INFO.RM</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main_nav_collapse" aria-controls="main_nav_collapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <div class="collapse navbar-collapse text-right" id="main_nav_collapse">
-            <ul class="navbar-nav mr-auto">
+          <div class="collapse navbar-collapse text-left" id="main_nav_collapse">
+            <div class="navbar-nav">
               <!-- Builder -->
-              <li class="nav-item">
-                <a class="nav-link" href= {{ url_for("builder") }}>
-                  StatBuilder
-                  <svg 
-                  class="bi bi-tools" 
+              <a class="nav-item nav-link" href= {{ url_for("builder") }}>
+                StatBuilder
+                <svg
+                  class="bi bi-tools"
                   width="1em"
                   height="1em"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M0 1l1-1 3.081 2.2a1 1 0 01.419.815v.07a1 1 0 00.293.708L10.5 9.5l.914-.305a1 1 0 011.023.242l3.356 3.356a1 1 0 010 1.414l-1.586 1.586a1 1 0 01-1.414 0l-3.356-3.356a1 1 0 01-.242-1.023L9.5 10.5 3.793 4.793a1 1 0 00-.707-.293h-.071a1 1 0 01-.814-.419L0 1zm11.354 9.646a.5.5 0 00-.708.708l3 3a.5.5 0 00.708-.708l-3-3z" clip-rule="evenodd"/>
-                    <path fill-rule="evenodd" d="M15.898 2.223a3.003 3.003 0 01-3.679 3.674L5.878 12.15a3 3 0 11-2.027-2.027l6.252-6.341A3 3 0 0113.778.1l-2.142 2.142L12 4l1.757.364 2.141-2.141zm-13.37 9.019L3.001 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z" clip-rule="evenodd"/>
-                  </svg>
+                  <path fill-rule="evenodd" d="M0 1l1-1 3.081 2.2a1 1 0 01.419.815v.07a1 1 0 00.293.708L10.5 9.5l.914-.305a1 1 0 011.023.242l3.356 3.356a1 1 0 010 1.414l-1.586 1.586a1 1 0 01-1.414 0l-3.356-3.356a1 1 0 01-.242-1.023L9.5 10.5 3.793 4.793a1 1 0 00-.707-.293h-.071a1 1 0 01-.814-.419L0 1zm11.354 9.646a.5.5 0 00-.708.708l3 3a.5.5 0 00.708-.708l-3-3z" clip-rule="evenodd"/>
+                  <path fill-rule="evenodd" d="M15.898 2.223a3.003 3.003 0 01-3.679 3.674L5.878 12.15a3 3 0 11-2.027-2.027l6.252-6.341A3 3 0 0113.778.1l-2.142 2.142L12 4l1.757.364 2.141-2.141zm-13.37 9.019L3.001 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z" clip-rule="evenodd"/>
+                </svg>
+              </a>
+              </div>
+              <!-- Leagues -->
+              <div class="nav-item row ml-auto justify-content-center text-center" style="left: 0; right: 0">
+              <!-- Bundesliga -->
+                <a class="nav-link col-2" href="{{ url_for('dashboard', league='bundesliga') }}">
+                  <img class="league_logo" src="https://media.api-football.com/leagues/8.png">
                 </a>
-              </li>
-            </ul>
-            <!-- Search Bar -->
-            <form class="form-inline my-2 my-lg-0 float-right text-right">
-              <input class="form-control mr-sm-2" style="font-size: x-small;" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-sm btn-outline-success my-2 my-sm-0" style="font-size: x-small;" type="submit">Search</button>
+              <!-- Ligue 1 -->
+                <a class="nav-link col-2" href="{{ url_for('dashboard', league='ligue-1') }}">
+                  <img class="league_logo" src="https://media.api-football.com/leagues/4.svg">
+                </a>
+              <!-- Premier League -->
+                <a class="nav-link col-4" href="{{ url_for('dashboard', league='premier-league') }}">
+                  <img class="league_logo" src="https://media.api-football.com/leagues/2.png">
+                </a>
+              <!-- La Liga -->
+                <a class="nav-link col-2" href="{{ url_for('dashboard', league='la-liga') }}">
+                  <img class="league_logo" src="https://media.api-football.com/leagues/87.png">
+                </a>
+              <!-- Serie A -->
+                <a class="nav-link col-2" href="{{ url_for('dashboard', league='serie-a') }}">
+                  <img class="league_logo" src="https://media.api-football.com/leagues/94.png">
+                </a>
+            </div>
+            <!-- Search Bar
+            <form class="form-inline float-left text-left">
+              <input class="form-control mr-sm-2" style="font-size: x-small; width: 60%" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-sm btn-outline-success my-2 my-sm-0" style="font-size: x-small; height: 130%" type="submit">Search</button>
             </form>
-        </nav>
-        <nav class="navbar navbar-light bg-light ml-auto mr-auto border justify-content-center">
-          <div class="row justify-content-center">
-          <!-- Bundesliga -->
-          <div class="nav-item col-xs-1 col-2">
-            <a class="nav-link" href="{{ url_for('dashboard', league='bundesliga') }}">
-              <img src="https://media.api-football.com/leagues/8.png" width="auto" height="30px">
-            </a>
-          </div>
-          <!-- Ligue 1 -->
-          <div class="nav-item  col-xs-1 col-2">
-            <a class="nav-link" href="{{ url_for('dashboard', league='ligue-1') }}">
-              <img src="https://media.api-football.com/leagues/4.svg" width="auto" height="30px">
-            </a>
-          </div>
-          <!-- Premier League -->
-          <div class="nav-item  col-xs-2 col-3">
-            <a class="nav-link" href="{{ url_for('dashboard', league='premier-league') }}">
-              <img src="https://media.api-football.com/leagues/2.png" width="auto" height="30px">
-            </a>
-          </div>
-          <!-- La Liga -->
-          <div class="nav-item col-xs-1 col-2">
-            <a class="nav-link" href="{{ url_for('dashboard', league='la-liga') }}">
-              <img src="https://media.api-football.com/leagues/87.png" width="auto" height="30px">
-            </a>
-          </div>
-          <!-- Serie A -->
-          <div class="nav-item col-xs-1 col-2">
-            <a class="nav-link" href="{{ url_for('dashboard', league='serie-a') }}">
-              <img src="https://media.api-football.com/leagues/94.png" width="auto" height="30px">
-            </a>
-          </div>
+            -->
           </div>
         </nav>
         <!-- Content -->
@@ -95,4 +95,3 @@
     </div>
   </body>
 </html>
-
