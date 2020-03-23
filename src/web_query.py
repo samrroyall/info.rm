@@ -36,8 +36,9 @@ def stmt(select_fields, filter_fields, order_field):
     )
     return stmt
 
+# only needed if division is being done
 def field_logical(field):
-    lops = ["/","*","+","-"]
+    lops = ["/"]
     for lop in lops:
         if lop in field:
             return True
@@ -82,7 +83,6 @@ def rank(query_result, fields, order_by_field, desc=True):
         elif desc == False and round(order_by_stat, 3) > prev_result:
             rank = count
         prev_result = round(order_by_stat, 3)
-
         # return
         ranked_tup = {
             "rank": (str(rank) + ".").ljust(3," "),

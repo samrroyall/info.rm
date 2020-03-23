@@ -163,10 +163,8 @@ def custom_stats(form_data):
     # move form data into dict
     for field, value in form_data:
         form_data_dict[field] = value
-
     # get select values
     select_fields = get_stat_values(form_data_dict, "select")
-
     # get filter values
     filter_fields = []
 
@@ -202,13 +200,11 @@ def custom_stats(form_data):
     stat_values = get_stat_values(form_data_dict, "filter")
     if len(stat_values) > 0:
         filter_fields += stat_values
-
     # finalize filter fields
     if len(filter_fields) > 0:
         filter_fields = [(filter_fields, "AND")]
     else:
         filter_fields = None
-
     # get order_by values
     order_field = get_stat_values(form_data_dict, "order")
     if len(order_field) == 0:

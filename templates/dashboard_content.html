@@ -26,7 +26,7 @@
             <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>
           </svg>
         </div>
-        <div class="card col-xs-3 card col-sm-10 col-md-10 col-lg-10" id="{{stat}}_card_{{card_num}}"
+        <div class="card col-10" id="{{stat}}_card_{{card_num}}"
           style="font-size: x-small;">
       {% else %}
         <!-- Prev Button Hidden -->
@@ -36,17 +36,17 @@
             <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>
           </svg>
         </div>
-        <div class="card col-xs-3 card col-sm-10 col-md-10 col-lg-10 hidden" id="{{stat}}_card_{{card_num}}"
+        <div class="card col-10 hidden" id="{{stat}}_card_{{card_num}}"
           style="font-size: x-small;">
       {% endif %}
-        <div class="card-body">
+        <div class="card-body ">
           <h6 class="card-title text-center text-secondary">
             {{section_names.get(substat)}}
           </h6>
           <!-- Card Contents -->
           <ul class="list-group list-group-flush">
-            {% set pagemod = query_result.get(stat).get(substat)|length % 10 %}
-            {% set pagediv = query_result.get(stat).get(substat)|length // 10 %}
+            {% set pagemod = query_result.get(stat).get(substat).get('data')|length % 10 %}
+            {% set pagediv = query_result.get(stat).get(substat).get('data')|length // 10 %}
             {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %}
             {% for page in range(1, num_pages + 1) %}
               {% if page == 1 %}
@@ -54,23 +54,25 @@
               {% else %}
                 <div id="{{stat}}_{{substat}}_page_{{page}}" class="hidden">
               {% endif %}
-              {% for row in (query_result.get(stat).get(substat)[10 * (page - 1) : 10 * page]) %}
-              <li class="list-group-item">
-                <div class="row h-100 justify-content-center align-items-center">
-                  <div class="col-3 text-center float-left">
-                    <img class="team_logo" src={{row.get("team_logo")}}>
+              {% for row in (query_result.get(stat).get(substat).get('data')[10 * (page - 1) : 10 * page]) %}
+              <li class="list-group-item py0">
+                <div class="row h-100 align-items-center justify-content-center">
+                  <div class="col-2 text-center">
+                    <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
                   </div>
-                  <div class="col-6 text-left float-center">
+                  <div class="col-3 text-left">
                     <div class="row player_name_rank">
-                      <strong>{{row.get("rank")}}.&nbsp{{row.get("name")}}</strong>
+                      <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
                     </div>
                     <div class="row">
                       <fine>{{row.get("team_name")}}</fine>
                     </div>
                   </div>
-                  <div class="col-3 text-center float-right">
-                    <fine>{{row.get("stat")}}</fine>
+                  {% for stat in row.get('stats') %}
+                  <div class="col-2 text-left">
+                    <fine>{{stat}}</fine>
                   </div>
+                  {% endfor %}
                 </div>
               </li>
               {% endfor %}
@@ -80,7 +82,7 @@
               <div class="row h-100">
                 <div class="col-12">
                   <nav class="nav justify-content-center">
-                    <ul class="pagination pagination">
+                    <ul class="pagination pagination-md">
                       {% for i in range(1, num_pages + 1) %}
                         {% if i == 1 %}
                           <li class="page-item text-primary active" id="{{stat}}_{{substat}}_pagination_{{i}}">
