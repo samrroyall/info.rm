@@ -74,19 +74,19 @@
               <li class="list-group-item py0">
                 <div class="row h-100 align-items-center">
                   <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
-                    <img src={{row.get("team_logo")}} height="28px"/>
+                    <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
                   </div>
-                  <div class="col-xs-2 col-sm-2 col-lg-2 text-left">
-                    <div class="row">
+                  <div class="col-xs-1 col-sm-2 col-lg-2 text-left">
+                    <div class="row player_name_rank">
                       <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
                     </div>
                     <div class="row">
-                      {{row.get("team_name")}}
+                      <fine>{{row.get("team_name")}}</fine>
                     </div>
                   </div>
                   {% for stat in row.get('stats')%}
                   <div class="col-xs-2 col-sm-2 col-lg-2 text-center">
-                    <strong>{{stat}}</strong>
+                    <fine>{{stat}}</fine>
                   </div>
                   {% endfor %}
                 </div>
