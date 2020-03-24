@@ -57,10 +57,11 @@
               {% for row in (query_result.get(stat).get(substat).get('data')[10 * (page - 1) : 10 * page]) %}
               <li class="list-group-item py0">
                 <div class="row h-100 align-items-center justify-content-center">
-                  <div class="col-2 text-center">
+                  <div class="col-1 text-left ml-auto">
                     <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
                   </div>
-                  <div class="col-3 text-left">
+                  <div class="col-1"></div>
+                  <div class="col-6 text-left">
                     <div class="row player_name_rank">
                       <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
                     </div>

@@ -20,11 +20,12 @@
       .navbar-brand { font-size: calc(70% + .3vw + .5vh) } 
       .nav-item { font-size: calc(60% + .10vw + .10vh) } 
 
-      h6 { font-size: calc(50% + .3vw + .3vh) } 
-      fine { font-size: calc(60% + .10vw + .10vh) } 
+      h6 { font-size: calc(70% + .1vw + .1vh) } 
+      fine { font-size: calc(70% + .1vw + .1vh) } 
+      fine { font-size: calc(70% + .1vw + .1vh) } 
 
-      .player_name_rank { font-size: calc(50% + .10vw + .10vh) }
-      .team_logo { height: 23px; }
+      .player_name_rank { font-size: calc(70% + .1vw + .1vh) }
+      .team_logo { height: 23px; width: 23px; }
       .league_logo { height: 25px; }
     </style>
 
@@ -33,7 +34,7 @@
     <body>
     <!-- Navigation Bar -->
     <div class="mr-auto ml-auto bg-white" style="position:relative; max-width: 1000px">
-      <div class="border shadow mr-auto ml-auto bg-white" id="content_wrapper" style="position:absolute; top:0; left:0; width:100%">
+      <div class="border shadow mr-auto ml-auto mx-1 bg-white" id="content_wrapper" style="position:absolute; top:0; left:0; width:100%">
         <nav class="navbar navbar-fixed-top navbar-light bg-light border navbar-expand-lg">
           <!-- Logo -->
           <a class="navbar-brand text-success" href="{{ url_for('home') }}">INFO.RM</a>
@@ -43,7 +44,7 @@
           <div class="collapse navbar-collapse text-left" id="main_nav_collapse">
             <div class="navbar-nav">
               <!-- Builder -->
-              <a class="nav-item nav-link" href= {{ url_for("builder") }}>
+              <a class="nav-item nav-link" href="{{ url_for('builder') }}">
                 StatBuilder
                 <svg
                   class="bi bi-tools"
@@ -56,29 +57,29 @@
                   <path fill-rule="evenodd" d="M15.898 2.223a3.003 3.003 0 01-3.679 3.674L5.878 12.15a3 3 0 11-2.027-2.027l6.252-6.341A3 3 0 0113.778.1l-2.142 2.142L12 4l1.757.364 2.141-2.141zm-13.37 9.019L3.001 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z" clip-rule="evenodd"/>
                 </svg>
               </a>
-              </div>
-              <!-- Leagues -->
-              <div class="nav-item row ml-auto justify-content-center text-center" style="left: 0; right: 0">
+            </div>
+            <!-- Leagues -->
+            <div class="nav-item row justify-content-center ml-auto">
               <!-- Bundesliga -->
-                <a class="nav-link col-2" href="{{ url_for('dashboard', league='bundesliga') }}">
-                  <img class="league_logo" src="https://media.api-football.com/leagues/8.png">
-                </a>
+              <a class="nav-link col-2 px-1.5 text-center" href="{{ url_for('dashboard', league='bundesliga') }}">
+                <img class="league_logo" src="https://media.api-football.com/leagues/8.png">
+              </a>
               <!-- Ligue 1 -->
-                <a class="nav-link col-2" href="{{ url_for('dashboard', league='ligue-1') }}">
-                  <img class="league_logo" src="https://media.api-football.com/leagues/4.svg">
-                </a>
+              <a class="nav-link col-2 px-1.5 text-center" href="{{ url_for('dashboard', league='ligue-1') }}">
+                <img class="league_logo" src="https://media.api-football.com/leagues/4.svg">
+              </a>
               <!-- Premier League -->
-                <a class="nav-link col-4" href="{{ url_for('dashboard', league='premier-league') }}">
-                  <img class="league_logo" src="https://media.api-football.com/leagues/2.png">
-                </a>
+              <a class="nav-link col-4 px-1.5 text-center" href="{{ url_for('dashboard', league='premier-league') }}">
+                <img class="league_logo" src="https://media.api-football.com/leagues/2.png">
+              </a>
               <!-- La Liga -->
-                <a class="nav-link col-2" href="{{ url_for('dashboard', league='la-liga') }}">
-                  <img class="league_logo" src="https://media.api-football.com/leagues/87.png">
-                </a>
+              <a class="nav-link col-2 px-1.5 text-center" href="{{ url_for('dashboard', league='la-liga') }}">
+                <img class="league_logo" src="https://media.api-football.com/leagues/87.png">
+              </a>
               <!-- Serie A -->
-                <a class="nav-link col-2" href="{{ url_for('dashboard', league='serie-a') }}">
-                  <img class="league_logo" src="https://media.api-football.com/leagues/94.png">
-                </a>
+              <a class="nav-link col-2 px-1.5 text-center" href="{{ url_for('dashboard', league='serie-a') }}">
+                <img class="league_logo" src="https://media.api-football.com/leagues/94.png">
+              </a>
             </div>
             <!-- Search Bar
             <form class="form-inline float-left text-left">
