@@ -47,7 +47,7 @@ def field_logical(field):
 def rank(query_result, fields, order_by_field, desc=True):
     count = 0
     rank = 0
-    prev_result = float("inf") if desc == True else -1.0 * float("inf")
+    prev_result = float("inf") if desc is True else -1.0 * float("inf")
     fields = default_select_fields + fields
     ranked_result = { "header": fields, "data": []}
     for idx in range(len(query_result)):
@@ -78,9 +78,9 @@ def rank(query_result, fields, order_by_field, desc=True):
         order_by_stat = float(tup[order_by_idx])
         # rank
         count += 1
-        if desc == True and round(order_by_stat, 3) < prev_result:
+        if desc is True and round(order_by_stat, 3) < prev_result:
             rank = count
-        elif desc == False and round(order_by_stat, 3) > prev_result:
+        elif desc is False and round(order_by_stat, 3) > prev_result:
             rank = count
         prev_result = round(order_by_stat, 3)
         # return
