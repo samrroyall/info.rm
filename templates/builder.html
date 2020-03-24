@@ -16,7 +16,7 @@
     });
   </script>
 
-  <div class="justify-content-center" style="padding-bottom: 30px; width: 100%">
+  <div class="justify-content-center" style="padding-top: 10px; padding-bottom: 30px; width: 100%">
     <div class="row justify-content-center ml-auto mr-auto" style="width: 100%">
       <div class="card col-xs-12 col-sm-12 col-lg-10" style="font-size: x-small">
         <div class="card-body">
@@ -36,10 +36,10 @@
           <ul class="list-group list-group-flush">
               {% set header = query_result.get('header')[3:] %}
               <li class="list-group-item py0 px0">
-                <div class="row">
-                  <div class="col-2 px-0">
+                <div class="row justify-content-center">
+                  <div class="col-2 px0">
                   </div>
-                  <div class="col-3 px-0">
+                  <div class="col-3 px0">
                   </div>
                   {% for i in range(3) %} <!-- DEBUG -->
                     {% if i < (header|length) %}
@@ -51,11 +51,11 @@
                           });
                         });
                       </script>
-                      <div class="col-2 px-0 text-center text-secondary px0">
+                      <div class="col-2 px0 text-left text-secondary px0">
                         <strong id="custom_stat_heading_{{i}}">''</strong>
                       </div>
                     {% else %}
-                      <div class="col-2 px-0">
+                      <div class="col-2 px0">
                       </div>
                     {% endif %}
                   {% endfor %}
@@ -73,9 +73,10 @@
               {% for row in (query_result.get('data')[10 * (page - 1) : 10 * page]) %}
               <li class="list-group-item py0 px0">
                 <div class="row align-items-center justify-content-center">
-                  <div class="col-2 text-center px0">
+                  <div class="col-1 text-right px0">
                     <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
                   </div>
+                  <div class="col-1"></div>
                   <div class="col-3 text-left px0">
                     <div class="row player_name_rank">
                       <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
@@ -85,7 +86,7 @@
                     </div>
                   </div>
                   {% for stat in row.get('stats')[:-1] %} <!-- DEBUG -->
-                  <div class="col-2 text-left px0">
+                  <div class="col-2 px0 text-left">
                     <fine>{{stat}}</fine>
                   </div>
                   {% endfor %}

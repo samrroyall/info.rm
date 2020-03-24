@@ -17,10 +17,14 @@ def scoring_stats(league, per_90):
         select_fields = (select_fields if per_90 is False
                          else [f"({select_fields[0]})/(players.minutes_played/90)"])
         filter_fields = (None if per_90 is False 
-                         else [(
-                             [("players.minutes_played", ">", str(max_minutes_played/3))], 
-                             "AND"
-                         )])
+                         else [ ("players.minutes_played", ">", str(max_minutes_played/3)) ])
+        if league is not None:
+            if filter_fields is not None:
+                filter_fields.append( ("teams.league_name", "=", league) )
+            else:
+                filter_fields = [ ("teams.league_name", "=", league) ]
+        if filter_fields is not None:
+            filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
         result = Query(
@@ -49,7 +53,12 @@ def shooting_stats(league, per_90):
                 filter_fields.append( ("players.minutes_played", ">", str(max_minutes_played/3)) )
             else:
                 filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
-        if filter_fields:
+        if league is not None:
+            if filter_fields is not None:
+                filter_fields.append( ("teams.league_name", "=", league) )
+            else:
+                filter_fields = [ ("teams.league_name", "=", league) ]
+        if filter_fields is not None:
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
@@ -77,7 +86,12 @@ def passing_stats(league, per_90):
                 filter_fields.append( ("players.minutes_played", ">", str(max_minutes_played/3)) )
             else:
                 filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
-        if filter_fields:
+        if league is not None:
+            if filter_fields is not None:
+                filter_fields.append( ("teams.league_name", "=", league) )
+            else:
+                filter_fields = [ ("teams.league_name", "=", league) ]
+        if filter_fields is not None:
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
@@ -105,7 +119,12 @@ def dribbling_stats(league, per_90):
                 filter_fields.append( ("players.minutes_played", ">", str(max_minutes_played/3)) )
             else:
                 filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
-        if filter_fields:
+        if league is not None:
+            if filter_fields is not None:
+                filter_fields.append( ("teams.league_name", "=", league) )
+            else:
+                filter_fields = [ ("teams.league_name", "=", league) ]
+        if filter_fields is not None:
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
@@ -126,7 +145,12 @@ def defending_stats(league, per_90):
                          else [f"({select_fields[0]})/(players.minutes_played/90)"])
         filter_fields = (None if per_90 is False 
                          else [("players.minutes_played", ">", str(max_minutes_played/3))])
-        if filter_fields:
+        if league is not None:
+            if filter_fields is not None:
+                filter_fields.append( ("teams.league_name", "=", league) )
+            else:
+                filter_fields = [ ("teams.league_name", "=", league) ]
+        if filter_fields is not None:
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
@@ -154,7 +178,12 @@ def other_stats(league, per_90):
                 filter_fields.append( ("players.position", "=", "Goalkeeper") )
             else:
                 filter_fields = [ ("players.position", "=", "Goalkeeper") ]
-        if filter_fields:
+        if league is not None:
+            if filter_fields is not None:
+                filter_fields.append( ("teams.league_name", "=", league) )
+            else:
+                filter_fields = [ ("teams.league_name", "=", league) ]
+        if filter_fields is not None:
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = (([order_by_stat], True) 

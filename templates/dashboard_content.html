@@ -55,13 +55,13 @@
                 <div id="{{stat}}_{{substat}}_page_{{page}}" class="hidden">
               {% endif %}
               {% for row in (query_result.get(stat).get(substat).get('data')[10 * (page - 1) : 10 * page]) %}
-              <li class="list-group-item py0">
-                <div class="row h-100 align-items-center justify-content-center">
-                  <div class="col-1 text-right px-0">
+              <li class="list-group-item py0 px0">
+                <div class="row align-items-center justify-content-center">
+                  <div class="col-1 text-right px0">
                     <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
                   </div>
                   <div class="col-1"></div>
-                  <div class="col-5 text-left">
+                  <div class="col-4 text-left px0">
                     <div class="row player_name_rank">
                       <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
                     </div>
@@ -70,7 +70,7 @@
                     </div>
                   </div>
                   {% for stat in row.get('stats') %}
-                  <div class="col-2 px-0 text-left">
+                  <div class="col-2 px0 text-left">
                     <fine>{{stat}}</fine>
                   </div>
                   {% endfor %}
