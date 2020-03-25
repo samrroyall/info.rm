@@ -145,8 +145,7 @@ def default_stats():
     select_fields = [
         "players.rating",
         "players.goals",
-        "players.assists",
-        "players.tackles"
+        "players.assists"
     ]
     max_minutes_played = get_max(DB_PATH, "players.minutes_played")
     filter_fields = [
