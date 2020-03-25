@@ -28,7 +28,6 @@ def dashboard(league, per_90 = False):
 
 @info_rm.route("/<league>/per-90")
 def dashboard_per90(league):
-    print("league", league)
     if league in leagues:
         return dashboard(league=league, per_90=True)
     else:
