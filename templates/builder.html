@@ -75,17 +75,29 @@
                   </div>
                   <div class="col-1"></div>
                   <div class="col-3 text-left px0">
-                    <div class="row player_name_rank">
-                      <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
-                    </div>
+                    {% if row.get('rank') == 'N/A.' %}
+                      <div class="row player_name_rank">
+                        <strong class="text-danger">{{row.get("rank")}}</strong><strong>&nbsp{{row.get("name")}}</strong>
+                      </div>
+                    {% else %}
+                      <div class="row player_name_rank">
+                        <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
+                      </div>
+                    {% endif %}
                     <div class="row">
                       <fine>{{row.get("team_name")}}</fine>
                     </div>
                   </div>
                   {% for stat in row.get('stats') %} <!-- DEBUG -->
-                  <div class="col-2 px0 text-center">
-                    <fine>{{stat}}</fine>
-                  </div>
+                    {% if stat == 'n/a' %}
+                      <div class="col-2 px0 text-center">
+                        <fine class="text-danger">{{stat}}</fine>
+                      </div>
+                    {% else %}
+                      <div class="col-2 px0 text-center">
+                        <fine>{{stat}}</fine>
+                      </div>
+                    {% endif %}
                   {% endfor %}
                 </div>
               </li>

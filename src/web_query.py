@@ -87,10 +87,10 @@ def rank(query_result, fields, order_by_field, desc=True):
                 rank = count
             prev_result = round(order_by_stat, 3)
         else:
-            rank = 1
+            rank = "N/A."
         # return
         ranked_tup = {
-            "rank": (str(rank) + ".").ljust(3," "),
+            "rank": (str(rank) + ".").ljust(3," ") if rank != "N/A." else rank,
             "name": name,
             "team_name": team_name,
             "team_logo": team_logo,
