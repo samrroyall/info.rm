@@ -136,7 +136,7 @@
           <div class="col-4 hidden" id="club_select_div">
           {% for league in leagues %}
             <div id="club_{{league.replace(' ', '_')}}_select_div">
-              <select class="custom-select custom-select-sm select_input" name="club_select">
+              <select class="custom-select custom-select-sm select_input" name="club_{{league.replace(' ', '_')}}_select">
                 <option>None</option>
                 {% for club in clubs.get(league) %}
                   <option>{{club}}</option>

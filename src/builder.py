@@ -12,8 +12,6 @@ leagues.sort()
 clubs_dict = get_by(DB_PATH, "name", "teams", "league_name", "name", "leagues")
 for league in leagues:
     clubs_dict[league].sort()
-clubs = list(clubs_dict.values())
-clubs.sort()
 nations = get_column(DB_PATH, "nationality", "players")
 nations.sort()
 
@@ -182,15 +180,22 @@ def custom_stats(form_data):
 
     # get club, league, nationality, position values
     for key in ["club", "league", "nationality", "position"]:
-        value = form_data_dict[f"{key}_select"]
+        if key != "club":
+            value = form_data_dict[f"{key}_select"]
         if key == "position" and value and value in positions:
             key_string = "players.position"
         elif key == "league" and value and value in leagues:
             key_string = "teams.league_name"
-            print(key_string, " ", value)
-        elif key == "club" and value and value in clubs:
-            key_string = "teams.name"
-            print(key_string, " ", value)
+        elif key == "club":
+            league_value = form_data_dict["club_league_select"]
+            if league_value and league_value in leagues:
+                value = form_data_dict[f"club_{league_value.replace(' ','_')}_select"]
+                if value and value in clubs_dict.get(league_value):
+                    key_string = "teams.name"
+                else:
+                    continue
+            else:
+                continue
         elif key == "nationality" and value and value in nations:
             key_string = "players.nationality"
         else: 
