@@ -26,15 +26,6 @@ $(document).ready(function() {
       $("#select_per90_toggle_div_3").addClass("hidden");
     }
   });
-  $("#select_plus_3").click(function() {
-    if ($("#select_div_4").hasClass("hidden")) {
-      $("#select_div_4").removeClass("hidden");
-      $("#select_per90_toggle_div_4").removeClass("hidden");
-    } else {
-      $("#select_div_4").addClass("hidden");
-      $("#select_per90_toggle_div_4").addClass("hidden");
-    }
-  });
   // add filter by stat option
   $("#stat_plus_1".toString()).click(function() {
     if ($("#stat_div_2").hasClass("hidden")) {
@@ -56,17 +47,6 @@ $(document).ready(function() {
       $("#stat_div_3").addClass("hidden");
       $("#stat_expression_3").addClass("hidden");
       $("#stat_per90_toggle_div_3").addClass("hidden");
-    }
-  });
-  $("#stat_plus_3".toString()).click(function() {
-    if ($("#stat_div_4").hasClass("hidden")) {
-      $("#stat_div_4").removeClass("hidden");
-      $("#stat_expression_4").removeClass("hidden");
-      $("#stat_per90_toggle_div_4").removeClass("hidden");
-    } else {
-      $("#stat_div_4").addClass("hidden");
-      $("#stat_expression_4").addClass("hidden");
-      $("#stat_per90_toggle_div_4").addClass("hidden");
     }
   });
   // trigger filter value options
