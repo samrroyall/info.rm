@@ -14,7 +14,7 @@
 
 {% for stat in query_result.keys() %}
   <div style="padding-bottom: 5%">
-    <h6 class="display-6 text-center text-success">{{stat.upper()}}</h6>
+    <h6 class="text-center text-success">{{stat.upper()}}</h6>
     <div class="row justify-content-center">
     {% for substat in query_result.get(stat).keys() %}
       {% set card_num = loop.index - 1 %}
@@ -70,7 +70,7 @@
                     </div>
                   </div>
                   {% for stat in row.get('stats') %}
-                  <div class="col-2 px0 text-left">
+                  <div class="col-2 col-xs-2 col-sm-2 col-md-1 col-lg-1 px0 text-left">
                     <fine>{{stat}}</fine>
                   </div>
                   {% endfor %}

@@ -17,14 +17,14 @@
 
 <!-- Customization Dropdown -->
 <div class="alert alert-light hidden" id="custom_stat" role="alert">
-  <h4 class="alert-heading">Customize Your Stat</h4>
+  <h5 class="alert-heading">Customize Your Stat</h5>
   <strong>Use the options below to generate your own custom statistic.</strong>
   <hr>
   <form action="{{ url_for('custom_stat') }}" method="post">
 
     <!-- SELECT FIELDS -->
     <div class="form-group">
-      <label for="select_field_1_1"><h5>Choose Stat to Show:</h5>
+      <label for="select_field_1_1"><h6>Choose Stat to Show:</h6>
         <p><strong>Tip: This is the only required field!</strong></p>
       </label>
       {% for select_row in range(1,4) %}
@@ -73,18 +73,18 @@
             <input type="checkbox" class="custom-control-input" id="select_per90_toggle_{{select_row}}" 
               name="select_per90_toggle_{{select_row}}">
             <label class="custom-control-label" for="select_per90_toggle_{{select_row}}">
-              Per 90 Minutes
+              <fine>Per 90 Minutes</fine>
             </label>
           </div>
       {% endfor %}
 
     <!-- FILTER FIELDS -->
     <div class="form-group" style="margin-top: 15px">
-      <label for="select_field_1"><h5>Choose Filter Types:</h5>
+      <label for="select_field_1"><h6>Choose Filter Types:</h6>
         <p><strong>Tip: For desirable results, try filtering by minutes played!</strong></p>
       </label>
       <div class="form-row">
-        <div class="col-4">
+        <div class="col-5 col-xs-3">
           <select class="custom-select custom-select-sm select_input" id="filter_type">
             <option>None</option>
             <option value="age">Age</option>
@@ -100,7 +100,7 @@
 
       <!-- Filter Age -->
       <div class="hidden" id="filter_age_div" style="margin-top: 15px">
-        <h6>Age:</h6>
+        <strong>Age:</strong>
         <div class="form-row">
           <div class="col-2">
             <select class="custom-select custom-select-sm select_input" id="age_op" name="age_op">
@@ -122,7 +122,7 @@
 
       <!-- Filter Club -->
       <div class="hidden" id="filter_club_div" style="margin-top: 15px">
-        <h6>Club:</h6>
+        <strong>Club:</strong>
         <div class="form-row">
           <div class="col-4">
             <select class="custom-select custom-select-sm select_input" id="club_league_select"
@@ -150,7 +150,7 @@
 
       <!-- Filter League -->
       <div class="hidden" id="filter_league_div" style="margin-top: 15px">
-        <h6>League:</h6>
+        <strong>League:</strong>
         <div class="form-row">
           <div class="col-4">
             <select class="custom-select custom-select-sm select_input" name="league_select">
@@ -165,7 +165,7 @@
 
       <!-- Filter Minutes Played -->
       <div class="hidden" id="filter_minutes_played_div" style="margin-top: 15px">
-        <h6>Minutes Played:</h6>
+        <strong>Minutes Played:</strong>
         <div class="form-row">
           <div class="col-2">
             <select class="custom-select custom-select-sm select_input" id="minutes_played_op" 
@@ -192,7 +192,7 @@
 
       <!-- Filter Nationality -->
       <div class="hidden" id="filter_nationality_div" style="margin-top: 15px">
-        <h6>Nation:</h6>
+        <strong>Nation:</strong>
         <div class="form-row">
           <div class="col-4">
             <select class="custom-select custom-select-sm select_input" name="nationality_select">
@@ -207,7 +207,7 @@
 
       <!-- Filter Position -->
       <div class="hidden" id="filter_position_div" style="margin-top: 15px">
-        <h6>Position:</h6>
+        <strong>Position:</strong>
         <div class="form-row">
           <div class="col-4">
             <select class="custom-select custom-select-sm select_input" name="position_select">
@@ -224,7 +224,7 @@
 
     <!-- Filter Stat -->
     <div class="hidden" id="filter_stat_div" style="margin-top: 15px">
-      <h6>Stats:</h6>
+      <strong>Stats:</strong>
       {% for filter_row in range(1,4) %}
         {% if filter_row != 1 %}
           <div  class="form-row justify-content-left hidden" id="stat_div_{{filter_row}}">
@@ -298,7 +298,7 @@
             <input type="checkbox" class="custom-control-input" id="stat_per90_toggle_{{filter_row}}"
               name="stat_per90_toggle_{{filter_row}}">
             <label class="custom-control-label" for="stat_per90_toggle_{{filter_row}}">
-              Per 90 Minutes
+              <fine>Per 90 Minutes</fine>
             </label>
           </div>
       {% endfor %}
@@ -306,7 +306,7 @@
       
     <!-- ORDER BY FIELDS -->
     <div class="form-group" style="margin-top: 15px">
-      <label for="order_field1"><h5>Choose Stat to Order By:</h5>
+      <label for="order_field1"><h6>Choose Stat to Order By:</h6>
         <p><strong>Tip: Must be one of your selected stats! (This is an optional parameter. The default is your first selected stat.)</strong></p>
       </label>
       <div  class="form-row">
@@ -335,27 +335,27 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="col-xs-3 col-sm-3 col-md-3">
+        <div class="col-6 col-md-3">
           <div class="custom-control custom-switch toggle">
             <input type="checkbox" class="custom-control-input" name="order_per90_toggle"
               id="order_per90_toggle">
             <label class="custom-control-label" for="order_per90_toggle">
-              Per 90 Minutes
+              <fine>Per 90 Minutes</fine>
             </label>
           </div>
         </div>
-        <div class="col-xs-3 col-sm-3 col-md-3">
+        <div class="col-6 col-md-3">
           <div class="custom-control custom-switch toggle">
             <input type="checkbox" class="custom-control-input" name="asc_toggle"
               id="asc_toggle">
             <label class="custom-control-label" for="asc_toggle">
-              Low to High
+              <fine>Low to High</fine>
             </label>
           </div>
         </div>
       </div>
       <div class="form-row text-center justify-content-center" style="padding-top: 15px">
-        <div class="col-xs-3 col-sm-3 col-md-3">
+        <div class="col-5 col-md-3">
         <button class="btn btn-sm btn-dark" type="submit">Generate Stat</button>
         </div>
       </div>

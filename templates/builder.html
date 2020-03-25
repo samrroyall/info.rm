@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 
-  <style> .toggle { font-size: 1.4em; font-height: 1.3em } </style>
   <script>
     $(document).ready( function () {
     // league to club action 
@@ -16,19 +15,23 @@
     });
   </script>
 
-  <div class="justify-content-center" style="padding-top: 10px; padding-bottom: 30px; width: 100%">
+  <style>
+    h6 { font-size: calc(100% + .1vw + .1vh) } 
+  </style>
+
+  <div class="justify-content-center" style="padding-top: 10px; padding-bottom: 10px; width: 100%">
     <div class="row justify-content-center ml-auto mr-auto" style="width: 100%">
       <div class="card col-xs-12 col-sm-12 col-lg-10" style="font-size: x-small">
         <div class="card-body">
           <div class="card-title">
-            <div class="text-center h6 text-success">
+            <h6 class="text-center text-success">
               YOUR STAT 
               <div id="filter_button">
                 <svg class="bi bi-filter" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" d="M6 10.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
                 </svg>              
               </div>
-            </div>
+            </h6>
             {% block customize %}{% endblock %}
           </div>
         </div>
@@ -51,7 +54,7 @@
                           });
                         });
                       </script>
-                      <div class="col-2 px0 text-left text-secondary px0">
+                      <div class="col-2 text-center text-secondary builder_header" style="padding-left: 0; padding-right: 0">
                         <strong id="custom_stat_heading_{{i}}">''</strong>
                       </div>
                     {% else %}
