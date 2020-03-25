@@ -66,7 +66,9 @@ def rank(query_result, fields, order_by_field, desc=True):
         stats = []
         for stat_idx in range(3,len(fields)):
             stat = tup[stat_idx]
-            if fields[stat_idx] in floats or field_logical(fields[stat_idx]):
+            if float(stat) == 0.0:
+                value = "n/a"
+            elif fields[stat_idx] in floats or field_logical(fields[stat_idx]):
                 value = str(round(float(tup[stat_idx]), 2)).ljust(4,"0")
             else:
                 value = round(float(tup[stat_idx]))
@@ -77,12 +79,15 @@ def rank(query_result, fields, order_by_field, desc=True):
         order_by_idx = fields.index(order_by_field)
         order_by_stat = float(tup[order_by_idx])
         # rank
-        count += 1
-        if desc is True and round(order_by_stat, 3) < prev_result:
-            rank = count
-        elif desc is False and round(order_by_stat, 3) > prev_result:
-            rank = count
-        prev_result = round(order_by_stat, 3)
+        if value != "n/a":
+            count += 1
+            if desc is True and round(order_by_stat, 3) < prev_result:
+                rank = count
+            elif desc is False and round(order_by_stat, 3) > prev_result:
+                rank = count
+            prev_result = round(order_by_stat, 3)
+        else:
+            rank = 1
         # return
         ranked_tup = {
             "rank": (str(rank) + ".").ljust(3," "),

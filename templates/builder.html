@@ -40,12 +40,10 @@
               {% set header = query_result.get('header')[3:] %}
               <li class="list-group-item py0 px0">
                 <div class="row justify-content-center">
-                  <div class="col-2 px0">
+                  <div class="col-5 px0">
                   </div>
-                  <div class="col-3 px0">
-                  </div>
-                  {% for i in range(3) %} <!-- DEBUG -->
-                    {% if i < (header|length) %}
+                  {% set num_stats = (query_result.get('header')|length) - 3 %}
+                  {% for i in range(num_stats) %} <!-- DEBUG -->
                       {% set column = header[i] %}
                       <script>
                         $(document).ready( function() {
@@ -57,10 +55,6 @@
                       <div class="col-2 text-center text-secondary builder_header" style="padding-left: 0; padding-right: 0">
                         <strong id="custom_stat_heading_{{i}}">''</strong>
                       </div>
-                    {% else %}
-                      <div class="col-2 px0">
-                      </div>
-                    {% endif %}
                   {% endfor %}
                 </div>
               </li>
@@ -88,7 +82,7 @@
                       <fine>{{row.get("team_name")}}</fine>
                     </div>
                   </div>
-                  {% for stat in row.get('stats')[:-1] %} <!-- DEBUG -->
+                  {% for stat in row.get('stats') %} <!-- DEBUG -->
                   <div class="col-2 px0 text-center">
                     <fine>{{stat}}</fine>
                   </div>

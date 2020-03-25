@@ -88,7 +88,7 @@ def get_stat_values(form_data_dict, type = "select"):
     if type == "order":
         length = 1
     else:
-        length = 4
+        length = 3
     for i in range(1,length + 1):
         # check values 
         if type == "select":
