@@ -186,9 +186,11 @@ def custom_stats(form_data):
         if key == "position" and value and value in positions:
             key_string = "players.position"
         elif key == "league" and value and value in leagues:
-            key_string = "leagues.name"
+            key_string = "teams.league_name"
+            print(key_string, " ", value)
         elif key == "club" and value and value in clubs:
             key_string = "teams.name"
+            print(key_string, " ", value)
         elif key == "nationality" and value and value in nations:
             key_string = "players.nationality"
         else: 
