@@ -66,7 +66,8 @@ def rank(query_result, fields, order_by_field, desc=True):
         stats = []
         for stat_idx in range(3,len(fields)):
             stat = tup[stat_idx]
-            if float(stat) == 0.0:
+            # values of 0 are only n/a if stats are presented descending
+            if float(stat) == 0.0 and desc is True:
                 value = "n/a"
             elif fields[stat_idx] in floats or field_logical(fields[stat_idx]):
                 value = str(round(float(tup[stat_idx]), 2)).ljust(4,"0")

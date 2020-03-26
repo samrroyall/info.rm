@@ -114,7 +114,7 @@ def get_stat_values(form_data_dict, type = "select"):
         else: 
             if field_two in stats.keys() and lop in lops:
                 select_string = f"{stats.get(field_one)}{lop}{stats.get(field_two)}"
-            elif field_two not in stats.keys() and lop == "None":
+            elif field_two not in stats.keys() and lop == "":
                 select_string = stats.get(field_one)
             else:
                 continue
@@ -220,7 +220,10 @@ def custom_stats(form_data):
         order_by_stat = order_field[0][0]
 
     # make query
-    query_result = Query(DB_PATH, stmt(select_fields, filter_fields, order_field)).query_db()
-    ranked_result = rank(query_result, select_fields, order_by_stat)
+    try:
+        query_result = Query(DB_PATH, stmt(select_fields, filter_fields, order_field)).query_db()
+        ranked_result = rank(query_result, select_fields, order_by_stat)
+    except:
+        ranked_result = "ERROR"
     return ranked_result, leagues, clubs_dict, nations
 

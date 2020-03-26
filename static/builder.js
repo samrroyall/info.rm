@@ -112,6 +112,25 @@ $(document).ready(function() {
       $("#stat_input2_div_4").addClass("hidden");
     }
   });
+  $("#builder_form").validate( {
+    rules: {
+      "select": {
+        required: true
+      },
+      "input": {
+        number: true
+      }
+    },
+    highlight: function (input) {
+      $(input).addClass("is-invalid");
+    },
+    unhighlight: function (input) {
+      $(input).removeClass("is-invalid");
+    },
+    errorPlacement: function (error, element) {
+      $(element).next().append(error);
+    }
+  });
 });
 
 function getColumnAbbrev(col1, lop, col2) {
