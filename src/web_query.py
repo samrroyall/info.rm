@@ -10,7 +10,6 @@ floats = [
     ]
 
 def stmt(select_fields, filter_fields, order_field):
-    print(order_field)
     select_fields = default_select_fields + select_fields
     table_names = []
     fields = []
