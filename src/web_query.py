@@ -10,6 +10,7 @@ floats = [
     ]
 
 def stmt(select_fields, filter_fields, order_field):
+    print(order_field)
     select_fields = default_select_fields + select_fields
     table_names = []
     fields = []
@@ -79,7 +80,7 @@ def rank(query_result, fields, order_by_field, desc=True):
         order_by_idx = fields.index(order_by_field)
         order_by_stat = float(tup[order_by_idx])
         # rank
-        if value != "n/a":
+        if order_by_stat != "n/a":
             count += 1
             if desc is True and round(order_by_stat, 3) < prev_result:
                 rank = count
