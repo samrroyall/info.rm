@@ -1,18 +1,12 @@
-import os
-import pathlib
+from .query import get_max, get_column, get_by, grab_columns
+from .web_query import rank_response
 
-from .query import Query, get_max, get_column, get_by, grab_columns
-from .web_query import stmt, rank
-
-file_path = pathlib.Path(__file__).parent.absolute()
-DB_PATH = os.path.join(str(file_path), "../db/info.rm.db")
-
-leagues = get_column(DB_PATH, "name", "leagues")
+leagues = get_column( "name", "leagues")
 leagues.sort()
-clubs_dict = get_by(DB_PATH, "name", "teams", "league_name", "name", "leagues")
+clubs_dict = get_by( "name", "teams", "league_name", "name", "leagues")
 for league in leagues:
     clubs_dict[league].sort()
-nations = get_column(DB_PATH, "nationality", "players")
+nations = get_column( "nationality", "players")
 nations.sort()
 
 ########################
@@ -145,14 +139,14 @@ def default_stats():
         "players.goals",
         "players.assists"
     ]
-    max_minutes_played = get_max(DB_PATH, "players.minutes_played")
+    max_minutes_played = get_max( "players.minutes_played")
     filter_fields = [
         ([("players.minutes_played",">",str(max_minutes_played/3))],"")
     ]
-    order_fields = (["players.rating"], True)
-    query_result = Query(DB_PATH, stmt(select_fields, filter_fields, order_fields)).query_db()
-    ranked_result = rank(query_result, select_fields, "players.rating")
-    return ranked_result, leagues, clubs_dict, nations
+    order_field = (["players.rating"], True)
+
+    query_result = rank_response(select_fields, filter_fields, order_field)
+    return query_result, leagues, clubs_dict, nations
 
 def custom_stats(form_data):
     form_data_dict = dict()
@@ -214,16 +208,12 @@ def custom_stats(form_data):
     # get order_by values
     order_field = get_stat_values(form_data_dict, "order")
     if len(order_field) == 0:
-        order_by_stat = select_fields[0]
-        order_field = ([order_by_stat], True)
-    else:
-        order_by_stat = order_field[0][0]
+        order_field = ([select_field[0]], True)
 
     # make query
     try:
-        query_result = Query(DB_PATH, stmt(select_fields, filter_fields, order_field)).query_db()
-        ranked_result = rank(query_result, select_fields, order_by_stat)
+        query_result = rank_response(select_fields, filter_fields, order_field)
     except:
-        ranked_result = "ERROR"
-    return ranked_result, leagues, clubs_dict, nations
+        query_result = "ERROR"
+    return query_result, leagues, clubs_dict, nations
 

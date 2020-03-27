@@ -42,12 +42,12 @@
             </script>
           {% else %}
           <ul class="list-group list-group-flush">
-              {% set header = query_result.get('header')[3:] %}
+              {% set header = query_result.get('header')[4:] %}
               <li class="list-group-item py0 px0">
                 <div class="row justify-content-center">
                   <div class="col-5 px0">
                   </div>
-                  {% set num_stats = (query_result.get('header')|length) - 3 %}
+                  {% set num_stats = header|length %}
                   {% for i in range(num_stats) %}
                       {% set column = header[i] %}
                       <script>
@@ -82,11 +82,17 @@
                   <div class="col-3 text-left px0">
                     {% if row.get('rank') == 'N/A.' %}
                       <div class="row player_name_rank">
-                        <strong class="text-danger">{{row.get("rank")}}</strong><strong>&nbsp{{row.get("name")}}</strong>
+                        <strong class="text-danger">{{row.get("rank")}}</strong>&nbsp
+                        <a href="{{ url_for('player', id=row.get('id')) }}">
+                          <strong>{{row.get("name")}}</strong>
+                        </a>
                       </div>
                     {% else %}
                       <div class="row player_name_rank">
-                        <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
+                        <strong>{{row.get("rank")}}</strong>&nbsp
+                        <a href="{{ url_for('player', id=row.get('id')) }}">
+                          <strong>{{row.get("name")}}</strong>
+                        </a>
                       </div>
                     {% endif %}
                     <div class="row">

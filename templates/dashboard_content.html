@@ -63,7 +63,10 @@
                   <div class="col-1"></div>
                   <div class="col-4 text-left px0">
                     <div class="row player_name_rank">
-                      <strong>{{row.get("rank")}}&nbsp{{row.get("name")}}</strong>
+                      <strong>{{row.get("rank")}}</strong>&nbsp
+                      <a href="{{ url_for('player', id=row.get('id')) }}">
+                        <strong>{{row.get("name")}}</strong>
+                      </a>
                     </div>
                     <div class="row">
                       <fine>{{row.get("team_name")}}</fine>

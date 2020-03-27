@@ -1,6 +1,6 @@
-from .query import Statement, grab_columns
+from .query import Query, Statement, grab_columns
 
-default_select_fields = ["teams.logo", "players.name", "teams.name"]
+default_select_fields = ["teams.logo", "players.name", "players.id", "teams.name"]
 join_params = {
         "players": "team_id",
         "teams": "id",
@@ -44,28 +44,35 @@ def field_logical(field):
             return True
     return False
 
-def rank(query_result, fields, order_by_field, desc=True):
+def rank_response(select_fields, filter_fields, order_field):
+    query_result = Query(stmt(select_fields, filter_fields, order_field)).query_db()
+    order_by_field = order_field[0][0]
+    desc = order_field[1]
+    fields = default_select_fields + select_fields
+
     count = 0
     rank = 0
     prev_result = float("inf") if desc is True else -1.0 * float("inf")
-    fields = default_select_fields + fields
     ranked_result = { "header": fields, "data": []}
     for idx in range(len(query_result)):
         tup = query_result[idx]
 
         # handle defaults
+        team_logo = tup[0]
+        # fix player name
         split_name = tup[1].split(" ")
         if len(split_name) == 2 and len(split_name[0]) > 2:
             name = split_name[0][0] + ". " + split_name[1]
         else:
             name = tup[1]
-        team_logo = tup[0]
-        team_name = tup[2]
+        id = tup[2]
+        team_name = tup[3]
 
         # handle stats
         stats = []
-        for stat_idx in range(3,len(fields)):
+        for stat_idx in range(len(default_select_fields),len(fields)):
             stat = tup[stat_idx]
+
             # values of 0 are only n/a if stats are presented descending
             if float(stat) == 0.0 and desc is True:
                 value = "n/a"
@@ -75,10 +82,12 @@ def rank(query_result, fields, order_by_field, desc=True):
                 value = round(float(tup[stat_idx]))
             stats.append(value)
 
+        # can only order by selected fields
         assert order_by_field in fields,\
             f"ERROR: invalid order_by_field supplied {order_by_field}"
         order_by_idx = fields.index(order_by_field)
         order_by_stat = float(tup[order_by_idx])
+
         # rank
         if order_by_stat != "n/a":
             count += 1
@@ -89,10 +98,12 @@ def rank(query_result, fields, order_by_field, desc=True):
             prev_result = round(order_by_stat, 3)
         else:
             rank = "N/A."
+
         # return
         ranked_tup = {
             "rank": (str(rank) + ".").ljust(3," ") if rank != "N/A." else rank,
             "name": name,
+            "id": id,
             "team_name": team_name,
             "team_logo": team_logo,
             "stats":  stats

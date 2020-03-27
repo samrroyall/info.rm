@@ -1,15 +1,9 @@
-import os
-import pathlib
-
 from .query import Query, get_max, get_column, get_by, grab_columns
-from .web_query import stmt, rank
-
-file_path = pathlib.Path(__file__).parent.absolute()
-DB_PATH = os.path.join(str(file_path), "../db/info.rm.db")
+from .web_query import rank_response
 
 def scoring_stats(league, per_90):
     query_result = dict()
-    max_minutes_played = get_max(DB_PATH,"players.minutes_played")
+    max_minutes_played = get_max("players.minutes_played")
     for stat in ["goals", "assists", "goal_contributions"]:
         select_fields = (["players.goals+players.assists"]
                              if stat == "goal_contributions" 
@@ -27,18 +21,13 @@ def scoring_stats(league, per_90):
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
-        result = Query(
-                  DB_PATH, 
-                  stmt(select_fields, filter_fields, order_field)
-              ).query_db()
-        ranked_result = rank(result, select_fields, order_by_stat)
-        query_result[stat] = ranked_result
+        query_result[stat] = rank_response(select_fields, filter_fields, order_field)
     return query_result
 
 def shooting_stats(league, per_90):
     query_result = dict()
-    max_minutes_played = get_max(DB_PATH,"players.minutes_played")
-    max_shots = get_max(DB_PATH,"players.shots")
+    max_minutes_played = get_max("players.minutes_played")
+    max_shots = get_max("players.shots")
     for stat in ["shots", "shots_on", "goals_per_shot"]:
         select_fields = (["players.goals/players.shots"]
                              if stat == "goals_per_shot" 
@@ -62,18 +51,13 @@ def shooting_stats(league, per_90):
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
-        result = Query(
-                  DB_PATH, 
-                  stmt(select_fields, filter_fields, order_field)
-              ).query_db()
-        ranked_result = rank(result, select_fields, order_by_stat)
-        query_result[stat] = ranked_result
+        query_result[stat] = rank_response(select_fields, filter_fields, order_field)
     return query_result
 
 def passing_stats(league, per_90):
     query_result = dict()
-    max_minutes_played = get_max(DB_PATH,"players.minutes_played")
-    max_passes = get_max(DB_PATH,"players.passes")
+    max_minutes_played = get_max("players.minutes_played")
+    max_passes = get_max("players.passes")
     for stat in ["passes_key", "passes", "passes_accuracy"]:
         select_fields = [f"players.{stat}"]
         select_fields = ([f"({select_fields[0]})/(players.minutes_played/90)"]
@@ -95,18 +79,13 @@ def passing_stats(league, per_90):
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
-        result = Query(
-                  DB_PATH, 
-                  stmt(select_fields, filter_fields, order_field)
-              ).query_db()
-        ranked_result = rank(result, select_fields, order_by_stat)
-        query_result[stat] = ranked_result
+        query_result[stat] = rank_response(select_fields, filter_fields, order_field)
     return query_result
 
 def dribbling_stats(league, per_90):
     query_result = dict()
-    max_minutes_played = get_max(DB_PATH,"players.minutes_played")
-    max_dribbles_attempted = get_max(DB_PATH,"players.dribbles_attempted")
+    max_minutes_played = get_max("players.minutes_played")
+    max_dribbles_attempted = get_max("players.dribbles_attempted")
     for stat in ["dribbles_succeeded", "dribbles_attempted", "dribbles_succeeded_pct"]:
         select_fields = [f"players.{stat}"]
         select_fields = ([f"({select_fields[0]})/(players.minutes_played/90)"]
@@ -128,17 +107,12 @@ def dribbling_stats(league, per_90):
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
-        result = Query(
-                  DB_PATH, 
-                  stmt(select_fields, filter_fields, order_field)
-              ).query_db()
-        ranked_result = rank(result, select_fields, order_by_stat)
-        query_result[stat] = ranked_result
+        query_result[stat] = rank_response(select_fields, filter_fields, order_field)
     return query_result
 
 def defending_stats(league, per_90):
     query_result = dict()
-    max_minutes_played = get_max(DB_PATH,"players.minutes_played")
+    max_minutes_played = get_max("players.minutes_played")
     for stat in ["tackles", "interceptions", "blocks"]:
         select_fields = [f"players.{stat}"]
         select_fields = (select_fields if per_90 is False
@@ -154,17 +128,12 @@ def defending_stats(league, per_90):
             filter_fields = [(filter_fields, "AND")]
         order_by_stat = select_fields[0]
         order_field = ([order_by_stat], True)
-        result = Query(
-                  DB_PATH, 
-                  stmt(select_fields, filter_fields, order_field)
-              ).query_db()
-        ranked_result = rank(result, select_fields, order_by_stat)
-        query_result[stat] = ranked_result
+        query_result[stat] = rank_response(select_fields, filter_fields, order_field)
     return query_result
 
 def other_stats(league, per_90):
     query_result = dict()
-    max_minutes_played = get_max(DB_PATH,"players.minutes_played")
+    max_minutes_played = get_max("players.minutes_played")
     for stat in ["rating", "goals_conceded", "penalties_saved"]:
         select_fields = ([f"(players.{stat})/(players.minutes_played/90)"]
                          if per_90 is True and stat == "goals_conceded"
@@ -189,15 +158,7 @@ def other_stats(league, per_90):
         order_field = (([order_by_stat], True) 
                        if stat != "goals_conceded" 
                        else ([order_by_stat], False))
-        result = Query(
-                  DB_PATH, 
-                  stmt(select_fields, filter_fields, order_field)
-              ).query_db()
-        if stat == "goals_conceded":
-            ranked_result = rank(result, select_fields, order_by_stat, False)
-        else:
-            ranked_result = rank(result, select_fields, order_by_stat)
-        query_result[stat] = ranked_result
+        query_result[stat] = rank_response(select_fields, filter_fields, order_field)
     return query_result
 
 ##########################

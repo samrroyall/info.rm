@@ -6,6 +6,9 @@ from typing import List, Tuple, Optional, Dict
 from .orm import Leagues, Teams, Players
 from .config import get_config_arg
 
+file_path = pathlib.Path(__file__).parent.absolute()
+db_path = os.path.join(str(file_path), "../db/info.rm.db")
+
 ###########################
 ###### Query Classes ######
 ###########################
@@ -166,7 +169,7 @@ class Statement:
 
 class Query:
 
-    def __init__(self, db_path: str, statement: Statement) -> None:
+    def __init__(self, statement: Statement) -> None:
         assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
             "ERROR: invalid DB path supplied to Query."
         self.db_path = db_path
@@ -214,7 +217,7 @@ def grab_columns(string: str) -> List[str]:
                 result.append(temp_col)
         return result
 
-def get_max(db_path: str, stat: str) -> float:
+def get_max(stat: str) -> float:
     assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
         "ERROR: invalid DB path supplied to Query."
     connection = sqlite3.connect(db_path)
@@ -226,7 +229,6 @@ def get_max(db_path: str, stat: str) -> float:
     return query_result
 
 def get_by(
-        db_path: str, 
         col1: str, 
         table1: str, 
         where_param: str, 
@@ -249,7 +251,7 @@ def get_by(
     connection.close()
     return result
 
-def get_column(db_path: str, col: str, table: str) -> List[str]:
+def get_column(col: str, table: str) -> List[str]:
     assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
         "ERROR: invalid DB path supplied to Query."
     connection = sqlite3.connect(db_path)
@@ -260,3 +262,14 @@ def get_column(db_path: str, col: str, table: str) -> List[str]:
     connection.close()
     return query_result
 
+def get_player_data(id: str) -> List[str]:
+    assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
+        "ERROR: invalid DB path supplied to Query."
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT * FROM players WHERE id = {id};")
+    query_result = list(cursor.fetchall()[0])
+    connection.commit()
+    connection.close()
+    print(query_result)
+    return query_result
