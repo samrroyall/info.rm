@@ -1,3 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
+
+<div class="justify-content-center" style="padding-top: 10px; padding-bottom: 10px; width: 100%">
+  <div class="row justify-content-center ml-auto mr-auto" style="width: 100%">
+    <div class="card col-xs-12 col-sm-12 col-lg-10" style="font-size: x-small">
+      <div class="card-body">
+        <div class="card-title">
+          <div class="row py0" id="header">
+            {% block player_info %}{% endblock %}
+            <div class="col-7 h1 text-center text-secondary" id="player-name" style="margin-top: auto; margin-bottom: 0">
+              {{player_data.get("firstname")}}
+              {{player_data.get("lastname")}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

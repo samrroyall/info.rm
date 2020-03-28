@@ -26,7 +26,7 @@ stats = {
     "Shots_on_Target": "players.shots_on",
     "Shots_on_Target_Percentage": "players.shots_on_pct",
     "Penalties_Won": "players.penalties_won",
-    "Penalties_Scored": "players.penalties_success",
+    "Penalties_Scored": "players.penalties_scored",
     "Penalties_Scored_Percentage": "players.penalties_scored_pct",
     "Penalties_Missed": "players.penalties_missed",
     "Passes": "players.passes",

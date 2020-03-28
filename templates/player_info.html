@@ -1,0 +1,93 @@
+{% extends "player.html" %}
+{% block player_info %}
+
+<div class="col-5">
+  <ul class="list-group" style="width: 100%; font-size: 1.3em">
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-4 text-secondary text-left">
+          <strong>Position</strong>
+        </div>
+        <div class="col-8 text-right">
+          {{player_data.get("position")}}
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-4 text-secondary text-left">
+          <strong>Team</strong>
+        </div>
+        <div class="col-8 text-right">
+          {{player_data.get("team_name")}}&nbsp
+          <img src="{{team_data.get('logo')}}" height="20px" width="20px">
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-4 text-secondary text-left">
+          <strong>League</strong>
+        </div>
+        <div class="col-8 text-right">
+          {{player_data.get("league_name")}}&nbsp
+          <img src="{{league_data.get('flag')}}" height="15px" width="auto">
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-5 text-secondary text-left">
+          <strong>Nationality</strong>
+        </div>
+        <div class="col-7 text-right">
+          {{player_data.get("nationality")}}&nbsp
+          <img src="{{player_data.get('flag')}}" height="15px" width="auto">
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-5 text-secondary text-left">
+          <strong>Date of Birth</strong>
+        </div>
+        <div class="col-7 text-right">
+          {% set birthdate_list = player_data.get("birth_date").split("-") %}
+          {{birthdate_list[1]|int}}/{{birthdate_list[2]|int}}/{{birthdate_list[0]}} ({{player_data.get("age")}})
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-5 text-secondary text-left">
+          <strong>Height</strong>
+        </div>
+        <div class="col-7 text-right">
+          {{player_data.get("height")}}
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-5 text-secondary text-left">
+          <strong>Weight</strong>
+        </div>
+        <div class="col-7 text-right">
+          {{player_data.get("weight")}}
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-5 text-secondary text-left">
+          <strong>Rating</strong>
+        </div>
+        <div class="col-7 text-right">
+          {{player_data.get("rating")|float|round(2)}}
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+
+{% endblock %}

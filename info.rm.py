@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for
 
 from src.dashboard import dashboard_stats 
 from src.builder import default_stats, custom_stats
-from src.player import player_data
+from src.player import player_team_data
 
 info_rm = Flask(__name__)
 
@@ -13,7 +13,6 @@ leagues = ["premier-league", "serie-a", "ligue-1", "la-liga", "bundesliga", "top
 @info_rm.route("/")
 def home():
     return redirect(url_for("dashboard", league="top-5"))
-
 
 @info_rm.route("/league/<league>")
 def dashboard(league, per_90 = False):
@@ -36,7 +35,16 @@ def dashboard_per90(league):
 
 @info_rm.route("/player/<id>")
 def player(id):
-    return render_template("player.html", player_stats = player_data(id))
+    data = player_team_data(id)
+    player_data = data[0]
+    team_data = data[1]
+    league_data = data[2]
+    return render_template(
+                    "player_info.html", 
+                    player_data=player_data, 
+                    team_data=team_data,
+                    league_data=league_data
+                )
 
 @info_rm.route("/builder")
 def builder():

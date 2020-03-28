@@ -113,6 +113,7 @@ class Players(Base):
         "age": int,
         "birth_date": date,
         "nationality": str,
+        "flag": str,
         "height": str,
         "weight": str,
         "rating": float,
@@ -144,7 +145,7 @@ class Players(Base):
         "cards_straight_red": float,
         "penalties_won": float,
         "penalties_committed": float,
-        "penalties_success": float,
+        "penalties_scored": float,
         "penalties_missed": float,
         "penalties_scored_pct": float,
         "penalties_saved": float,
@@ -168,6 +169,7 @@ class Players(Base):
     age = Column(Integer)
     birth_date = Column(Date) 
     nationality = Column(String)
+    flag = Column(String)
     height = Column(String)  
     weight = Column(String) 
     rating = Column(Float) 
@@ -208,7 +210,7 @@ class Players(Base):
     # "penalty": {"won":x,"commited":y,"success":z,"missed":za,"saved":zb} [sic]
     penalties_won = Column(Float)
     penalties_committed = Column(Float)
-    penalties_success = Column(Float)
+    penalties_scored = Column(Float)
     penalties_missed = Column(Float)
     penalties_scored_pct = Column(Float)
     penalties_saved = Column(Float)

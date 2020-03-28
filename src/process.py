@@ -3,8 +3,10 @@
 from hashlib import md5
 from datetime import datetime, date
 
-from config import get_config_arg
+from config import get_config_arg, set_config_arg
 from orm import Leagues, Teams, Players
+
+
 
 ###########################
 ##### PROCESS HELPERS #####
@@ -235,6 +237,17 @@ def process_players(players, team_id, filtered_players, request_instance):
     orm_class = Players
     attributes = getattr(orm_class, "_TYPES")
 
+    # get nation flags
+    flags_dict = get_config_arg("flags")
+    if flags_dict is None:
+        flags_dict = dict()
+        api_response = request_instance.make_call("countries").get("response")
+        for country in api_response:
+            flags_dict[country.get("name")] = country.get("flag")
+        set_config_arg("flags", flags_dict)
+    else:
+        flags_dict = eval(flags_dict)
+
     for idx in range(len(players)):
         player = players[idx]
         # check player
@@ -288,6 +301,7 @@ def process_players(players, team_id, filtered_players, request_instance):
             temp_player["lastname"] = player_info.get("lastname")
             temp_player["age"] = player_info.get("age")
             temp_player["nationality"] = player_info.get("nationality")
+            temp_player["flag"] = flags_dict.get(temp_player.get("nationality")) 
             temp_player["height"], temp_player["weight"] = process_height_weight(
                                                                player_info.get("height"),
                                                                player_info.get("weight")

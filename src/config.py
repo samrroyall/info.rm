@@ -27,9 +27,10 @@ def write_config(args):
 def get_config_arg(config_arg):
     """ Function for reading IDs from config.ini """
     config_args = read_config()
-    assert config_args.get(config_arg), \
-        f"ERROR: Config file does not have argument {config_arg}."
-    return config_args.get(config_arg)
+    if config_args.get(config_arg):
+        return config_args.get(config_arg)
+    else:
+        return None
 
 def set_config_arg(config_arg, value):
     """ Function for writing IDs to config.ini """

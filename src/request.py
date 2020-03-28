@@ -113,9 +113,12 @@ class Request(metaclass=Registry):
         # View ratelimit before proceeding, sleep if needed
         self.get_ratelimit()
         # Make API request
-        if endpoint and params:
+        if endpoint:
           url = f"{cls._API_URL}{endpoint}" 
-          api_response = get(url, headers=self.headers, params=params)
+          if params:
+            api_response = get(url, headers=self.headers, params=params)
+          else:
+            api_response = get(url, headers=self.headers)
         else:
           url = f"{cls._API_URL}{self.endpoint}" 
           api_response = get(url, headers=self.headers, params=self.params)

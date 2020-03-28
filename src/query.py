@@ -267,9 +267,21 @@ def get_player_data(id: str) -> List[str]:
         "ERROR: invalid DB path supplied to Query."
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
+
     cursor.execute(f"SELECT * FROM players WHERE id = {id};")
-    query_result = list(cursor.fetchall()[0])
+    player_result = list(cursor.fetchall()[0])
     connection.commit()
+
+    team_id = player_result[3]
+    cursor.execute(f"SELECT * FROM teams WHERE id = {team_id};")
+    team_result = list(cursor.fetchall()[0])
+    connection.commit()
+
+    league_id = player_result[1]
+    cursor.execute(f"SELECT * FROM leagues WHERE id = {league_id};")
+    league_result = list(cursor.fetchall()[0])
+    connection.commit()
+
+
     connection.close()
-    print(query_result)
-    return query_result
+    return player_result, team_result, league_result
