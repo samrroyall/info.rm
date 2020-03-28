@@ -6,8 +6,108 @@ from datetime import datetime, date
 from config import get_config_arg, set_config_arg
 from orm import Leagues, Teams, Players
 
+###########################
+####### FLAGS DICT ########
+###########################
 
-
+flags_dict = {
+    "Albania": "AL",
+    "Algeria": "DZ",
+    "Angola": "AO",
+    "Argentina": "AR",
+    "Armenia": "AM",
+    "Australia": "AU",
+    "Austria": "AT",
+    "Belgium": "BE",
+    "Bosnia and Herzegovina": "BA",
+    "Brazil": "BR",
+    "Burkina Faso": "BF",
+    "Cameroon": "CM",
+    "Canada": "CA",
+    "Cape Verde Islands": "CV",
+    "Central African Republic": "CF",
+    "Chad": "TD",
+    "Chile": "CL",
+    "China PR": "CN",
+    "Colombia": "CO",
+    "Congo DR": "CD",
+    "Costa Rica": "CR",
+    "Croatia": "HR",
+    "Cuba": "CU",
+    "Czech Republic": "CZ",
+    "Côte d'Ivoire": "CI",
+    "Denmark": "DK",
+    "Dominican Republic": "DO",
+    "Ecuador": "EC",
+    "Egypt": "EG",
+    "England": "GB",
+    "Equatorial Guinea": "GQ",
+    "Estonia": "EE",
+    "Finland": "FI",
+    "France": "FR",
+    "French Guiana": "GF",
+    "Gabon": "GA",
+    "Gambia": "GM",
+    "Germany": "DE",
+    "Ghana": "GH",
+    "Greece": "GR",
+    "Guadeloupe": "GP",
+    "Guinea": "GN",
+    "Guinea-Bissau": "GW",
+    "Hungary": "HU",
+    "Iceland": "IS",
+    "Iran": "IR",
+    "Israel": "IL",
+    "Italy": "IT",
+    "Jamaica": "JM",
+    "Japan": "JP",
+    "Kenya": "KE",
+    "Korea Republic": "KR",
+    "Kosovo": "",
+    "Lithuania": "LT",
+    "Luxembourg": "LU",
+    "Madagascar": "MG",
+    "Mali": "ML",
+    "Martinique": "MQ",
+    "Mexico": "MX",
+    "Moldova": "MD",
+    "Montenegro": "ME",
+    "Morocco": "MA",
+    "Mozambique": "MZ",
+    "Netherlands": "NL",
+    "New Zealand": "NZ",
+    "Nigeria": "NG",
+    "North Macedonia": "MK",
+    "Northern Ireland": "GB",
+    "Norway": "NO",
+    "Paraguay": "PY",
+    "Peru": "PE",
+    "Poland": "PL",
+    "Portugal": "PT",
+    "Republic of Ireland": "IE",
+    "Romania": "RO",
+    "Russia": "RU",
+    "Scotland": "GB",
+    "Senegal": "SN",
+    "Serbia": "RS",
+    "Slovakia": "SK",
+    "Slovenia": "SI",
+    "South Africa": "ZA",
+    "Spain": "ES",
+    "Sweden": "SE",
+    "Switzerland": "CH",
+    "Tanzania": "TZ",
+    "Togo": "TG",
+    "Tunisia": "TN",
+    "Turkey": "TR",
+    "USA": "US",
+    "Ukraine": "UA",
+    "Uruguay": "UY",
+    "Venezuela": "VE",
+    "Wales": "GB",
+    "Zambia": "ZM",
+    "Zimbabwe": "ZW",
+}
 ###########################
 ##### PROCESS HELPERS #####
 ###########################
@@ -21,7 +121,7 @@ def get_alternative_league(league_name):
         return None
 
 def process_height_weight(height, weight):
-    if height: 
+    if height:
         height_in = float(height.split(" ")[0]) * 0.393701
         feet = int(height_in // 12)
         inches = round(height_in % 12)
@@ -82,7 +182,7 @@ def process_stats(stats, temp_player):
     temp_player["shots_on"] = not_null(player_shot_info.get("on"))
     temp_player["shots_on_pct"] = None
     # ensure >= 0 shots
-    if temp_player.get("shots") > 0: 
+    if temp_player.get("shots") > 0:
         temp_player["shots_on_pct"] = round(temp_player.get("shots_on") * 100
                                             / temp_player.get("shots"))
     # goals
@@ -106,7 +206,7 @@ def process_stats(stats, temp_player):
     temp_player["duels_won"] = not_null(player_duel_info.get("won"))
     temp_player["duels_won_pct"] = None
     # ensure >= 0 duels
-    if temp_player.get("duels") > 0: 
+    if temp_player.get("duels") > 0:
         temp_player["duels_won_pct"] = round(temp_player.get("duels_won") * 100
                                                 / temp_player.get("duels"))
     # dribbles
@@ -114,11 +214,11 @@ def process_stats(stats, temp_player):
     temp_player["dribbles_past"] = not_null(player_dribble_info.get("past"))
     temp_player["dribbles_attempted"] = not_null(player_dribble_info.get("attempts"))
     temp_player["dribbles_succeeded"] = not_null(player_dribble_info.get("success"))
-    temp_player["dribbles_succeeded_pct"] = None 
+    temp_player["dribbles_succeeded_pct"] = None
     # ensure >= 0 dribbles_attempted
-    if temp_player.get("dribbles_attempted") > 0: 
+    if temp_player.get("dribbles_attempted") > 0:
         temp_player["dribbles_succeeded_pct"] = round(
-                                            temp_player.get("dribbles_succeeded") 
+                                            temp_player.get("dribbles_succeeded")
                                             / temp_player.get("dribbles_attempted")
                                             * 100
                                         )
@@ -131,7 +231,7 @@ def process_stats(stats, temp_player):
     temp_player["cards_yellow"] = not_null(player_card_info.get("yellow"))
     temp_player["cards_red"] = not_null(player_card_info.get("red"))
     temp_player["cards_second_yellow"] = not_null(player_card_info.get("yellowred"))
-    temp_player["cards_straight_red"] = (temp_player.get("cards_red") 
+    temp_player["cards_straight_red"] = (temp_player.get("cards_red")
                                         - temp_player.get("cards_second_yellow"))
     # penalty
     player_pen_info = stats.get("penalty")
@@ -141,16 +241,16 @@ def process_stats(stats, temp_player):
     temp_player["penalties_saved"] = not_null(player_pen_info.get("saved"))
     temp_player["penalties_committed"] = not_null(player_pen_info.get("commited")) #sic
     temp_player["penalties_scored_pct"] = None
-    if (temp_player.get("penalties_scored") > 0 or 
-        temp_player.get("penalties_missed") > 0): 
+    if (temp_player.get("penalties_scored") > 0 or
+        temp_player.get("penalties_missed") > 0):
         temp_player["penalties_scored_pct"] = round(
                                             temp_player.get("penalties_scored") /
                                             (temp_player.get("penalties_scored")
                                                 + temp_player.get("penalties_missed"))
                                             * 100
-                                        )   
+                                        )
     return temp_player
-         
+
 #############################
 ##### PROCESS FUNCTIONS #####
 #############################
@@ -205,7 +305,7 @@ def process_teams(teams, league_id):
     for idx in range(len(teams)):
         team = teams[idx]
         temp_team = dict()
-        temp_team["league_id"] = league_id 
+        temp_team["league_id"] = league_id
         temp_team["league_name"] = league_name
         # team
         temp_team["id"] = team.get("team").get("id")
@@ -237,17 +337,6 @@ def process_players(players, team_id, filtered_players, request_instance):
     orm_class = Players
     attributes = getattr(orm_class, "_TYPES")
 
-    # get nation flags
-    flags_dict = get_config_arg("flags")
-    if flags_dict is None:
-        flags_dict = dict()
-        api_response = request_instance.make_call("countries").get("response")
-        for country in api_response:
-            flags_dict[country.get("name")] = country.get("flag")
-        set_config_arg("flags", flags_dict)
-    else:
-        flags_dict = eval(flags_dict)
-
     for idx in range(len(players)):
         player = players[idx]
         # check player
@@ -259,12 +348,12 @@ def process_players(players, team_id, filtered_players, request_instance):
         for stats in player_stats:
             temp_player = dict()
             temp_league_name = stats.get("league").get("name")
-            if temp_league_name != league_name and (alt_league_name is None or 
+            if temp_league_name != league_name and (alt_league_name is None or
                 temp_league_name != alt_league_name):
                 continue
             # use consistent league name
             # only store statistics on players that have played
-            if (not stats.get("games").get("minutes") or 
+            if (not stats.get("games").get("minutes") or
                 float(stats.get("games").get("minutes")) == 0.0):
                 continue
 
@@ -294,14 +383,15 @@ def process_players(players, team_id, filtered_players, request_instance):
                 # if this isn't the most recent version, don't process
                 elif int(temp_player.get("team_id")) != most_recent_team_id:
                     continue
-            # player 
+            # player
             player_info = player.get("player")
             temp_player["name"] = player_info.get("name").replace("&apos;","'")
             temp_player["firstname"] = player_info.get("firstname")
             temp_player["lastname"] = player_info.get("lastname")
             temp_player["age"] = player_info.get("age")
             temp_player["nationality"] = player_info.get("nationality")
-            temp_player["flag"] = flags_dict.get(temp_player.get("nationality")) 
+            country_abbrev = flags_dict.get(temp_player.get("nationality")).lower()
+            temp_player["flag"] = f"https://media.api-sports.io/flags/{country_abbrev}.svg"
             temp_player["height"], temp_player["weight"] = process_height_weight(
                                                                player_info.get("height"),
                                                                player_info.get("weight")
@@ -313,5 +403,3 @@ def process_players(players, team_id, filtered_players, request_instance):
             processed_player = check_keys(temp_player, attributes)
             filtered_players[processed_player.get("id")] = processed_player
     return filtered_players
-
-
