@@ -37,11 +37,13 @@ def dashboard_per90(league):
 def player(id):
     data = player_team_data(id)
     player_data = data[0]
-    team_data = data[1]
-    league_data = data[2]
+    player_stats = data[1]
+    team_data = data[2]
+    league_data = data[3]
     return render_template(
                     "player_info.html", 
                     player_data=player_data, 
+                    player_stats=player_stats, 
                     team_data=team_data,
                     league_data=league_data
                 )

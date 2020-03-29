@@ -6,12 +6,373 @@
     <div class="card col-xs-12 col-sm-12 col-lg-10" style="font-size: x-small">
       <div class="card-body">
         <div class="card-title">
-          <div class="row py0" id="header">
-            {% block player_info %}{% endblock %}
-            <div class="col-7 h1 text-center text-secondary" id="player-name" style="margin-top: auto; margin-bottom: 0">
-              {{player_data.get("firstname")}}
-              {{player_data.get("lastname")}}
+          <div class="text-center h3 text-secondary" id="player-name" style="margin-bottom: 30px">
+            {{player_data.get("firstname")}}
+            {{player_data.get("lastname")}}
+          </div>
+          <div>
+        </div>
+        <div class="row py0 justify-content-left" id="header">
+          {% block player_info %}{% endblock %}
+          <div class="col-7">
+            <!-- scoring -->
+            <div class="h6 text-success text-center">
+              SHOOTING
             </div>
+            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 15px">
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Goals</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("goals")|int}} ({{player_stats.get("penalties_scored")|int}})
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Goals Conceded</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("goals_conceded")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Assists</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("assists")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Shots</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("shots")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Shots on Target</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("shots_on")|int}}
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- passing -->
+            <div class="h6 text-success text-center">
+              PASSING
+            </div>
+            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Passes</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("passes")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Key Passes</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("passes_key")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Pass Accuracy</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("passes_accuracy")|int}}%
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- dribbling -->
+            <div class="h6 text-success text-center">
+              DRIBBLING
+            </div>
+            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Successful Dribbles</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("dribbles_succeeded")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Attempted Dribbles</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("dribbles_attempted")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Dribble Success Rate</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("dribbles_succeeded_pct")|int}}%
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- defending -->
+            <div class="h6 text-success text-center">
+              DEFENDING
+            </div>
+            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Tackles</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("tackles")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Interceptions</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("interceptions")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Blocks</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("blocks")|int}}
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Fouling -->
+            <div class="h6 text-success text-center">
+              Fouling
+            </div>
+            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Fouls Committed</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("fouls_committed")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Fouls Drawn</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("fouls_drawn")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Red Cards</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("cards_red")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Yellow Cards</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("cards_yellow")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Straight Red Cards</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("cards_straight_red")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Second Yellow Cards</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("cards_second_yellow")|int}}
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Penalties -->
+            <div class="h6 text-success text-center">
+              Penalties
+            </div>
+            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Penalties Scored</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("penalties_scored")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Penalties Missed</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("penalties_missed")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Penalties Committed</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("penalties_committed")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Penalties Drawn</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("penalties_won")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Penalties Saved</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("penalties_saved")|int}}
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Gameplay -->
+            <div class="h6 text-success text-center">
+              Gameplay
+            </div>
+            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Minutes Played</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("minutes_played")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Games Started</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("games_started")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Games Benched</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("games_bench")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Game Appearances</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("games_appearances")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Substitutions In</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("substitutions_in")|int}}
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-9 text-secondary text-left">
+                    <strong>Substitutions Out</strong>
+                  </div>
+                  <div class="col-3 text-right">
+                    {{player_stats.get("substitutions_out")|int}}
+                  </div>
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
