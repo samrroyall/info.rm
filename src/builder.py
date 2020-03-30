@@ -233,4 +233,4 @@ def custom_stats(form_data):
         query_result = rank_response(select_fields, filter_fields, order_field, season)
     except:
         query_result = "ERROR"
-    return query_result, leagues, clubs_dict, nations
+    return query_result, leagues, clubs_dict, nations, season

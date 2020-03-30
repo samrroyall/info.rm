@@ -278,7 +278,8 @@ def get_player_data(
     cursor = connection.cursor()
 
     cursor.execute(f"SELECT * FROM players WHERE id = {id};")
-    player_result = list(cursor.fetchall()[0])
+    player_result = cursor.fetchall()
+    player_result = list(player_result[0])
     connection.commit()
 
     team_id = player_result[3]

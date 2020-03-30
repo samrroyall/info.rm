@@ -112,9 +112,15 @@
                     {% else %}
                       <div class="row player_name_rank">
                         <strong>{{row.get("rank")}}</strong>&nbsp
-                        <a href="{{ url_for('player', id=row.get('id')) }}">
-                          <strong>{{row.get("name")}}</strong>
-                        </a>
+                        {% if custom_season %}
+                          <a href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
+                            <strong>{{row.get("name")}}</strong>
+                          </a>
+                        {% else %}
+                          <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
+                            <strong>{{row.get("name")}}</strong>
+                          </a>
+                        {% endif %}
                       </div>
                     {% endif %}
                     <div class="row">
