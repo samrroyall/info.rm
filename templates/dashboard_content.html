@@ -7,8 +7,8 @@
 <div class="row" style="padding-left: 10px">
   <div class="col-4 col-sm-2 mr-auto custom-control custom-switch" style="padding-top: 1%">
     <input type="checkbox" class="custom-control-input" id="main_per90_toggle">
-    <label class="custom-control-label text-secondary align-self-center" 
-      for="main_per90_toggle" id="main_per90_toggle_label" 
+    <label class="custom-control-label text-secondary align-self-center"
+      for="main_per90_toggle" id="main_per90_toggle_label"
       style="font-size: .7em; line-height: 2em;">
       <strong>Per 90</strong>
     </label>
@@ -32,97 +32,107 @@
     <h6 class="text-center text-success">{{stat.upper()}}</h6>
     <div class="row justify-content-center">
     {% for substat in query_result.get(stat).keys() %}
-      {% set card_num = loop.index - 1 %}
-      {% if card_num == 0 %}
-        <!-- Prev Button -->
-        <div class="col-1 align-self-center text-right" id="{{stat}}_prev_{{card_num}}"
-          style="padding-right: .7%" onclick="changeStat('{{stat}}', {{card_num}}, 'prev');">
-          <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>
-          </svg>
-        </div>
-        <div class="card col-10" id="{{stat}}_card_{{card_num}}"
-          style="font-size: x-small;">
-      {% else %}
-        <!-- Prev Button Hidden -->
-        <div class="col-1 align-self-center text-right hidden" id="{{stat}}_prev_{{card_num}}"
-          style="padding-right: .7%" onclick="changeStat('{{stat}}', {{card_num}}, 'prev');">
-          <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>
-          </svg>
-        </div>
-        <div class="card col-10 hidden" id="{{stat}}_card_{{card_num}}"
-          style="font-size: x-small;">
-      {% endif %}
-        <div class="card-body ">
-          <h6 class="card-title text-center text-secondary">
-            {{section_names.get(substat)}}
-          </h6>
-          <!-- Card Contents -->
-          <ul class="list-group list-group-flush">
-            {% set pagemod = query_result.get(stat).get(substat).get('data')|length % 10 %}
-            {% set pagediv = query_result.get(stat).get(substat).get('data')|length // 10 %}
-            {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %}
-            {% for page in range(1, num_pages + 1) %}
-              {% if page == 1 %}
-                <div id="{{stat}}_{{substat}}_page_{{page}}">
-              {% else %}
-                <div id="{{stat}}_{{substat}}_page_{{page}}" class="hidden">
-              {% endif %}
-              {% for row in (query_result.get(stat).get(substat).get('data')[10 * (page - 1) : 10 * page]) %}
-              <li class="list-group-item py0 px0">
-                <div class="row align-items-center justify-content-center">
-                  <div class="col-1 text-right px0">
-                    <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
-                  </div>
-                  <div class="col-1"></div>
-                  <div class="col-4 text-left px0">
-                    <div class="row player_name_rank">
-                      <strong>{{row.get("rank")}}</strong>&nbsp
-                      <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
-                        <strong>{{row.get("name")}}</strong>
-                      </a>
+      {% if not ((substat == "blocks" or substat == "tackles") and (current_season|int < 2017)) %}
+        {% if substat == "interceptions" and current_season|int < 2017 %}
+          {% set card_num = 0 %}
+        {% else %}
+          {% set card_num = loop.index - 1 %}
+        {% endif %}
+        {% if card_num == 0 %}
+          {% if not (stat == "defending" and current_season|int < 2017) %}
+            <!-- Prev Button -->
+            <div class="col-1 align-self-center text-right" id="{{stat}}_prev_{{card_num}}"
+              style="padding-right: .7%" onclick="changeStat('{{stat}}', {{card_num}}, 'prev');">
+              <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+          {% endif %}
+          <div class="card col-10" id="{{stat}}_card_{{card_num}}"
+            style="font-size: x-small;">
+        {% else %}
+          {% if not (stat == "defending" and current_season|int < 2017) %}
+            <!-- Prev Button Hidden -->
+            <div class="col-1 align-self-center text-right hidden" id="{{stat}}_prev_{{card_num}}"
+              style="padding-right: .7%" onclick="changeStat('{{stat}}', {{card_num}}, 'prev');">
+              <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+          {% endif %}
+          <div class="card col-10 hidden" id="{{stat}}_card_{{card_num}}"
+            style="font-size: x-small;">
+        {% endif %}
+          <div class="card-body ">
+            <h6 class="card-title text-center text-secondary">
+              {{section_names.get(substat)}}
+            </h6>
+            <!-- Card Contents -->
+            <ul class="list-group list-group-flush">
+              {% set pagemod = query_result.get(stat).get(substat).get('data')|length % 10 %}
+              {% set pagediv = query_result.get(stat).get(substat).get('data')|length // 10 %}
+              {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %}
+              {% for page in range(1, num_pages + 1) %}
+                {% if page == 1 %}
+                  <div id="{{stat}}_{{substat}}_page_{{page}}">
+                {% else %}
+                  <div id="{{stat}}_{{substat}}_page_{{page}}" class="hidden">
+                {% endif %}
+                {% for row in (query_result.get(stat).get(substat).get('data')[10 * (page - 1) : 10 * page]) %}
+                <li class="list-group-item py0 px0">
+                  <div class="row align-items-center justify-content-center">
+                    <div class="col-1 text-right px0">
+                      <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
                     </div>
-                    <div class="row">
-                      <fine>{{row.get("team_name")}}</fine>
+                    <div class="col-1"></div>
+                    <div class="col-4 text-left px0">
+                      <div class="row player_name_rank">
+                        <strong>{{row.get("rank")}}</strong>&nbsp
+                        <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
+                          <strong>{{row.get("name")}}</strong>
+                        </a>
+                      </div>
+                      <div class="row">
+                        <fine>{{row.get("team_name")}}</fine>
+                      </div>
                     </div>
+                    {% for stat in row.get('stats') %}
+                    <div class="col-2 col-xs-2 col-sm-2 col-md-1 col-lg-1 px0 text-left">
+                      <fine>{{stat}}</fine>
+                    </div>
+                    {% endfor %}
                   </div>
-                  {% for stat in row.get('stats') %}
-                  <div class="col-2 col-xs-2 col-sm-2 col-md-1 col-lg-1 px0 text-left">
-                    <fine>{{stat}}</fine>
+                </li>
+                {% endfor %}
+                </div>
+              {% endfor %}
+              <li class="list-group-item">
+                <div class="row h-100">
+                  <div class="col-12">
+                    <nav class="nav justify-content-center">
+                      <ul class="pagination pagination-md">
+                        {% for i in range(1, num_pages + 1) %}
+                          {% if i == 1 %}
+                            <li class="page-item text-primary active" id="{{stat}}_{{substat}}_pagination_{{i}}">
+                          {% else %}
+                            <li class="page-item text-primary" id="{{stat}}_{{substat}}_pagination_{{i}}">
+                          {% endif %}
+                            <a class="page-link" onclick="changePage('{{stat}}','{{substat}}',{{i}});">
+                              {{i}}
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </nav>
                   </div>
-                  {% endfor %}
                 </div>
               </li>
-              {% endfor %}
-              </div>
-            {% endfor %}
-            <li class="list-group-item">
-              <div class="row h-100">
-                <div class="col-12">
-                  <nav class="nav justify-content-center">
-                    <ul class="pagination pagination-md">
-                      {% for i in range(1, num_pages + 1) %}
-                        {% if i == 1 %}
-                          <li class="page-item text-primary active" id="{{stat}}_{{substat}}_pagination_{{i}}">
-                        {% else %}
-                          <li class="page-item text-primary" id="{{stat}}_{{substat}}_pagination_{{i}}">
-                        {% endif %}
-                          <a class="page-link" onclick="changePage('{{stat}}','{{substat}}',{{i}});">
-                            {{i}}
-                          </a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </nav>
-                </div>
-              </div>
-            </li>
-          </ul>
+            </ul>
           <!-- End Card Contents -->
         </div>
       </div>
       <!-- Next Button -->
+      {% if not (stat == "defending" and current_season|int < 2017) %}
       {% if card_num == 0 %}
         <div class="col-1 align-self-center text-left" id="{{stat}}_next_{{card_num}}"
           style="padding-left: .7%" onclick="changeStat('{{stat}}', {{card_num}}, 'next');">
@@ -138,7 +148,9 @@
           </svg>
         </div>
       {% endif %}
+      {% endif %}
       <!-- End of Next Button -->
+      {% endif %}
     {% endfor %}
     </div>
   </div>
