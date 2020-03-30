@@ -5,6 +5,7 @@ from hashlib import md5
 
 from config import get_config_arg
 from orm import Leagues, Teams, Players
+import sys
 
 ###########################
 ####### FLAGS DICT ########
@@ -566,11 +567,12 @@ def process_players(players, team_id, season, filtered_players, request_instance
                             print("ERROR: Could Not Format Transfer Date: {}, {}.".format(
                                                                                 transfer.get("date"),
                                                                                 temp_player.get("id")
-                                                                            )
+                                                                            ))
+                            sys.exit(1)
                         if (most_recent_transfer_date is None or 
                             transfer_date > most_recent_transfer_date):
                             # ensure not a future transfer
-                            if ((transfer_date.year = int(season) + 1 and transfer_date.month < 3) or 
+                            if ((transfer_date.year == int(season) + 1 and transfer_date.month < 3) or 
                                 (transfer_date.year <= int(season))):
                                 most_recent_transfer_date = transfer_date
                                 most_recent_team_id = transfer.get("teams").get("in").get("id")
