@@ -44,8 +44,8 @@ def field_logical(field):
             return True
     return False
 
-def rank_response(select_fields, filter_fields, order_field):
-    query_result = Query(stmt(select_fields, filter_fields, order_field)).query_db()
+def rank_response(select_fields, filter_fields, order_field, season):
+    query_result = Query(stmt(select_fields, filter_fields, order_field), season).query_db()
     order_by_field = order_field[0][0]
     desc = order_field[1]
     fields = default_select_fields + select_fields
@@ -74,7 +74,9 @@ def rank_response(select_fields, filter_fields, order_field):
             stat = tup[stat_idx]
 
             # values of 0 are only n/a if stats are presented descending
-            if float(stat) == 0.0 and desc is True:
+            if stat is None:
+               value = "n/a" 
+            elif float(stat) == 0.0 and desc is True:
                 value = "n/a"
             elif fields[stat_idx] in floats or field_logical(fields[stat_idx]):
                 value = str(round(float(tup[stat_idx]), 2)).ljust(4,"0")
@@ -86,7 +88,10 @@ def rank_response(select_fields, filter_fields, order_field):
         assert order_by_field in fields,\
             f"ERROR: invalid order_by_field supplied {order_by_field}"
         order_by_idx = fields.index(order_by_field)
-        order_by_stat = float(tup[order_by_idx])
+        if tup[order_by_idx] is None:
+            order_by_stat = "n/a"
+        else:
+            order_by_stat = float(tup[order_by_idx])
 
         # rank
         if order_by_stat != "n/a":

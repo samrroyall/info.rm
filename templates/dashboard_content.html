@@ -4,12 +4,27 @@
 
 {% set section_names = {"goals": "Goals","assists": "Assists","goal_contributions": "Goal Contributions","shots_on": "Shots On Target","shots": "Shots","goals_per_shot":  "Goals Per Shot","passes_key": "Key Passes","passes": "Passes","passes_accuracy": "Pass Accuracy","dribbles_succeeded": "Successful Dribbles","dribbles_attempted": "Attempted Dribbles","dribbles_succeeded_pct": "Dribble Success Rate","tackles": "Tackles","interceptions": "Interceptions","blocks": "Blocks","rating": "Player Rating","goals_conceded": "Avg. Goals Conceded","penalties_saved": "Penalties Saved"} %}
 
-<div class="custom-control custom-switch" style="padding-top: 1%">
-  <input type="checkbox" class="custom-control-input" id="main_per90_toggle">
-  <label class="custom-control-label text-secondary align-self-center" for="main_per90_toggle"
-    id="main_per90_toggle_label" style="font-size: .7em; line-height: 2em;">
-    <strong>Per 90</strong>
-  </label>
+<div class="row" style="padding-left: 10px">
+  <div class="col-4 col-sm-2 mr-auto custom-control custom-switch" style="padding-top: 1%">
+    <input type="checkbox" class="custom-control-input" id="main_per90_toggle">
+    <label class="custom-control-label text-secondary align-self-center" 
+      for="main_per90_toggle" id="main_per90_toggle_label" 
+      style="font-size: .7em; line-height: 2em;">
+      <strong>Per 90</strong>
+    </label>
+  </div>
+
+  <div class="col-4 col-sm-2 ml-auto" style="padding-top: 1%">
+    <select class="custom-select" id="season-select" value=""
+      style="font-size: .7em">
+      <option>{{current_season}}</option>
+      {% for season in seasons %}
+        {% if season != current_season %}
+          <option>{{season}}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
 </div>
 
 {% for stat in query_result.keys() %}

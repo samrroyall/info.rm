@@ -7,7 +7,7 @@ $(document).ready(function() {
       $("#custom_stat").addClass("hidden");
     }
   });
-  // add select option 
+  // add select option
   $("#select_plus_1").click(function() {
     if ($("#select_div_2").hasClass("hidden")) {
       $("#select_div_2").removeClass("hidden");
@@ -53,9 +53,45 @@ $(document).ready(function() {
   $("#filter_type").change(function() {
     var val = $(this).val();
     const types = ["age","club","league","minutes_played","nationality","position","stat"];
-    if (val == "None") {
+    if (val == "") {
       for (const key of types) {
         $("#filter_" + key + "_div").addClass("hidden");
+        if (key == "stat") {
+          $("#stat_field1_1").val("");
+          $("#stat_field1_2").val("");
+          $("#stat_field1_3").val("");
+          $("#stat_field2_1").val("");
+          $("#stat_field2_2").val("");
+          $("#stat_field2_3").val("");
+          $("#stat_lop_1").val("");
+          $("#stat_lop_2").val("");
+          $("#stat_lop_3").val("");
+          $("#stat_cop_1").val("");
+          $("#stat_cop_2").val("");
+          $("#stat_cop_3").val("");
+          $("#stat_input1_1").val("");
+          $("#stat_input1_2").val("");
+          $("#stat_input1_3").val("");
+          $("#stat_input2_1").val("");
+          $("#stat_input2_2").val("");
+          $("#stat_input2_3").val("");
+          $("#stat_per90_toggle_1").prop("checked", false);
+          $("#stat_per90_toggle_2").prop("checked", false);
+          $("#stat_per90_toggle_3").prop("checked", false);
+        } if (key == "minutes_played") {
+          $("#minutes_played_op").val("");
+          $("#minutes_played_input1").val("");
+          $("#minutes_played_input2").val("");
+        } if (key == "age") {
+          $("#age_op").val("");
+          $("#age_input1").val("");
+          $("#age_input2").val("");
+        } if (key == "club") {
+          $("#club_league_select").val("");
+          $("#club_select").val("");
+        } else {
+          $("#" + key + "_select").val("");
+        }
       }
     } else {
       $("#filter_" + val + "_div").removeClass("hidden");
@@ -181,11 +217,10 @@ function getColumnName(statName, idName) {
     cols[0] = tempStatName.split(".")[1];
   }
 
-  var result = getColumnAbbrev(cols[0], col_lop, cols[1]); 
+  var result = getColumnAbbrev(cols[0], col_lop, cols[1]);
   if (per90 == true) {
     result += " (/90)";
   }
 
   $("#" + idName).text(result);
 }
-

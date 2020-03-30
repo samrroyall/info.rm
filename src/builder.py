@@ -1,18 +1,12 @@
 from .query import get_max, get_column, get_by, grab_columns
 from .web_query import rank_response
 
-leagues = get_column( "name", "leagues")
-leagues.sort()
-clubs_dict = get_by( "name", "teams", "league_name", "name", "leagues")
-for league in leagues:
-    clubs_dict[league].sort()
-nations = get_column( "nationality", "players")
-nations.sort()
-
 ########################
 ##### FORM INPUTS ######
 ########################
 
+CURRENT_SEASON = "2019"
+SEASONS = ["2019", "2018", "2017", "2016", "2015"]
 lops = ["+","-","*","/"]
 cops = ["<",">","=","><"]
 positions = ["Attacker", "Midfielder", "Defender", "Goalkeeper"]
@@ -49,6 +43,32 @@ stats = {
 ##### HELPER FUNCTIONS #######
 ##############################
 
+def get_data():
+    nations = dict()
+    clubs_dict = dict()
+
+    leagues = get_column("name", "leagues")
+    leagues.sort()
+
+    for season in SEASONS:
+        temp_clubs = get_by(
+                        "name",
+                        "teams",
+                        "league_name",
+                        "name",
+                        "leagues",
+                        season
+                    )
+        for league in leagues:
+            temp_clubs[league].sort()
+        clubs_dict[season] = temp_clubs
+
+        temp_nations = get_column("nationality", "players", season)
+        temp_nations.sort()
+        nations[season] = temp_nations
+
+    return leagues, clubs_dict, nations
+
 def check_input_value(input, type):
     if type == "stats":
         # int or float
@@ -71,9 +91,9 @@ def check_cop_values(cop, input_one, input_two):
         # ensure first input is smaller
         if float(input_one) >= float(input_two):
             return 0
-        return 2 
+        return 2
     else:
-        return 1 
+        return 1
 
 def get_stat_values(form_data_dict, type = "select"):
     values = []
@@ -82,7 +102,7 @@ def get_stat_values(form_data_dict, type = "select"):
     else:
         length = 3
     for i in range(1,length + 1):
-        # check values 
+        # check values
         if type == "select":
             field_one = form_data_dict[f"select_field1_{i}"]
             field_two = form_data_dict[f"select_field2_{i}"]
@@ -105,14 +125,14 @@ def get_stat_values(form_data_dict, type = "select"):
 
         if field_one not in stats.keys():
             continue
-        else: 
+        else:
             if field_two in stats.keys() and lop in lops:
                 select_string = f"{stats.get(field_one)}{lop}{stats.get(field_two)}"
             elif field_two not in stats.keys() and lop == "":
                 select_string = stats.get(field_one)
             else:
                 continue
-            if per90: 
+            if per90:
                 select_string = f"({select_string})/(players.minutes_played/90.0)"
             if type == "select":
                 values.append(select_string)
@@ -134,18 +154,19 @@ def get_stat_values(form_data_dict, type = "select"):
 #############################
 
 def default_stats():
+    leagues, clubs_dict, nations = get_data()
     select_fields = [
         "players.rating",
         "players.goals",
         "players.assists"
     ]
-    max_minutes_played = get_max( "players.minutes_played")
+    max_minutes_played = get_max("players.minutes_played", CURRENT_SEASON)
     filter_fields = [
         ([("players.minutes_played",">",str(max_minutes_played/3))],"")
     ]
     order_field = (["players.rating"], True)
 
-    query_result = rank_response(select_fields, filter_fields, order_field)
+    query_result = rank_response(select_fields, filter_fields, order_field, CURRENT_SEASON)
     return query_result, leagues, clubs_dict, nations
 
 def custom_stats(form_data):
@@ -164,7 +185,7 @@ def custom_stats(form_data):
         cop = form_data_dict[f"{key}_op"]
         input_one = form_data_dict[f"{key}_input1"]
         input_two = form_data_dict[f"{key}_input2"]
-        key_string = f"players.{key}" 
+        key_string = f"players.{key}"
         cop_values = check_cop_values(cop, input_one, input_two)
         if cop_values == 2:
             filter_fields.append( (key_string, ">", input_one) )
@@ -172,27 +193,24 @@ def custom_stats(form_data):
         elif cop_values == 1:
             filter_fields.append( (key_string, cop, input_one) )
 
+    # grab season-specific data
+    season = form_data_dict.get("season_select")
+    leagues, clubs_dict, nations = get_data()
+
     # get club, league, nationality, position values
     for key in ["club", "league", "nationality", "position"]:
         if key != "club":
-            value = form_data_dict[f"{key}_select"]
+            value = form_data_dict.get(f"{key}_select")
         if key == "position" and value and value in positions:
             key_string = "players.position"
         elif key == "league" and value and value in leagues:
             key_string = "teams.league_name"
-        elif key == "club":
-            league_value = form_data_dict["club_league_select"]
-            if league_value and league_value in leagues:
-                value = form_data_dict[f"club_{league_value.replace(' ','_')}_select"]
-                if value and value in clubs_dict.get(league_value):
-                    key_string = "teams.name"
-                else:
-                    continue
-            else:
-                continue
+        elif (key == "club" and form_data_dict.get("club_league_select") and
+            value in clubs_dict.get(form_data_dict.get("club_league_select"))):
+            key_string = "teams.name"
         elif key == "nationality" and value and value in nations:
             key_string = "players.nationality"
-        else: 
+        else:
             continue
         filter_fields.append( (key_string, "=", value) )
 
@@ -208,12 +226,11 @@ def custom_stats(form_data):
     # get order_by values
     order_field = get_stat_values(form_data_dict, "order")
     if len(order_field) == 0:
-        order_field = ([select_field[0]], True)
+        order_field = ([select_fields[0]], True)
 
     # make query
     try:
-        query_result = rank_response(select_fields, filter_fields, order_field)
+        query_result = rank_response(select_fields, filter_fields, order_field, season)
     except:
         query_result = "ERROR"
     return query_result, leagues, clubs_dict, nations
-

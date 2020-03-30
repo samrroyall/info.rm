@@ -3,11 +3,11 @@ import pathlib
 import sqlite3
 from typing import List, Tuple, Optional, Dict
 
-from .orm import Leagues, Teams, Players
 from .config import get_config_arg
+from .orm import Leagues, Teams, Players
 
 file_path = pathlib.Path(__file__).parent.absolute()
-db_path = os.path.join(str(file_path), "../db/info.rm.db")
+CURRENT_SEASON = "2019"
 
 ###########################
 ###### Query Classes ######
@@ -71,8 +71,8 @@ class FilterList:
     _LOPS = ["AND", "OR"]
 
     def __init__(
-        self, 
-        properties: Tuple[List[Tuple[str,str,str]], str], 
+        self,
+        properties: Tuple[List[Tuple[str,str,str]], str],
     ) -> None:
         cls = self.__class__
         filters, logical_operator = properties
@@ -84,12 +84,12 @@ class FilterList:
     def to_str(self) -> str:
         filter_strings = [ filter.to_str() for filter in self.filters ]
         return f" {self.logical_operator} ".join(filter_strings)
-                                   
+
 
 class Order:
 
     def __init__(
-            self, 
+            self,
             order_field: Tuple[List[str], bool]
         ) -> None:
         self.order_field, self.desc = order_field
@@ -105,7 +105,7 @@ class Order:
 class Select:
 
     def __init__(
-            self, 
+            self,
             select_fields: List[str],
             table_names: List[Tuple[str,str]], # table name and join parameter
         ) -> None:
@@ -144,10 +144,10 @@ class Select:
 class Statement:
 
     def __init__(
-        self, 
-        table_names: List[Tuple[str,str]], 
-        select_fields: List[str], 
-        order_field: Tuple[List[str], bool], 
+        self,
+        table_names: List[Tuple[str,str]],
+        select_fields: List[str],
+        order_field: Tuple[List[str], bool],
         filter_fields: Optional[List[Tuple[List[Tuple[str,str,str]], str]]] = None
     ) -> None:
         self.select_stmt = Select(select_fields, table_names)
@@ -169,10 +169,12 @@ class Statement:
 
 class Query:
 
-    def __init__(self, statement: Statement) -> None:
-        assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
-            "ERROR: invalid DB path supplied to Query."
-        self.db_path = db_path
+    def __init__(
+        self,
+        statement: Statement,
+        season: str = CURRENT_SEASON
+    ) -> None:
+        self.db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
         assert isinstance(statement, Statement),\
             "ERROR: Query class not supplied with Statement object."
         self.statement = statement
@@ -190,7 +192,7 @@ class Query:
 #### Public Functions ####
 ##########################
 
-def check_col(col):
+def check_col(col: str) -> bool:
     if "." not in col:
         return False
     else:
@@ -201,25 +203,27 @@ def check_col(col):
     return True
 
 def grab_columns(string: str) -> List[str]:
-        chars = ['/','*','+','-','(',')',' ']
-        result = []
-        temp_col = ""
-        for char in string:
-            if char not in chars:
-                temp_col += char
-            else:
-                if temp_col != "":
-                    if check_col(temp_col):
-                        result.append(temp_col)
-                    temp_col = ""
-        if temp_col != "":
-            if check_col(temp_col):
-                result.append(temp_col)
-        return result
+    chars = ['/','*','+','-','(',')',' ']
+    result = []
+    temp_col = ""
+    for char in string:
+        if char not in chars:
+            temp_col += char
+        else:
+            if temp_col != "":
+                if check_col(temp_col):
+                    result.append(temp_col)
+                temp_col = ""
+    if temp_col != "":
+        if check_col(temp_col):
+            result.append(temp_col)
+    return result
 
-def get_max(stat: str) -> float:
-    assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
-        "ERROR: invalid DB path supplied to Query."
+def get_max(
+        stat: str,
+        season: str = CURRENT_SEASON
+    ) -> float:
+    db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(f"SELECT max({stat}) FROM players;")
@@ -229,17 +233,17 @@ def get_max(stat: str) -> float:
     return query_result
 
 def get_by(
-        col1: str, 
-        table1: str, 
-        where_param: str, 
-        col2: str, 
-        table2: str
+        col1: str,
+        table1: str,
+        where_param: str,
+        col2: str,
+        table2: str,
+        season: str = CURRENT_SEASON
     ) -> Dict[str, List[str]]:
-    assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
-        "ERROR: invalid DB path supplied to Query."
+    db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
-    result = dict() 
+    result = dict()
     cursor.execute(f"SELECT DISTINCT {col2} FROM {table2};")
     values = [tup[0] for tup in cursor.fetchall()]
     connection.commit()
@@ -251,9 +255,12 @@ def get_by(
     connection.close()
     return result
 
-def get_column(col: str, table: str) -> List[str]:
-    assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
-        "ERROR: invalid DB path supplied to Query."
+def get_column(
+        col: str,
+        table: str,
+        season: str = CURRENT_SEASON
+    ) -> List[str]:
+    db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(f"SELECT DISTINCT {col} FROM {table};")
@@ -262,9 +269,11 @@ def get_column(col: str, table: str) -> List[str]:
     connection.close()
     return query_result
 
-def get_player_data(id: str) -> List[str]:
-    assert os.path.isfile(db_path) and os.path.splitext(db_path)[1] == ".db",\
-        "ERROR: invalid DB path supplied to Query."
+def get_player_data(
+        id: str,
+        season: str = CURRENT_SEASON
+    ) -> List[str]:
+    db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
 

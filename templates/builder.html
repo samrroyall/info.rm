@@ -3,20 +3,42 @@
 
   <script>
     $(document).ready( function () {
-    // league to club action 
-      $("#club_league_select").change(function() {
-        {% for league in leagues %}
-          $("#club_{{league.replace(' ','_')}}_select_div").addClass("hidden");
+      // season to league and club action
+      $("#season_select").change(function() {
+        // hide all divs
+        $("#club_select").val("");
+        $("#club_league_select").val("");
+        $("#league_select").val("");
+        $("#nationality__select").val("");
+        {% for season in seasons %}
+          $("#nationality_{{season}}_select_div").addClass("hidden");
+          {% for league in leagues %}
+            $("#club_{{league.replace(' ','_')}}_{{season}}_select_div").addClass("hidden");
+          {% endfor %}
         {% endfor %}
-        var val = $(this).val();
-        $("#club_select_div").removeClass("hidden");
-        $("#club_" + val.replace(" ","_") + "_select_div").removeClass("hidden");
+        // show correct div
+        var season = $(this).val();
+        $("#nationality_" + season + "_select_div").removeClass("hidden");
+      });
+      // league to club action
+      $("#club_league_select").change(function() {
+        // hide all divs
+        $("#club_select").val("");
+        {% for season in seasons %}
+          {% for league in leagues %}
+            $("#club_{{league.replace(' ','_')}}_{{season}}_select_div").addClass("hidden");
+          {% endfor %}
+        {% endfor %}
+        // show correct div
+        var league = $(this).val();
+        var season = $("#season_select").val();
+        $("#club_" + league.replace(" ", "_") + "_" + season + "_select_div").removeClass("hidden");
       });
     });
   </script>
 
   <style>
-    h6 { font-size: calc(100% + .1vw + .1vh) } 
+    h6 { font-size: calc(100% + .1vw + .1vh) }
   </style>
 
   <div class="justify-content-center" style="padding-top: 10px; padding-bottom: 10px; width: 100%">
@@ -25,11 +47,11 @@
         <div class="card-body">
           <div class="card-title">
             <h6 class="text-center text-success">
-              YOUR STAT 
+              YOUR STAT
               <div id="filter_button">
                 <svg class="bi bi-filter" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" d="M6 10.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
-                </svg>              
+                </svg>
               </div>
             </h6>
             {% block customize %}{% endblock %}
@@ -65,7 +87,7 @@
               </li>
             {% set pagemod = query_result.get('data')|length % 10 %}
             {% set pagediv = query_result.get('data')|length // 10 %}
-            {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %} 
+            {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %}
             {% for page in range(1, num_pages + 1) %}
               {% if page == 1 %}
                 <div id="stats_builder_page_{{page}}">

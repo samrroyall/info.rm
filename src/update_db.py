@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import sys
 
-from parser import initialize_parser
-from orm import Leagues, Teams, Players
-from tasks import setup, get_data
 from db import initialize_engine, update_table, insert_into_table
+from orm import Leagues, Teams, Players
+from parser import initialize_parser
+from tasks import setup, get_data
 
 #######################
 #### MAIN FUNCTION ####
@@ -24,8 +24,9 @@ def main(**kwargs):
         del kwargs["action"]
         setup(kwargs)
     else:
-        engine = initialize_engine()
-        processed_data = get_data(action, engine)
+        season = kwargs.get("current_season").split("-")[0]
+        engine = initialize_engine(season)
+        processed_data = get_data(action, engine, season)
         action_type = action.split("_")[0]
         endpoint = action.split("_")[1]
         for processed_vals in processed_data:

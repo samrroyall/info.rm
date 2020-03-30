@@ -67,7 +67,7 @@ def initialize_parser():
             "info.rm.py: error: setup procedure requires the following arguments: -t/--token, -s/--season, and -st/--subscription-time"
         setattr(args, "leagues", [num_to_league.get(num) for num in getattr(args, "leagues")])
     else: 
-        assert not args.token and not args.current_season and not args.subscription_time, \
+        assert not args.token and not args.subscription_time, \
             f"info.rm.py: error: {args.action} procedure takes no additional arguments"
     return args
 

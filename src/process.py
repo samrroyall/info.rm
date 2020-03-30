@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from hashlib import md5
 from datetime import datetime, date
+from hashlib import md5
 
-from config import get_config_arg, set_config_arg
+from config import get_config_arg
 from orm import Leagues, Teams, Players
 
 ###########################
@@ -11,100 +11,248 @@ from orm import Leagues, Teams, Players
 ###########################
 
 flags_dict = {
+    "Afghanistan": "AF",
     "Albania": "AL",
     "Algeria": "DZ",
+    "American Samoa": "AS",
+    "Andorra": "AD",
     "Angola": "AO",
+    "Anguilla": "AI",
+    "Antigua and Barbuda": "AG",
     "Argentina": "AR",
     "Armenia": "AM",
+    "Aruba": "AW",
     "Australia": "AU",
     "Austria": "AT",
+    "Azerbaijan": "AZ",
+    "Bahamas": "BS",
+    "Bahrain": "BH",
+    "Bangladesh": "BD",
+    "Barbados": "BB",
+    "Belarus": "BY",
     "Belgium": "BE",
+    "Belize": "BZ",
+    "Benin": "BJ",
+    "Bermuda": "BM",
+    "Bhutan": "BT",
+    "Bolivia": "BO",
+    "Bonaire": "BQ",
     "Bosnia and Herzegovina": "BA",
+    "Botswana": "BW",
+    "Bouvet Island": "BV",
     "Brazil": "BR",
+    "Brunei": "BN",
+    "Bulgaria": "BG",
     "Burkina Faso": "BF",
+    "Burundi": "BI",
+    "Cambodia": "KH",
     "Cameroon": "CM",
     "Canada": "CA",
     "Cape Verde Islands": "CV",
+    "Cayman Islands": "KY",
     "Central African Republic": "CF",
     "Chad": "TD",
     "Chile": "CL",
     "China PR": "CN",
     "Colombia": "CO",
+    "Comoros": "KM",
+    "Congo": "CG",
     "Congo DR": "CD",
+    "Cook Islands": "CK",
     "Costa Rica": "CR",
     "Croatia": "HR",
     "Cuba": "CU",
+    "Curaçao": "CW",
+    "Cyprus": "CY",
     "Czech Republic": "CZ",
     "Côte d'Ivoire": "CI",
     "Denmark": "DK",
+    "Djibouti": "DJ",
+    "Dominica": "DM",
     "Dominican Republic": "DO",
     "Ecuador": "EC",
     "Egypt": "EG",
-    "England": "GB",
+    "El Salvador": "SV",
     "Equatorial Guinea": "GQ",
+    "England": "GB",
+    "Eritrea": "ER",
     "Estonia": "EE",
+    "Ethiopia": "ET",
+    "Falkland Islands": "FK",
+    "Faroe Islands": "FK",
+    "Fiji": "FJ",
     "Finland": "FI",
     "France": "FR",
     "French Guiana": "GF",
+    "French Polynesia": "PF",
+    "FYR Macedonia": "MK",
     "Gabon": "GA",
     "Gambia": "GM",
+    "Georgia": "GE",
     "Germany": "DE",
     "Ghana": "GH",
+    "Gibraltar": "GI",
     "Greece": "GR",
+    "Greenland": "GL",
+    "Grenada": "GD",
     "Guadeloupe": "GP",
+    "Guam": "GU",
     "Guinea": "GN",
     "Guinea-Bissau": "GW",
+    "Guyana": "GY",
+    "Haiti": "HT",
+    "Honduras": "HN",
+    "Hong Kong": "HK",
     "Hungary": "HU",
     "Iceland": "IS",
+    "India": "IN",
+    "Indonesia": "ID",
     "Iran": "IR",
+    "Iraq": "IQ",
+    "Ireland": "IE",
+    "Ireland Republic": "IE",
+    "Isle of Man": "IM",
     "Israel": "IL",
     "Italy": "IT",
     "Jamaica": "JM",
     "Japan": "JP",
+    "Jordan": "JO",
+    "Kazakhstan": "KZ",
     "Kenya": "KE",
+    "Kiribati": "KI",
     "Korea Republic": "KR",
-    "Kosovo": "",
+    "Korea DPR": "KP",
+    "Kuwait": "KW",
+    "Kyrgyzstan": "KG",
+    "Laos": "LA",
+    "Latvia": "LV",
+    "Lebanon": "LB",
+    "Lesotho": "LS",
+    "Liberia": "LR",
+    "Libya": "LY",
+    "Liechtenstein": "LI",
     "Lithuania": "LT",
     "Luxembourg": "LU",
+    "Macao": "MO",
+    "Macedonia": "MK",
     "Madagascar": "MG",
+    "Malawi": "MW",
+    "Malaysia": "MW",
+    "Maldives": "MV",
     "Mali": "ML",
+    "Malta": "MT",
+    "Marshall Islands": "MH",
     "Martinique": "MQ",
+    "Mauritania": "MR",
+    "Mauritius": "MU",
+    "Mayotte": "YT",
     "Mexico": "MX",
+    "Micronesia": "FM",
     "Moldova": "MD",
+    "Monaco": "MC",
+    "Mongolia": "MN",
     "Montenegro": "ME",
+    "Montserrat": "MS",
     "Morocco": "MA",
     "Mozambique": "MZ",
+    "Myanmar": "MM",
+    "Namibia": "NA",
+    "Nauru": "NR",
+    "Nepal": "NP",
     "Netherlands": "NL",
+    "New Caledonia": "NC",
     "New Zealand": "NZ",
+    "Nicaragua": "NI",
+    "Niger": "NE",
     "Nigeria": "NG",
+    "Niue": "NU",
+    "Norfolk Island": "NF",
+    "Northern Mariana Islands": "MP",
     "North Macedonia": "MK",
     "Northern Ireland": "GB",
     "Norway": "NO",
+    "Oman": "OM",
+    "Pakistan": "PK",
+    "Palau": "PW",
+    "Palestine": "PS",
+    "Panama": "PA",
+    "Papau New Guinea": "PA",
     "Paraguay": "PY",
     "Peru": "PE",
+    "Philippines": "PH",
+    "Pitcairn": "PN",
     "Poland": "PL",
     "Portugal": "PT",
+    "Puerto Rico": "PR",
+    "Qatar": "QA",
     "Republic of Ireland": "IE",
     "Romania": "RO",
     "Russia": "RU",
+    "Rwanda": "RW",
+    "Réunion": "RE",
+    "Saint Barthelemy": "BL",
+    "Saint Helena": "SH",
+    "Saint Kitts and Nevis": "KN",
+    "Saint Lucia": "LC",
+    "Saint Martin": "MF",
+    "Saint Pierre and Miquelon": "PM",
+    "Saint Vincent and the Grenadines": "VC",
+    "Samoa": "WS",
+    "San Marino": "SM",
+    "Sao Tome and Principe": "ST",
+    "Saudi Arabia": "SA",
     "Scotland": "GB",
     "Senegal": "SN",
     "Serbia": "RS",
+    "Seychelles": "SC",
+    "Sierra Leone": "SL",
+    "Singapore": "SG",
+    "Sint Maarten": "SX",
     "Slovakia": "SK",
     "Slovenia": "SI",
+    "Solomon Islands": "ZA",
+    "Somalia": "SO",
     "South Africa": "ZA",
+    "South Georgia and the South Sandwich Islands": "GS",
+    "South Sudan": "SS",
     "Spain": "ES",
+    "Sri Lanka": "LK",
+    "Sudan": "SD",
+    "Suriname": "SR",
+    "Svalbard and Jan Mayen": "SJ",
+    "Swaziland": "SE",
     "Sweden": "SE",
     "Switzerland": "CH",
+    "Syria": "SY",
+    "Taiwan": "TW",
+    "Tajikistan": "TJ",
     "Tanzania": "TZ",
+    "Thailand": "TH",
+    "Timor-Leste": "TL",
     "Togo": "TG",
+    "Tokelau": "TK",
+    "Tonga": "TO",
+    "Trinidad and Tobago": "TT",
     "Tunisia": "TN",
     "Turkey": "TR",
-    "USA": "US",
+    "Turkmenistan": "TM",
+    "Turks and Caicos Islands": "TC",
+    "Tuvalu": "TV",
+    "Uganda": "UG",
     "Ukraine": "UA",
+    "United Arab Emirates": "AE",
     "Uruguay": "UY",
+    "USA": "US",
+    "United States": "US",
+    "Uzbekistan": "UZ",
+    "Vanuatu": "VU",
     "Venezuela": "VE",
+    "Vietnam": "VN",
+    "British Virgin Islands": "VG",
+    "US Virgin Islands": "VI",
+    "Wallis and Futuna": "WF",
     "Wales": "GB",
+    "Yemen": "YE",
     "Zambia": "ZM",
     "Zimbabwe": "ZW",
 }
@@ -121,23 +269,54 @@ def get_alternative_league(league_name):
         return None
 
 def process_height_weight(height, weight):
-    if height:
-        height_in = float(height.split(" ")[0]) * 0.393701
-        feet = int(height_in // 12)
-        inches = round(height_in % 12)
-        height = f"{feet}'{inches}\""
-    if weight:
-        weight_lb = round(float(weight.split(" ")[0]) * 2.20462)
-        weight = f"{weight_lb} lbs"
+    if height and height != "":
+        split_height = height.split(" ")
+        if len(split_height) == 1:
+            height_in = float(height) * 0.393701
+            feet = int(height_in // 12)
+            inches = round(height_in % 12)
+            height = f"{feet}'{inches}\""
+        elif len(split_height) == 2:
+            height_in = float(split_height[0]) * 0.393701
+            feet = int(height_in // 12)
+            inches = round(height_in % 12)
+            height = f"{feet}'{inches}\""
+        else:
+            print(height)
+            height = "NULL"
+
+    if weight and weight != "":
+        split_weight = weight.split(" ")
+        if len(split_weight) == 1:
+            weight_lb = round(float(weight) * 2.20462)
+            weight = f"{weight_lb} lbs"
+        if len(split_weight) == 2:
+            weight_lb = round(float(split_weight[0]) * 2.20462)
+            weight = f"{weight_lb} lbs"
+        else:
+            print(weight)
+            weight = "NULL"
     return height, weight
 
 def process_birthdate(birthdate_str) -> date:
     if birthdate_str:
-        birthdate_date = datetime.strptime(
-                             birthdate_str,
-                             "%d/%m/%Y"
-                         ).date()
-    return birthdate_date
+        split_date = birthdate_str.split("/")
+        split_date[0] = split_date[0].rjust(2,"0")
+        split_date[1] = split_date[1].rjust(2,"0")
+        split_date[2] = split_date[2]
+        birthdate_str = "/".join(split_date)
+        try:
+            birthdate_date = datetime.strptime(
+                                    birthdate_str,
+                                    "%d/%m/%Y"
+                                ).date()
+            return birthdate_date
+        except:
+            birthdate_date = datetime.strptime(
+                                    birthdate_str,
+                                    "%m/%d/%Y"
+                                ).date()
+            return birthdate_date
 
 # no type checking on functions dealing with JSON data
 def check_keys(response_data, attributes):
@@ -256,11 +435,11 @@ def process_stats(stats, temp_player):
 #############################
 
 # no type checking on functions dealing with JSON data
-def process_leagues(leagues, _):
+def process_leagues(leagues, _, season):
     """ Function to process the API response regarding league data. """
     orm_class = Leagues
     attributes = getattr(orm_class, "_TYPES")
-    current_leagues = eval(get_config_arg("leagues"))
+    current_leagues = eval(get_config_arg("leagues", season))
 
     league_ids = dict()
     filtered_leagues = []
@@ -295,9 +474,9 @@ def process_leagues(leagues, _):
     return {"ids":league_ids,"processed_data":filtered_leagues}
 
 # no type checking on functions dealing with JSON data
-def process_teams(teams, league_id):
+def process_teams(teams, league_id, season):
     """ Function to process the API response regarding team data. """
-    league_name = eval(get_config_arg("league_ids")).get(league_id)
+    league_name = eval(get_config_arg("league_ids", season)).get(league_id)
     orm_class = Teams
     attributes = getattr(orm_class, "_TYPES")
 
@@ -329,10 +508,10 @@ def process_teams(teams, league_id):
         }
     return {"ids":team_ids,"processed_data":teams}
 
-def process_players(players, team_id, filtered_players, request_instance):
+def process_players(players, team_id, season, filtered_players, request_instance):
     """ Function to process the API response regarding player data. """
-    config_values = eval(get_config_arg("team_ids")).get(team_id)
-    league_name = config_values.get("league_name")
+    config_values = eval(get_config_arg("team_ids", season)).get(team_id)
+    league_name = config_values.get("league_name", season)
     alt_league_name = get_alternative_league(league_name)
     orm_class = Players
     attributes = getattr(orm_class, "_TYPES")
@@ -365,24 +544,30 @@ def process_players(players, team_id, filtered_players, request_instance):
             # check for duplicates, only process most recent versions
             if temp_player.get("id") in filtered_players.keys() :
                 # find most recent transfered-to-club
-                api_response = request_instance.make_call("transfers",{"player": temp_player.get("id")})
-                player_transfers = api_response.get("response")[0].\
-                                                       get("transfers")
-                most_recent_transfer_date = None
-                most_recent_team_id = None
-                for transfer in player_transfers:
-                    transfer_date = datetime.strptime(transfer.get("date"),"%Y-%m-%d").date()
-                    if most_recent_transfer_date is None or transfer_date > most_recent_transfer_date:
-                        most_recent_transfer_date = transfer_date
-                        most_recent_team_id = transfer.get("teams").get("in").get("id")
-                # if we already have the most recent version, don't process
-                filtered_players_team_id = int(filtered_players.get(temp_player.get("id")).\
-                                                                get("team_id"))
-                if filtered_players_team_id == most_recent_team_id:
-                    continue
-                # if this isn't the most recent version, don't process
-                elif int(temp_player.get("team_id")) != most_recent_team_id:
-                    continue
+                api_response = request_instance.make_call(
+                                                    "transfers",
+                                                    {"player": temp_player.get("id")}
+                                                ).get("response")
+                if len(api_response) > 0:
+                    player_transfers = api_response[0].get("transfers")
+                    most_recent_transfer_date = None
+                    most_recent_team_id = None
+                    for transfer in player_transfers:
+                        try:
+                          transfer_date = datetime.strptime(transfer.get("date"),"%Y-%m-%d").date()
+                        except:
+                          transfer_date = int(transfer.get("date"))
+                        if most_recent_transfer_date is None or transfer_date > most_recent_transfer_date:
+                            most_recent_transfer_date = transfer_date
+                            most_recent_team_id = transfer.get("teams").get("in").get("id")
+                    # if we already have the most recent version, don't process
+                    filtered_players_team_id = int(filtered_players.get(temp_player.get("id")).\
+                                                                    get("team_id"))
+                    if filtered_players_team_id == most_recent_team_id:
+                        continue
+                    # if this isn't the most recent version, don't process
+                    elif int(temp_player.get("team_id")) != most_recent_team_id:
+                        continue
             # player
             player_info = player.get("player")
             temp_player["name"] = player_info.get("name").replace("&apos;","'")
@@ -390,8 +575,12 @@ def process_players(players, team_id, filtered_players, request_instance):
             temp_player["lastname"] = player_info.get("lastname")
             temp_player["age"] = player_info.get("age")
             temp_player["nationality"] = player_info.get("nationality")
-            country_abbrev = flags_dict.get(temp_player.get("nationality")).lower()
-            temp_player["flag"] = f"https://media.api-sports.io/flags/{country_abbrev}.svg"
+            country_abbrev = flags_dict.get(temp_player.get("nationality"))
+            if country_abbrev is None:
+                print(f"INFO: No Flag Found For {temp_player.get('nationality')}.")
+                temp_player["flag"] = "#"
+            else:
+                temp_player["flag"] = f"https://media.api-sports.io/flags/{country_abbrev.lower()}.svg"
             temp_player["height"], temp_player["weight"] = process_height_weight(
                                                                player_info.get("height"),
                                                                player_info.get("weight")

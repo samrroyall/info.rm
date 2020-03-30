@@ -41,9 +41,10 @@ function changePage(stat, substat, page) {
      }
   }
 }
-// Per 90 Toggler JS
+// Per 90 Toggler and Season Dropdown JS
 $(document).ready( function() {
-  $(function () {var split_loc = window.location.href.split("/");
+  $(function () {
+    var split_loc = window.location.href.split("/");
     if (split_loc[split_loc.length - 1] == "per-90") {
       $("#main_per90_toggle").prop("checked", true);
       $("#main_per90_toggle_label").toggleClass("text-secondary text-primary");
@@ -57,6 +58,19 @@ $(document).ready( function() {
         window.location.href = window.location.href.split("/per-90")[0];
       } else {
         window.location.href = window.location.href + "/per-90";
+      }
+    });
+  });
+  $(function() {
+    $("#season-select").change(function () {
+      var val = $(this).val();
+      var split_loc = window.location.href.split("/");
+      if (split_loc[split_loc.length - 1] == "per-90") {
+        split_loc[split_loc.length - 2] = val;
+        window.location.href = split_loc.join("/") 
+      } else {
+        split_loc[split_loc.length - 1] = val;
+        window.location.href = split_loc.join("/") 
       }
     });
   });
