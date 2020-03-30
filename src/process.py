@@ -312,11 +312,18 @@ def process_birthdate(birthdate_str) -> date:
                                 ).date()
             return birthdate_date
         except:
-            birthdate_date = datetime.strptime(
-                                    birthdate_str,
-                                    "%m/%d/%Y"
-                                ).date()
-            return birthdate_date
+            try:
+                birthdate_date = datetime.strptime(
+                                        birthdate_str,
+                                        "%m/%d/%Y"
+                                    ).date()
+                return birthdate_date
+            except:
+                birthdate_date = datetime.strptime(
+                                        birthdate_str,
+                                        "%Y/%m/%d"
+                                    ).date()
+                return birthdate_date    
 
 # no type checking on functions dealing with JSON data
 def check_keys(response_data, attributes):
@@ -554,12 +561,19 @@ def process_players(players, team_id, season, filtered_players, request_instance
                     most_recent_team_id = None
                     for transfer in player_transfers:
                         try:
-                          transfer_date = datetime.strptime(transfer.get("date"),"%Y-%m-%d").date()
+                            transfer_date = datetime.strptime(transfer.get("date"),"%Y-%m-%d").date()
                         except:
-                          transfer_date = int(transfer.get("date"))
-                        if most_recent_transfer_date is None or transfer_date > most_recent_transfer_date:
-                            most_recent_transfer_date = transfer_date
-                            most_recent_team_id = transfer.get("teams").get("in").get("id")
+                            print("ERROR: Could Not Format Transfer Date: {}, {}.".format(
+                                                                                transfer.get("date"),
+                                                                                temp_player.get("id")
+                                                                            )
+                        if (most_recent_transfer_date is None or 
+                            transfer_date > most_recent_transfer_date):
+                            # ensure not a future transfer
+                            if ((transfer_date.year = int(season) + 1 and transfer_date.month < 3) or 
+                                (transfer_date.year <= int(season))):
+                                most_recent_transfer_date = transfer_date
+                                most_recent_team_id = transfer.get("teams").get("in").get("id")
                     # if we already have the most recent version, don't process
                     filtered_players_team_id = int(filtered_players.get(temp_player.get("id")).\
                                                                     get("team_id"))
