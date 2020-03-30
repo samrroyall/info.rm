@@ -105,9 +105,15 @@
                     {% if row.get('rank') == 'N/A.' %}
                       <div class="row player_name_rank">
                         <strong class="text-danger">{{row.get("rank")}}</strong>&nbsp
-                        <a href="{{ url_for('player', id=row.get('id')) }}">
-                          <strong>{{row.get("name")}}</strong>
-                        </a>
+                        {% if custom_season %}
+                          <a href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
+                            <strong>{{row.get("name")}}</strong>
+                          </a>
+                        {% else %}
+                          <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
+                            <strong>{{row.get("name")}}</strong>
+                          </a>
+                        {% endif %}
                       </div>
                     {% else %}
                       <div class="row player_name_rank">

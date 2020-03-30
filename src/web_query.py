@@ -76,7 +76,7 @@ def rank_response(select_fields, filter_fields, order_field, season):
             # values of 0 are only n/a if stats are presented descending
             if stat is None:
                value = "n/a" 
-            elif float(stat) == 0.0 and desc is True:
+            elif float(stat) == 0.0:
                 value = "n/a"
             elif fields[stat_idx] in floats or field_logical(fields[stat_idx]):
                 value = str(round(float(tup[stat_idx]), 2)).ljust(4,"0")
@@ -92,6 +92,8 @@ def rank_response(select_fields, filter_fields, order_field, season):
             order_by_stat = "n/a"
         else:
             order_by_stat = float(tup[order_by_idx])
+            if order_by_stat == 0.0:
+                order_by_stat = "n/a"
 
         # rank
         if order_by_stat != "n/a":
