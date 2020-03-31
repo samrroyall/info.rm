@@ -7,8 +7,8 @@
 <div class="row" style="padding-left: 10px">
   <div class="col-4 col-sm-2 mr-auto custom-control custom-switch" style="padding-top: 1%">
     <input type="checkbox" class="custom-control-input" id="main_per90_toggle">
-    <label class="custom-control-label text-secondary align-self-center" 
-      for="main_per90_toggle" id="main_per90_toggle_label" 
+    <label class="custom-control-label text-secondary align-self-center"
+      for="main_per90_toggle" id="main_per90_toggle_label"
       style="font-size: .7em; line-height: 2em;">
       <strong>Per 90</strong>
     </label>
@@ -80,7 +80,7 @@
                   <div class="col-4 text-left px0">
                     <div class="row player_name_rank">
                       <strong>{{row.get("rank")}}</strong>&nbsp
-                      <a href="{{ url_for('player', id=row.get('id')) }}">
+                      <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
                         <strong>{{row.get("name")}}</strong>
                       </a>
                     </div>
@@ -124,6 +124,7 @@
         </div>
       </div>
       <!-- Next Button -->
+      {% if not (stat == "defending" and current_season|int < 2017) %}
       {% if card_num == 0 %}
         <div class="col-1 align-self-center text-left" id="{{stat}}_next_{{card_num}}"
           style="padding-left: .7%" onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'next');">
@@ -140,6 +141,7 @@
         </div>
       {% endif %}
       <!-- End of Next Button -->
+      {% endif %}
     {% endfor %}
     </div>
   </div>

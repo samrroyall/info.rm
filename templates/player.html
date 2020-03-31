@@ -1,18 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
 
+<script>
+  $(document).ready( function() {
+    $("#player-season-select").change( function() {
+      var season = $(this).val();
+      var split_href = window.location.href.split("/");
+      if (split_href[split_href.length - 1] == "per-90") {
+        split_href[split_href.length - 2] = season;
+      } else {
+        split_href[split_href.length - 1] = season;
+      }
+      window.location.href = split_href.join("/");
+    });
+  });
+</script>
+
 <div class="justify-content-center" style="padding-top: 10px; padding-bottom: 10px; width: 100%">
   <div class="row justify-content-center ml-auto mr-auto" style="width: 100%">
-    <div class="card col-xs-12 col-sm-12 col-lg-10" style="font-size: x-small">
+    <div class="card col-xs-12 col-sm-12 col-lg-10">
       <div class="card-body">
+        <div class="row" style="padding-left: 12px">
+          <div class="col-4 col-sm-2 mr-auto custom-control custom-switch" style="padding-top: 1%">
+            <input type="checkbox" class="custom-control-input" id="player_per90_toggle">
+            <label class="custom-control-label text-secondary align-self-center" 
+              for="player_per90_toggle" id="player_per90_toggle_label" 
+              style="font-size: .7em; line-height: 2em;">
+              <strong>Per 90</strong>
+            </label>
+          </div>
+
+          <div class="col-4 col-sm-2 ml-auto" style="padding-top: 1%">
+            <select class="custom-select" id="player-season-select" value=""
+              style="font-size: .7em">
+              <option>{{current_season}}</option>
+              {% for season in seasons %}
+                {% if season != current_season %}
+                  <option>{{season}}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
         <div class="card-title">
           <div class="text-center h3 text-secondary" id="player-name" style="margin-bottom: 30px">
             {{player_data.get("firstname")}}
             {{player_data.get("lastname")}}
           </div>
-          <div>
         </div>
-        <div class="row py0 justify-content-left" id="header">
+
+        <div class="row py0 justify-content-left" id="header" style="font-size: x-small">
           {% block player_info %}{% endblock %}
           <div class="col-7">
             <!-- scoring -->
@@ -26,7 +64,12 @@
                     <strong>Goals</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("goals")|int}} ({{player_stats.get("penalties_scored")|int}})
+                    {% if per_90 == false %}
+                      {{player_stats.get("goals")|int}}
+                      ({{player_stats.get("penalties_scored")|int}})
+                    {% else %}
+                      {{player_stats.get("goals")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -36,7 +79,15 @@
                     <strong>Goals Conceded</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("goals_conceded")|int}}
+                  {% if player_data.get("position") != "Goalkeeper" %}
+                    <span class="text-secondary">n/a</span>
+                  {% else %}
+                    {% if per_90 == false %}
+                      {{player_stats.get("goals_conceded")|int}}
+                    {% else %}
+                      {{player_stats.get("goals_conceded")}}
+                   {% endif %}
+                  {% endif %}
                   </div>
                 </div>
               </li>
@@ -46,7 +97,11 @@
                     <strong>Assists</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("assists")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("assists")|int}}
+                    {% else %}
+                      {{player_stats.get("assists")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -56,7 +111,11 @@
                     <strong>Shots</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("shots")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("shots")|int}}
+                    {% else %}
+                      {{player_stats.get("shots")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -66,7 +125,11 @@
                     <strong>Shots on Target</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("shots_on")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("shots_on")|int}}
+                    {% else %}
+                      {{player_stats.get("shots_on")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -83,7 +146,11 @@
                     <strong>Passes</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("passes")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("passes")|int}}
+                    {% else %}
+                      {{player_stats.get("passes")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -93,7 +160,11 @@
                     <strong>Key Passes</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("passes_key")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("passes_key")|int}}
+                    {% else %}
+                      {{player_stats.get("passes_key")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -120,7 +191,11 @@
                     <strong>Successful Dribbles</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("dribbles_succeeded")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("dribbles_succeeded")|int}}
+                    {% else %}
+                      {{player_stats.get("dribbles_succeeded")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -130,7 +205,11 @@
                     <strong>Attempted Dribbles</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("dribbles_attempted")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("dribbles_attempted")|int}}
+                    {% else %}
+                      {{player_stats.get("dribbles_attempted")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -157,7 +236,15 @@
                     <strong>Tackles</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("tackles")|int}}
+                    {% if current_season|int > 2016%}
+                      {% if per_90 == false %}
+                        {{player_stats.get("tackles")|int}}
+                      {% else %}
+                        {{player_stats.get("tackles")}}
+                      {% endif %}
+                    {% else %}
+                      <span class="text-secondary">n/a</span>
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -167,7 +254,11 @@
                     <strong>Interceptions</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("interceptions")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("interceptions")|int}}
+                    {% else %}
+                      {{player_stats.get("interceptions")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -177,7 +268,15 @@
                     <strong>Blocks</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("blocks")|int}}
+                    {% if current_season|int > 2016%}
+                      {% if per_90 == false %}
+                        {{player_stats.get("blocks")|int}}
+                      {% else %}
+                        {{player_stats.get("blocks")}}
+                      {% endif %}
+                    {% else %}
+                      <span class="text-secondary">n/a</span>
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -194,7 +293,11 @@
                     <strong>Fouls Committed</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("fouls_committed")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("fouls_committed")|int}}
+                    {% else %}
+                      {{player_stats.get("fouls_committed")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -204,7 +307,11 @@
                     <strong>Fouls Drawn</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("fouls_drawn")|int}}
+                    {% if per_90 == false %}
+                      {{player_stats.get("fouls_drawn")|int}}
+                    {% else %}
+                      {{player_stats.get("fouls_drawn")}}
+                    {% endif %}
                   </div>
                 </div>
               </li>
@@ -301,7 +408,11 @@
                     <strong>Penalties Saved</strong>
                   </div>
                   <div class="col-3 text-right">
-                    {{player_stats.get("penalties_saved")|int}}
+                    {% if player_data.get("position") != "Goalkeeper" %}
+                      <span class="text-secondary">n/a</span>
+                    {% else %}
+                      {{player_stats.get("penalties_saved")|int}}
+                    {% endif %}
                   </div>
                 </div>
               </li>

@@ -193,9 +193,8 @@ def custom_stats(form_data):
         elif cop_values == 1:
             filter_fields.append( (key_string, cop, input_one) )
 
-    # grab season-specific data
+    # get season in scope 
     season = form_data_dict.get("season_select")
-    leagues, clubs_dict, nations = get_data()
 
     # get club, league, nationality, position values
     for key in ["club", "league", "nationality", "position"]:
@@ -229,8 +228,9 @@ def custom_stats(form_data):
         order_field = ([select_fields[0]], True)
 
     # make query
+    leagues, clubs_dict, nations = get_data()
     try:
         query_result = rank_response(select_fields, filter_fields, order_field, season)
     except:
         query_result = "ERROR"
-    return query_result, leagues, clubs_dict, nations
+    return query_result, leagues, clubs_dict, nations, season

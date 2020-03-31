@@ -53,9 +53,9 @@ def dashboard_per90(league, season = CURRENT_SEASON):
                 season=CURRENT_SEASON
             ))
 
-@info_rm.route("/player/<id>")
-def player(id):
-    data = player_team_data(id)
+@info_rm.route("/player/<id>/season/<season>")
+def player(id, season, per_90 = False):
+    data = player_team_data(id, season, per_90)
     player_data = data[0]
     player_stats = data[1]
     team_data = data[2]
@@ -65,8 +65,15 @@ def player(id):
                     player_data=player_data,
                     player_stats=player_stats,
                     team_data=team_data,
-                    league_data=league_data
+                    league_data=league_data,
+                    seasons=SEASONS,
+                    current_season=season,
+                    per_90=per_90
                 )
+
+@info_rm.route("/player/<id>/season/<season>/per-90")
+def player_per90(id, season):
+    return player(id=id, season=season, per_90=True)
 
 @info_rm.route("/builder")
 def builder():
@@ -84,7 +91,7 @@ def builder():
 @info_rm.route("/builder/custom-stat", methods=["POST"])
 def custom_stat():
     form_data = list(request.form.items())
-    query_result, leagues, clubs, nations = custom_stats(form_data)
+    query_result, leagues, clubs, nations, season = custom_stats(form_data)
     return render_template(
                     "customize.html",
                     query_result=query_result,
@@ -92,7 +99,8 @@ def custom_stat():
                     clubs=clubs,
                     nations=nations,
                     seasons=SEASONS,
-                    current_season=CURRENT_SEASON
+                    current_season=CURRENT_SEASON,
+                    custom_season=season
                 )
 
 if __name__ == "__main__":

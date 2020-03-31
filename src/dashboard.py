@@ -114,7 +114,11 @@ def dribbling_stats(league, season, per_90):
 def defending_stats(league, season, per_90):
     query_result = dict()
     max_minutes_played = get_max("players.minutes_played", season)
-    for stat in ["tackles", "interceptions", "blocks"]:
+    if int(season) < 2017:
+        stats = ["interceptions"]
+    else:
+        stats = ["tackles", "interceptions", "blocks"]
+    for stat in stats:
         select_fields = [f"players.{stat}"]
         select_fields = (select_fields if per_90 is False
                          else [f"({select_fields[0]})/(players.minutes_played/90)"])
