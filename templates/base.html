@@ -1,107 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <!-- META TAGS -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- BOOTSTRAP STYLESHEET -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
+      crossorigin="anonymous">
     <!-- JQUERY SCRIPTS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" 
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" 
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous">
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.1/dist/jquery.validate.min.js"></script>
     <!-- SELF-DEFINED JS -->
     <script type="text/javascript" src="{{ url_for('static', filename='builder.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='dashboard.js') }}"></script>
     <!-- SELF-DEFINED CSS -->
-    <style> 
-      .hidden { display: none; } 
-
-      .navbar-brand { font-size: calc(70% + .3vw + .5vh) } 
-      .nav-item { font-size: calc(60% + .10vw + .10vh) } 
-
-      h5 { font-size: calc(110% + .1vw + .1vh) } 
-      h6 { font-size: calc(70% + .1vw + .1vh) } 
-      strong { font-size: calc(70% + .1vw + .1vh) } 
-      fine { font-size: calc(70% + .1vw + .1vh) } 
-
-      .player_name_rank { font-size: calc(70% + .1vw + .1vh) }
-      .builder_header { font-size: calc(70% + .1vw + .1vh) }
-      .team_logo { height: 23px; width: 23px; }
-      .league_logo { height: 25px; }
-
-      .select_input { font-size: 1em; }
-      .text_input { font-size: .8em; height: 100%; }
-
-      .toggle { font-size: 1.4em; font-height: 1.3em }
-    </style>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
     <title>info.rm - statistics on players in the top five leagues</title>
   </head>
-    <body>
-    <!-- Navigation Bar -->
-    <div class="mr-auto ml-auto bg-white" style="position:relative; max-width: 1000px">
-      <div class="border shadow mr-auto ml-auto mx-1 bg-white" id="content_wrapper" style="position:absolute; top:0; left:0; width:100%">
-        <nav class="navbar navbar-fixed-top navbar-light bg-light border navbar-expand-lg">
-          <!-- Logo -->
-          <a class="navbar-brand text-success" href="{{ url_for('home') }}">INFO.RM</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main_nav_collapse" aria-controls="main_nav_collapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse text-left" id="main_nav_collapse">
-            <div class="navbar-nav">
-              <!-- Builder -->
-              <a class="nav-item nav-link" href="{{ url_for('builder') }}">
-                StatBuilder
-                <svg
-                  class="bi bi-tools"
-                  width="1em"
-                  height="1em"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" d="M0 1l1-1 3.081 2.2a1 1 0 01.419.815v.07a1 1 0 00.293.708L10.5 9.5l.914-.305a1 1 0 011.023.242l3.356 3.356a1 1 0 010 1.414l-1.586 1.586a1 1 0 01-1.414 0l-3.356-3.356a1 1 0 01-.242-1.023L9.5 10.5 3.793 4.793a1 1 0 00-.707-.293h-.071a1 1 0 01-.814-.419L0 1zm11.354 9.646a.5.5 0 00-.708.708l3 3a.5.5 0 00.708-.708l-3-3z" clip-rule="evenodd"/>
-                  <path fill-rule="evenodd" d="M15.898 2.223a3.003 3.003 0 01-3.679 3.674L5.878 12.15a3 3 0 11-2.027-2.027l6.252-6.341A3 3 0 0113.778.1l-2.142 2.142L12 4l1.757.364 2.141-2.141zm-13.37 9.019L3.001 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z" clip-rule="evenodd"/>
-                </svg>
-              </a>
-            </div>
-            <!-- Leagues -->
-            <div class="nav-item row justify-content-center ml-auto">
-              <!-- Bundesliga -->
-              <a class="nav-link col-2 col-md px0 text-center" href="{{ url_for('dashboard', league='bundesliga', season=current_season) }}">
-                <img class="league_logo" src="https://media.api-football.com/leagues/8.png">
-              </a>
-              <!-- Ligue 1 -->
-              <a class="nav-link col-2 col-md px0 text-center" href="{{ url_for('dashboard', league='ligue-1', season=current_season) }}">
-                <img class="league_logo" src="https://media.api-football.com/leagues/4.svg">
-              </a>
-              <!-- Premier League -->
-              <a class="nav-link col-3 col-md px0 text-center" href="{{ url_for('dashboard', league='premier-league', season=current_season) }}">
-                <img class="league_logo" src="https://media.api-football.com/leagues/2.png">
-              </a>
-              <!-- La Liga -->
-              <a class="nav-link col-2 col-md px0 text-center" href="{{ url_for('dashboard', league='la-liga', season=current_season) }}">
-                <img class="league_logo" src="https://media.api-football.com/leagues/87.png">
-              </a>
-              <!-- Serie A -->
-              <a class="nav-link col-2 col-md px0 text-center" href="{{ url_for('dashboard', league='serie-a', season=current_season) }}">
-                <img class="league_logo" src="https://media.api-football.com/leagues/94.png">
-              </a>
-            </div>
-            <!-- Search Bar
-            <form class="form-inline float-left text-left">
-              <input class="form-control mr-sm-2" style="font-size: x-small; width: 60%" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-sm btn-outline-success my-2 my-sm-0" style="font-size: x-small; height: 130%" type="submit">Search</button>
-            </form>
-            -->
-          </div>
-        </nav>
+
+  <body>
+    <div class="mr-auto ml-auto bg-white" id="page_wrapper">
+      <div class="border shadow mr-auto ml-auto mx-1 bg-white" id="content_wrapper">
+
+        <!-- Navigation Bar -->
+        {% include "navbar.html" %}
+
         <!-- Content -->
         <div class="container-fluid ml-auto mr-auto" style="min-height: 100%;">
           {% block content %}{% endblock %}
         </div>
+
       </div>
     </div>
   </body>
+
 </html>

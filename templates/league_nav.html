@@ -1,0 +1,22 @@
+<div class="nav-item row justify-content-center ml-auto">
+  <!-- Bundesliga -->
+  <a class="nav-link col-2 col-md px0 text-center" href="{{ url_for('dashboard', league='bundesliga', season=current_season) }}">
+    <img class="league_logo" src="https://media.api-football.com/leagues/8.png">
+  </a>
+  <!-- Ligue 1 -->
+  <a class="nav-link col-2 col-md px0 text-center" href="{{ url_for('dashboard', league='ligue-1', season=current_season) }}">
+    <img class="league_logo" src="https://media.api-football.com/leagues/4.svg">
+  </a>
+  <!-- Premier League -->
+  <a class="nav-link col-3 col-md px0 text-center" href="{{ url_for('dashboard', league='premier-league', season=current_season) }}">
+    <img class="league_logo" src="https://media.api-football.com/leagues/2.png">
+  </a>
+  <!-- La Liga -->
+  <a class="nav-link col-2 col-md px0 text-center" href="{{ url_for('dashboard', league='la-liga', season=current_season) }}">
+    <img class="league_logo" src="https://media.api-football.com/leagues/87.png">
+  </a>
+  <!-- Serie A -->
+  <a class="nav-link col-2 col-md px0 text-center" href="{{ url_for('dashboard', league='serie-a', season=current_season) }}">
+    <img class="league_logo" src="https://media.api-football.com/leagues/94.png">
+  </a>
+</div>

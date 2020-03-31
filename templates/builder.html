@@ -41,139 +41,40 @@
     h6 { font-size: calc(100% + .1vw + .1vh) }
   </style>
 
+  <!-- StatBuilder Wrapper -->
   <div class="justify-content-center" style="padding-top: 10px; padding-bottom: 10px; width: 100%">
+    <!-- StatBuilder Row Start -->
     <div class="row justify-content-center ml-auto mr-auto" style="width: 100%">
+      <!-- StatBuilder Card Start -->
       <div class="card col-xs-12 col-sm-12 col-lg-10" style="font-size: x-small">
+
+        <!-- StatBuilder Header Card Body Start -->
         <div class="card-body">
+          
+          <!-- StatBuilder Header Card Title Start -->
           <div class="card-title">
             <h6 class="text-center text-success">
               YOUR STAT
               <div id="filter_button">
-                <svg class="bi bi-filter" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" d="M6 10.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
-                </svg>
+                <a class="text-success" style="cursor: pointer">
+                {% include "filter_icon.html" %}
+                </a>
               </div>
             </h6>
-            {% block customize %}{% endblock %}
+            <!-- Customization Section Contents -->
+            {% include "customize.html" %}
           </div>
-        </div>
+          <!-- StatBuilder Header Card Title End -->
+        
           <!-- Card Contents -->
-          {% if query_result == "ERROR" %}
-            <script>
-              alert("There was an error in the last submission!");
-            </script>
-          {% else %}
-          <ul class="list-group list-group-flush">
-              {% set header = query_result.get('header')[4:] %}
-              <li class="list-group-item py0 px0">
-                <div class="row justify-content-center">
-                  <div class="col-5 px0">
-                  </div>
-                  {% set num_stats = header|length %}
-                  {% for i in range(num_stats) %}
-                      {% set column = header[i] %}
-                      <script>
-                        $(document).ready( function() {
-                          $(function() {
-                            getColumnName("{{column}}", "custom_stat_heading_{{i}}")();
-                          });
-                        });
-                      </script>
-                      <div class="col-2 text-center text-secondary builder_header" style="padding-left: 0; padding-right: 0">
-                        <strong id="custom_stat_heading_{{i}}">''</strong>
-                      </div>
-                  {% endfor %}
-                </div>
-              </li>
-            {% set pagemod = query_result.get('data')|length % 10 %}
-            {% set pagediv = query_result.get('data')|length // 10 %}
-            {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %}
-            {% for page in range(1, num_pages + 1) %}
-              {% if page == 1 %}
-                <div id="stats_builder_page_{{page}}">
-              {% else %}
-                <div id="stats_builder_page_{{page}}" class="hidden">
-              {% endif %}
-              {% for row in (query_result.get('data')[10 * (page - 1) : 10 * page]) %}
-              <li class="list-group-item py0 px0">
-                <div class="row align-items-center justify-content-center">
-                  <div class="col-1 text-right px0">
-                    <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
-                  </div>
-                  <div class="col-1"></div>
-                  <div class="col-3 text-left px0">
-                    {% if row.get('rank') == 'N/A.' %}
-                      <div class="row player_name_rank">
-                        <strong class="text-danger">{{row.get("rank")}}</strong>&nbsp
-                        {% if custom_season %}
-                          <a href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
-                            <strong>{{row.get("name")}}</strong>
-                          </a>
-                        {% else %}
-                          <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
-                            <strong>{{row.get("name")}}</strong>
-                          </a>
-                        {% endif %}
-                      </div>
-                    {% else %}
-                      <div class="row player_name_rank">
-                        <strong>{{row.get("rank")}}</strong>&nbsp
-                        {% if custom_season %}
-                          <a href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
-                            <strong>{{row.get("name")}}</strong>
-                          </a>
-                        {% else %}
-                          <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
-                            <strong>{{row.get("name")}}</strong>
-                          </a>
-                        {% endif %}
-                      </div>
-                    {% endif %}
-                    <div class="row">
-                      <fine>{{row.get("team_name")}}</fine>
-                    </div>
-                  </div>
-                  {% for stat in row.get('stats') %}
-                    {% if stat == 'n/a' %}
-                      <div class="col-2 px0 text-center">
-                        <fine class="text-danger">{{stat}}</fine>
-                      </div>
-                    {% else %}
-                      <div class="col-2 px0 text-center">
-                        <fine>{{stat}}</fine>
-                      </div>
-                    {% endif %}
-                  {% endfor %}
-                </div>
-              </li>
-              {% endfor %}
-              </div>
-            {% endfor %}
-            <li class="list-group-item">
-              <div class="row h-100">
-                <div class="col-12">
-                  <nav class="nav justify-content-center">
-                    <ul class="pagination pagination-md">
-                      {% for i in range(1, num_pages + 1) %}
-                        {% if i == 1 %}
-                          <li class="page-item text-primary active" id="stats_builder_pagination_{{i}}">
-                        {% else %}
-                          <li class="page-item text-primary" id="stats_builder_pagination_{{i}}">
-                        {% endif %}
-                          <a class="page-link" onclick="changePage('stats','builder', {{i}})">{{i}}</a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </nav>
-                </div>
-              </div>
-            </li>
-          </ul>
-          {% endif %}
-          <!-- End Card Contents -->
-
+          {% include "card.html" %}
+        
         </div>
+        <!-- StatBuilder Header Card Body End -->
       </div>
+      <!-- StatBuilder Card End -->
     </div>
+    <!-- StatBuilder Card Section Name Row End -->
   </div>
+  <!-- StatBuilder Wrapper End -->
 {% endblock %}

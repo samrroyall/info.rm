@@ -1,7 +1,3 @@
-{% extends "builder.html" %}
-
-{% block customize %}
-
 {% set stats = ["Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Straight Red Cards","Yellow Cards","Second Yellow Cards"] %}
 <!-- Duels/Dribbles Past
 <option>Dribbles Past</option>
@@ -75,7 +71,8 @@
               </div>
             </div>
           {% endif %}
-          </div>
+        </div>
+
         <!-- Per 90 Button -->
         {% if select_row != 1 %}
           <div class="custom-control custom-switch toggle hidden" id="select_per90_toggle_div_{{select_row}}" >
@@ -89,6 +86,7 @@
             </label>
           </div>
       {% endfor %}
+    </div>
 
     <!-- FILTER FIELDS -->
     <div class="form-group" style="margin-top: 15px">
@@ -245,10 +243,12 @@
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- Filter Stat -->
     <div class="hidden" id="filter_stat_div" style="margin-top: 15px">
+
       <strong>Stats:</strong>
       {% for filter_row in range(1,4) %}
         {% if filter_row != 1 %}
@@ -288,7 +288,8 @@
               </div>
             </div>
           {% endif %}
-          </div>
+        </div>
+
         <!-- Logical Expression -->
         {% if filter_row != 1 %}
           <div  class="form-row hidden" id="stat_expression_{{filter_row}}" style="margin-top: 5px">
@@ -318,6 +319,7 @@
               </div>
             </div>
           </div>
+
         <!-- Per 90 Button -->
         {% if filter_row != 1 %}
           <div class="custom-control custom-switch toggle hidden" id="stat_per90_toggle_div_{{filter_row}}" >
@@ -331,13 +333,16 @@
             </label>
           </div>
       {% endfor %}
+
     </div>
 
     <!-- ORDER BY FIELDS -->
     <div class="form-group" style="margin-top: 15px">
+
       <label for="order_field1"><h6>Choose Stat to Order By:</h6>
         <p><strong>Tip: Must be one of your selected stats! (This is an optional parameter. The default is your first selected stat.)</strong></p>
       </label>
+
       <div  class="form-row">
         <div class="col-5">
           <select class="custom-select custom-select-sm select_input" id="order_field1" name="order_field1">
@@ -365,6 +370,7 @@
           </select>
         </div>
       </div>
+
       <div class="form-row">
         <div class="col-6 col-md-3">
           <div class="custom-control custom-switch toggle">
@@ -385,6 +391,7 @@
           </div>
         </div>
       </div>
+
       <div class="form-row text-center justify-content-center" style="padding-top: 15px">
         <div class="col-5 col-md-3">
           <button class="btn btn-sm btn-dark" type="submit">
@@ -392,9 +399,9 @@
           </button>
         </div>
       </div>
+
     </div>
+
   </form>
 </div>
 <!-- End Customization Dropdown -->
-
-{% endblock %}

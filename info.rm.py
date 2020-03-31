@@ -24,7 +24,7 @@ def home():
 def dashboard(league, season = CURRENT_SEASON, per_90 = False):
     if league in LEAGUES and season in SEASONS:
         return render_template(
-                    "dashboard_content.html",
+                    "dashboard.html",
                     query_result = dashboard_stats(league, season, per_90),
                     current_league = league,
                     current_season = season,
@@ -79,7 +79,7 @@ def player_per90(id, season):
 def builder():
     default_query_result, leagues, clubs, nations = default_stats()
     return render_template(
-                    "customize.html",
+                    "builder.html",
                     query_result=default_query_result,
                     leagues=leagues,
                     clubs=clubs,
@@ -93,7 +93,7 @@ def custom_stat():
     form_data = list(request.form.items())
     query_result, leagues, clubs, nations, season = custom_stats(form_data)
     return render_template(
-                    "customize.html",
+                    "builder.html",
                     query_result=query_result,
                     leagues=leagues,
                     clubs=clubs,
