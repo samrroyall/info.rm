@@ -4,14 +4,23 @@ from .web_query import rank_response
 def scoring_stats(league, season, per_90):
     query_result = dict()
     max_minutes_played = get_max("players.minutes_played", season)
-    for stat in ["goals", "assists", "goal_contributions"]:
-        select_fields = (["players.goals+players.assists"]
-                             if stat == "goal_contributions"
-                             else [f"players.{stat}"])
-        select_fields = (select_fields if per_90 is False
-                         else [f"({select_fields[0]})/(players.minutes_played/90)"])
-        filter_fields = (None if per_90 is False
-                         else [ ("players.minutes_played", ">", str(max_minutes_played/3)) ])
+    max_shots = get_max("players.shots", season)
+    for stat in ["goals", "assists", "goal_contributions", "goals_per_shot"]:
+        if stat == "goal_contributions":
+            select_fields = ["players.goals+players.assists"]
+        elif stat == "goals_per_shot":
+            select_fields = ["players.goals/players.shots"]
+        else:
+            select_fields = [f"players.{stat}"]
+        select_fields = ([f"({select_fields[0]})/(players.minutes_played/90)"] 
+                         if per_90 is True and stat != "goals_per_shot"
+                         else select_fields)
+        if per_90 is True and stat != "goals_per_shot":
+            filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
+        elif stat == "goals_per_shot":
+            filter_fields = [ ("players.shots", ">", str(max_shots/3)) ]
+        else:
+            filter_fields = None
         if league is not None:
             if filter_fields is not None:
                 filter_fields.append( ("teams.league_name", "=", league) )
@@ -27,21 +36,13 @@ def scoring_stats(league, season, per_90):
 def shooting_stats(league, season, per_90):
     query_result = dict()
     max_minutes_played = get_max("players.minutes_played", season)
-    max_shots = get_max("players.shots", season)
-    for stat in ["shots", "shots_on", "goals_per_shot"]:
-        select_fields = (["players.goals/players.shots"]
-                             if stat == "goals_per_shot"
-                             else [f"players.{stat}"])
+    for stat in ["shots", "shots_on"]:
         select_fields = ([f"({select_fields[0]})/(players.minutes_played/90)"]
-                             if per_90 is True and stat != "goals_per_shot"
-                             else select_fields)
-        filter_fields = (None if stat != "goals_per_shot"
-                             else [("players.shots", ">", str(max_shots/3))])
-        if per_90 is True and stat != "goals_per_shot":
-            if filter_fields is not None:
-                filter_fields.append( ("players.minutes_played", ">", str(max_minutes_played/3)) )
-            else:
-                filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
+                             if per_90 is True else [f"players.{stat}"])
+        if per_90 is True:
+            filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
+        else:
+            filter_fields = None
         if league is not None:
             if filter_fields is not None:
                 filter_fields.append( ("teams.league_name", "=", league) )

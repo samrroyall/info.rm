@@ -1,6 +1,19 @@
 // Stat arrows JS
-function changeStat(stat, currPage, action) {
+function changeStat(stat, currPage, numPages, action) {
   if (action == "next") {
+    $("#" + stat + "_card_" + currPage.toString()).addClass("hidden");
+    $("#" + stat + "_prev_" + currPage.toString()).addClass("hidden");
+    $("#" + stat + "_next_" + currPage.toString()).addClass("hidden");
+    if (currPage != (numPages - 1)) {
+      $("#" + stat + "_card_" + (currPage + 1).toString()).removeClass("hidden");
+      $("#" + stat + "_prev_" + (currPage + 1).toString()).removeClass("hidden");
+      $("#" + stat + "_next_" + (currPage + 1).toString()).removeClass("hidden");
+    } else { 
+      $("#" + stat + "_card_0").removeClass("hidden");
+      $("#" + stat + "_prev_0").removeClass("hidden");
+      $("#" + stat + "_next_0").removeClass("hidden");
+    }
+  } else if (action == "prev") {
     $("#" + stat + "_card_" + currPage.toString()).addClass("hidden");
     $("#" + stat + "_prev_" + currPage.toString()).addClass("hidden");
     $("#" + stat + "_next_" + currPage.toString()).addClass("hidden");
@@ -8,23 +21,10 @@ function changeStat(stat, currPage, action) {
       $("#" + stat + "_card_" + (currPage - 1).toString()).removeClass("hidden");
       $("#" + stat + "_prev_" + (currPage - 1).toString()).removeClass("hidden");
       $("#" + stat + "_next_" + (currPage - 1).toString()).removeClass("hidden");
-    } else { 
-      $("#" + stat + "_card_2").removeClass("hidden");
-      $("#" + stat + "_prev_2").removeClass("hidden");
-      $("#" + stat + "_next_2").removeClass("hidden");
-    }
-  } else if (action == "prev") {
-    $("#" + stat + "_card_" + currPage.toString()).addClass("hidden");
-    $("#" + stat + "_prev_" + currPage.toString()).addClass("hidden");
-    $("#" + stat + "_next_" + currPage.toString()).addClass("hidden");
-    if (currPage != 2) {
-      $("#" + stat + "_card_" + (currPage + 1).toString()).removeClass("hidden");
-      $("#" + stat + "_prev_" + (currPage + 1).toString()).removeClass("hidden");
-      $("#" + stat + "_next_" + (currPage + 1).toString()).removeClass("hidden");
     } else {
-      $("#" + stat + "_card_0").removeClass("hidden");
-      $("#" + stat + "_prev_0").removeClass("hidden");
-      $("#" + stat + "_next_0").removeClass("hidden");
+      $("#" + stat + "_card_" + (numPages - 1).toString()).removeClass("hidden");
+      $("#" + stat + "_prev_" + (numPages - 1).toString()).removeClass("hidden");
+      $("#" + stat + "_next_" + (numPages - 1).toString()).removeClass("hidden");
     }
   }
 }
