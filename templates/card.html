@@ -53,7 +53,7 @@
       {% set pagemod = query_result.get(stat).get(substat).get('data')|length % 10 %}
       {% set pagediv = query_result.get(stat).get(substat).get('data')|length // 10 %}
       <!-- Beginning Card Body -->
-      <div class="card-body">
+      <div class="card-body" style="padding-bottom: 0">
         <!-- Dashboard Title -->
         <h6 class="card-title text-center text-secondary">
           {{section_names.get(substat)}}
@@ -102,7 +102,7 @@
               <div class="col-3 text-left px0">
             <!-- Dashboard Column -->
             {% else %}
-              <div class="col-4 text-left px0">
+              <div class="col-4 col-xs-3 col-md-2 text-left px0">
             {% endif %}
 
               <!-- Player Name Row -->
@@ -141,7 +141,13 @@
 
             <!-- Player Stat Columns -->
             {% for stat in row.get('stats') %}
-              <div class="col-2 px0 text-center">
+              <!-- Builder Stat Column -->
+              {% if "header" in query_result.keys() %}
+                <div class="col-2 px0 text-center">
+              <!-- Regular Stat Column -->
+              {% else %}
+                <div class="col-3 px0 text-right">
+              {% endif %}
                 <!-- N/A Player Stat -->
                 {% if stat == 'n/a' %}
                   <fine class="text-danger">{{stat}}</fine>

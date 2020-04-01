@@ -23,9 +23,9 @@
 
   <!-- Player Card -->
   {% if card_num == 0 %}
-    <div class="col-10" id="player_card_{{card_num}}">
+    <div class="col-10 col-lg-6" id="player_card_{{card_num}}">
   {% else %}
-    <div class="col-10 hidden" id="player_card_{{card_num}}">
+    <div class="col-10 col-lg-6 hidden" id="player_card_{{card_num}}">
   {% endif %}
     {% include card %}
   </div>

@@ -3,50 +3,52 @@
 
 <!-- Player Wrapper -->
 <div class="justify-content-center" id="player_wrapper">
+
+  <div class="row" style="padding-left: 50px; padding-right: 38px">
+    <!-- Per 90 Toggler -->
+    <div class="col-4 col-xs-3 col-md-2 mr-auto custom-control custom-switch"
+      style="padding-top: 2px">
+        <input type="checkbox" class="custom-control-input"
+          id="player_per90_toggle">
+        <label class="custom-control-label align-self-center per90label" 
+          for="player_per90_toggle" id="player_per90_toggle_label">
+            <strong class="text-secondary">Per 90</strong>
+        </label>
+    </div>
+
+    <!-- Seasons Dropdown -->
+    <div class="col-4 col-xs-3 col-md-2 ml-auto"
+      style="padding-top: 0px">
+        <select class="custom-select custom-select-sm seasonselect" 
+          id="player-season-select" value="">
+            <option>{{current_season}}</option>
+            {% for season in seasons %}
+              {% if season != current_season %}
+                <option>{{season}}</option>
+              {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+  </div>
+
   <!-- Player Row -->
-  <div class="row justify-content-center ml-auto mr-auto">
+  <div class="row justify-content-center ml-auto mr-auto"
+    id="playerpage_row">
     <!-- Player Card -->
     <div class="card col-xs-12 col-sm-12 col-lg-10">
       <!-- Player Card Body -->
       <div class="card-body">
 
-        <div class="row" style="padding-left: 12px">
-          <!-- Per 90 Toggler -->
-          <div class="col-4 col-xs-3 col-md-2 mr-auto custom-control custom-switch"
-            style="padding-top: 1%">
-              <input type="checkbox" class="custom-control-input"
-                id="player_per90_toggle">
-              <label class="custom-control-label align-self-center per90label" 
-                for="player_per90_toggle" id="player_per90_toggle_label">
-                  <strong class="text-secondary">Per 90</strong>
-              </label>
-          </div>
-
-          <!-- Seasons Dropdown -->
-          <div class="col-4 col-xs-3 col-md-2 ml-auto"
-            style="padding-top: 1%">
-              <select class="custom-select custom-select-sm seasonselect" 
-                id="player-season-select" value="">
-                  <option>{{current_season}}</option>
-                  {% for season in seasons %}
-                    {% if season != current_season %}
-                      <option>{{season}}</option>
-                    {% endif %}
-                  {% endfor %}
-              </select>
-          </div>
-        </div>
-
         <!-- Player Card Title -->
         <div class="card-title">
-          <div class="text-center h3 text-secondary playerpage_title">
+          <div class="text-center h4 text-secondary playerpage_title">
             {{player_data.get("firstname")}}
             {{player_data.get("lastname")}}
           </div>
         </div>
 
         <!-- Player Cards Wrapper -->
-        <div class="row" id="playercards_wrapper">
+        <div class="row justify-content-center" id="playercards_wrapper">
 
           <!-- Player Info -->
           {% include "player_info.html" %}

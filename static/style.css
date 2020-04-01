@@ -1,46 +1,129 @@
-.hidden { display: none; } 
+body, html { 
+  height: 100%; 
+}
 
-.navbar-brand { font-size: calc(70% + .3vw + .5vh); } 
-.nav-item { font-size: calc(60% + .10vw + .10vh); } 
+.hidden { 
+  display: none; 
+} 
 
-h5 { font-size: calc(110% + .1vw + .1vh); } 
-h6 { font-size: calc(70% + .1vw + .1vh); } 
-strong { font-size: calc(70% + .1vw + .1vh); } 
-fine { font-size: calc(70% + .1vw + .1vh); } 
+.navbar-brand { 
+  font-size: calc(70% + .3vw + .5vh); 
+} 
 
-.player_name_rank { font-size: calc(70% + .1vw + .1vh); }
-.builder_header { font-size: calc(70% + .1vw + .1vh); }
-.team_logo { height: 23px; width: 23px; }
-.league_logo { height: 25px; }
+.nav-item { 
+  font-size: calc(60% + .10vw + .10vh); 
+} 
 
-.select_input { font-size: 1em; }
-.text_input { font-size: .8em; height: 100%; }
+h5 { 
+  font-size: calc(110% + .1vw + .1vh); 
+} 
 
-.toggle { font-size: 1.4em; font-height: 1.3em; }
+h6, strong, fine, .player_name_rank, .builder_header
+{ 
+  font-size: calc(70% + .1vw + .1vh); 
+} 
 
-#page_wrapper { position:relative; max-width: 1000px; }
-#content_wrapper { position:absolute; top:0; left:0; width:100%; }
-#builder_wrapper { padding-top: 10px; padding-bottom: 10px; width: 100%; font-size: x-small; }
-#dashboard_section_wrapper { padding-bottom: 5% }
-#player_wrapper { padding-top: 10px; padding-bottom: 10px; width: 100%; }
+.team_logo { 
+  height: 23px;
+  width: 23px; 
+}
 
-select { cursor: pointer; }
+.league_logo { 
+  height: 25px; 
+}
 
-.per90label { cursor: pointer; font-size: .7em; line-height: 2em; }
-.orderlabel { cursor: pointer; }
+.select_input { 
+  font-size: 1em; 
+}
 
-.seasonselect { font-size: .7em; }
+.text_input { 
+  font-size: .8em;
+  height: 100%; 
+}
 
-.arrowlink { cursor: pointer; }
-.prevarrow { padding-right: .7%; }
-.nextarrow { padding-left: .7%; }
-.dashcard { font-size: x-small; }
-.page-link { cursor: pointer; }
-.filtericon { cursor: pointer; }
+.toggle { 
+  font-size: 1.4em; 
+  font-height: 1.3em; 
+}
 
-.builder_header { padding-left: 0; padding-right: 0; }
+#page_wrapper { 
+  position:relative;
+  max-width: 1000px; 
+  height: auto; 
+  min-height: 100%;
+}
 
-.customizelabel { font-size: calc(100% + .1vw + .1vh); }
+#content_wrapper {
+  position:absolute; 
+  min-height: 100%;
+  width:100%; 
+  padding-bottom: 5%;
+  top:0; 
+  left:0; 
+}
 
-.playerpage_card {  font-size: x-small; margin-bottom: 15px; }
-.playerpage_title {  margin-top: 10px; margin-bottom: 10px; }
+#builder_wrapper { 
+  padding-top: 10px; 
+  padding-bottom: 10px; 
+  width: 100%; 
+  font-size: x-small; 
+}
+
+#dashboard_section_wrapper { 
+  padding-top: 5%;
+}
+
+#player_wrapper { 
+  padding-top: 10px; 
+  padding-bottom: 10px; 
+  width: 100%; 
+}
+
+#playerpage_row { 
+  padding-top: 5%; 
+}
+
+select, .orderlabel, .arrowlink, .page-link, .filtericon { 
+  cursor: pointer; 
+}
+
+.per90label { 
+  cursor: pointer; 
+  font-size: .7em; 
+  line-height: 2em; 
+}
+
+.seasonselect { 
+  font-size: .7em; 
+}
+.prevarrow { 
+  padding-right: .7%; 
+}
+
+.nextarrow { 
+  padding-left: .7%; 
+}
+
+.dashcard { 
+  font-size: x-small; 
+}
+
+.builder_header { 
+  padding-left: 0; 
+  padding-right: 0; 
+}
+
+.customizelabel { 
+  font-size: calc(100% + .1vw + .1vh); 
+}
+
+.playerpage_card {  
+  font-size: x-small; 
+  margin-bottom: 20px; 
+}
+
+.playerpage_title { 
+  margin-top: 10px; 
+  margin-bottom: 20px; 
+}
+
