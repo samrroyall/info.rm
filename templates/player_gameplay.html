@@ -1,0 +1,66 @@
+<!-- Gameplay -->
+<div class="h6 text-success text-center">
+  STATS
+</div>
+<ul class="list-group playerpage_card">
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Minutes Played</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("minutes_played")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Games Started</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("games_started")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Games Benched</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("games_bench")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Game Appearances</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("games_appearances")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Substitutions In</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("substitutions_in")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Substitutions Out</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("substitutions_out")|int}}
+      </div>
+    </div>
+  </li>
+</ul>

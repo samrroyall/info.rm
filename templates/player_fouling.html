@@ -1,0 +1,129 @@
+<div class="h6 text-success text-center">
+  STATS
+</div>
+<ul class="list-group playerpage_card">
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Fouls Committed</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("fouls_committed")|int}}
+        {% else %}
+          {{player_stats.get("fouls_committed")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Fouls Drawn</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("fouls_drawn")|int}}
+        {% else %}
+          {{player_stats.get("fouls_drawn")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Red Cards</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("cards_red")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Yellow Cards</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("cards_yellow")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Straight Red Cards</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("cards_straight_red")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Second Yellow Cards</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("cards_second_yellow")|int}}
+      </div>
+    </div>
+  </li>
+
+  <!-- Penalties -->
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Penalties Scored</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("penalties_scored")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Penalties Missed</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("penalties_missed")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Penalties Committed</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("penalties_committed")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Penalties Drawn</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("penalties_won")|int}}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Penalties Saved</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if player_data.get("position") != "Goalkeeper" %}
+          <span class="text-secondary">n/a</span>
+        {% else %}
+          {{player_stats.get("penalties_saved")|int}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+</ul>

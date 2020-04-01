@@ -6,38 +6,44 @@
 
 <div class="row" style="padding-left: 50px; padding-right: 38px">
   <!-- Dashboard Per 90 Toggle -->
-  <div class="col-4 col-3-xs col-md-2 mr-auto custom-control custom-switch" style="padding-top: 1%">
-    <input type="checkbox" class="custom-control-input" id="main_per90_toggle">
-    <label class="custom-control-label text-secondary align-self-center"
-      for="main_per90_toggle" id="main_per90_toggle_label"
-      style="font-size: .7em; line-height: 2em;">
-      <strong>Per 90</strong>
-    </label>
+  <div class="col-4 col-3-xs col-md-2 mr-auto custom-control custom-switch" 
+    style="padding-top: 1%">
+      <input type="checkbox" class="custom-control-input" 
+        id="main_per90_toggle">
+      <label class="custom-control-label align-self-center per90label"
+        for="main_per90_toggle" id="main_per90_toggle_label">
+          <strong class="text-secondary">Per 90</strong>
+      </label>
   </div>
 
   <!-- Dashboard Season Dropdown -->
-  <div class="col-4 col-3-xs col-md-2 ml-auto" style="padding-top: 1%">
-    <select class="custom-select custom-select-sm" id="season-select" value=""
-      style="font-size: .7em">
-      <option>{{current_season}}</option>
-      {% for season in seasons %}
-        {% if season != current_season %}
-          <option>{{season}}</option>
-        {% endif %}
-      {% endfor %}
-    </select>
+  <div class="col-4 col-xs-3 col-md-2 ml-auto" 
+    style="padding-top: 1%">
+      <select class="custom-select custom-select-sm seasonselect" 
+        id="season-select" value="">
+          <option>{{current_season}}</option>
+          {% for season in seasons %}
+            {% if season != current_season %}
+              <option>{{season}}</option>
+            {% endif %}
+          {% endfor %}
+      </select>
   </div>
 </div>
 
+<!-- Loop Through Stat Sections -->
 {% for stat in query_result.keys() %}
   <!-- Section Wrapper -->
-  <div style="padding-bottom: 5%">
+  <div id="dashboard_section_wrapper">
     <!-- Section Heading -->
     <h6 class="text-center text-success">{{stat.upper()}}</h6>
     <!-- Card Row -->
     <div class="row justify-content-center">
 
+      <!-- Number of Cards in Given Section -->
       {% set num_cards = query_result.get(stat).keys()|length %}
+
+      <!-- Loop Through Stat Section's Substats -->
       {% for substat in query_result.get(stat).keys() %}
 
         <!-- Iteration Number -->
@@ -45,58 +51,48 @@
 
         <!-- Prev Button -->
         {% if card_num == 0 %}
-          <div class="col-1 align-self-center text-right"
-            id="{{stat}}_prev_{{card_num}}" style="padding-right: .7%"
-            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'prev');">
-              <a class="text-secondary" style="cursor: pointer">
-                {% include "prev_arrow.html" %}
-              </a>
-          </div>
+          <div class="col-1 align-self-center text-right prevarrow"
+            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'prev');"
+            id="{{stat}}_prev_{{card_num}}">
         <!-- Prev Button Hidden -->
         {% else %}
-          <div class="col-1 align-self-center text-right hidden"
-            id="{{stat}}_prev_{{card_num}}" style="padding-right: .7%"
-            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'prev');">
-              <a class="text-secondary" style="cursor: pointer">
-                {% include "prev_arrow.html" %}
-              </a>
-          </div>
+          <div class="col-1 align-self-center text-right prevarrow hidden"
+            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'prev');"
+            id="{{stat}}_prev_{{card_num}}">
         {% endif %}
+            <a class="text-secondary arrowlink">
+              {% include "prev_arrow.html" %}
+            </a>
+          </div>
         <!-- End of Prev Button -->
 
         <!-- Card Content Beginning -->
         {% if card_num == 0 %}
-          <div class="card col-10" id="{{stat}}_card_{{card_num}}"
-            style="font-size: x-small">
-              {% include "card.html" %}
-          </div>
+          <div class="card col-10 dashcard" 
+            id="{{stat}}_card_{{card_num}}">
         {% else %}
-          <div class="card col-10 hidden" id="{{stat}}_card_{{card_num}}"
-            style="font-size: x-small">
-              {% include "card.html" %}
-          </div>
+          <div class="card col-10 dashcard hidden" 
+            id="{{stat}}_card_{{card_num}}">
         {% endif %}
+            {% include "card.html" %}
+          </div>
         <!-- Card Content End -->
 
         <!-- Next Button -->
         {% if card_num == 0 %}
-          <div class="col-1 align-self-center text-left"
-            id="{{stat}}_next_{{card_num}}" style="padding-left: .7%"
-            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'next');">
-              <a class="text-secondary" style="cursor: pointer">
-                {% include "next_arrow.html" %}
-              </a>
-          </div>
+          <div class="col-1 align-self-center nextarrow text-left"
+            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'next');"
+            id="{{stat}}_next_{{card_num}}">
         <!-- Next Button Hidden -->
         {% else %}
-          <div class="col-1 align-self-center text-left hidden"
-            id="{{stat}}_next_{{card_num}}" style="padding-left: .7%"
-            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'next');">
-              <a class="text-secondary" style="cursor: pointer">
+          <div class="col-1 align-self-center text-left nextarrow hidden"
+            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'next');"
+            id="{{stat}}_next_{{card_num}}">
+        {% endif %}
+              <a class="text-secondary arrowlink">
                 {% include "next_arrow.html" %}
               </a>
           </div>
-        {% endif %}
         <!-- End of Next Button -->
 
       {% endfor %}

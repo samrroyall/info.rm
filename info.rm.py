@@ -61,7 +61,7 @@ def player(id, season, per_90 = False):
     team_data = data[2]
     league_data = data[3]
     return render_template(
-                    "player_info.html",
+                    "player.html",
                     player_data=player_data,
                     player_stats=player_stats,
                     team_data=team_data,

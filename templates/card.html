@@ -21,9 +21,12 @@
     
     <!-- Custom Stats Header -->
     {% if "header" in query_result.keys() %}
+      <!-- Set Page Constants -->
       {% set pagemod = query_result.get("data")|length % 10 %}
       {% set pagediv = query_result.get("data")|length // 10 %}
       {% set header = query_result.get('header')[4:] %}
+
+      <!-- Builder Title -->
       <li class="list-group-item py0 px0">
         <div class="row justify-content-center">
           <div class="col-5 px0">
@@ -38,26 +41,30 @@
                   });
                 });
               </script>
-              <div class="col-2 text-center text-secondary builder_header"
-                style="padding-left: 0; padding-right: 0">
-                  <strong id="custom_stat_heading_{{i}}">''</strong>
+              <div class="col-2 text-center text-secondary builder_header">
+                <strong id="custom_stat_heading_{{i}}">''</strong>
               </div>
           {% endfor %}
         </div>
       </li>
     <!-- Card Label -->
     {% else %}
+      <!-- Set Page Constants -->
       {% set pagemod = query_result.get(stat).get(substat).get('data')|length % 10 %}
       {% set pagediv = query_result.get(stat).get(substat).get('data')|length // 10 %}
       <!-- Beginning Card Body -->
       <div class="card-body">
+        <!-- Dashboard Title -->
         <h6 class="card-title text-center text-secondary">
           {{section_names.get(substat)}}
         </h6>
     {% endif %}
     <!-- Custom Stats End -->
     
+    <!-- Get Number of Pages in Substat -->
     {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %}
+
+    <!-- Loop through Pages -->
     {% for page in range(1, num_pages + 1) %}
       <!-- Get the list of stats-->
       {% if "header" in query_result.keys() %}
@@ -73,64 +80,82 @@
         <div id="{{page_div_id1}}_{{page_div_id2}}_page_{{page}}" class="hidden">
       {% endif %}
 
+      <!-- Loop through Page Rows -->
       {% for row in stat_list[10 * (page - 1) : 10 * page] %}
+        <!-- Beginning of Player Row -->
         <li class="list-group-item py0 px0">
           <div class="row align-items-center justify-content-center">
+
+            <!-- Team Logo Column -->
             <div class="col-1 text-right px0">
               <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
             </div>
+
+            <!-- Filler Column -->
             <div class="col-1"></div>
+
+
+            <!-- Player Name/Team Column -->
+
+            <!-- Builder Column -->
             {% if "header" in query_result.keys() %}
               <div class="col-3 text-left px0">
+            <!-- Dashboard Column -->
             {% else %}
               <div class="col-4 text-left px0">
             {% endif %}
+
+              <!-- Player Name Row -->
               <div class="row player_name_rank">
+
+                <!-- N/A Rank -->
                 {% if row.get('rank') == 'N/A.' %}
-                  <div class="row player_name_rank">
-                    <strong class="text-danger">{{row.get("rank")}}</strong>&nbsp
-                    {% if custom_season %}
-                      <a href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
-                        <strong>{{row.get("name")}}</strong>
-                      </a>
-                    {% else %}
-                      <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
-                        <strong>{{row.get("name")}}</strong>
-                      </a>
-                    {% endif %}
-                  </div>
+                  <strong class="text-danger">{{row.get("rank")}}</strong>&nbsp
+                <!-- Regular Rank -->
                 {% else %}
-                  <div class="row player_name_rank">
-                    <strong>{{row.get("rank")}}</strong>&nbsp
-                    {% if custom_season %}
-                      <a href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
-                        <strong>{{row.get("name")}}</strong>
-                      </a>
-                    {% else %}
-                      <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
-                        <strong>{{row.get("name")}}</strong>
-                      </a>
-                    {% endif %}
-                  </div>
+                  <strong>{{row.get("rank")}}</strong>&nbsp
                 {% endif %}
+
+                <!-- Custom Stat Player Link -->
+                {% if custom_season %}
+                  <a href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
+                    <strong>{{row.get("name")}}</strong>
+                  </a>
+                <!-- Regular Player Link -->
+                {% else %}
+                  <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
+                    <strong>{{row.get("name")}}</strong>
+                  </a>
+                {% endif %}
+
               </div>
+              <!-- Player Name Row End -->
+                
+              <!-- Player Team Row -->
               <div class="row">
                 <fine>{{row.get("team_name")}}</fine>
               </div>
+
             </div>
+            <!-- Player Name/Team Column End -->
+
+            <!-- Player Stat Columns -->
             {% for stat in row.get('stats') %}
-              {% if stat == 'n/a' %}
-                <div class="col-2 px0 text-center">
+              <div class="col-2 px0 text-center">
+                <!-- N/A Player Stat -->
+                {% if stat == 'n/a' %}
                   <fine class="text-danger">{{stat}}</fine>
-                </div>
-              {% else %}
-                <div class="col-2 px0 text-center">
+                <!-- Regular Player Stat -->
+                {% else %}
                   <fine>{{stat}}</fine>
-                </div>
-              {% endif %}
+                {% endif %}
+              </div>
             {% endfor %}
+            <!-- Player Stat Columns End -->
+
           </div>
         </li>
+        <!-- End of Player Row -->
       {% endfor %}
       </div>
       <!-- Card Page Div End -->
@@ -155,7 +180,7 @@
                   <li class="page-item text-primary"
                     id="{{page_div_id1}}_{{page_div_id2}}_pagination_{{i}}">
                 {% endif %}
-                  <a class="page-link" style="cursor: pointer"
+                  <a class="page-link"
                     onclick="changePage('{{page_div_id1}}', '{{page_div_id2}}', {{i}});">
                       {{i}}
                   </a>

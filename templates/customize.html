@@ -1,4 +1,5 @@
 {% set stats = ["Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Straight Red Cards","Yellow Cards","Second Yellow Cards"] %}
+
 <!-- Duels/Dribbles Past
 <option>Dribbles Past</option>
 <option>Duels</option>
@@ -81,7 +82,7 @@
         {% endif %}
             <input type="checkbox" class="custom-control-input" id="select_per90_toggle_{{select_row}}"
               name="select_per90_toggle_{{select_row}}">
-            <label class="custom-control-label" for="select_per90_toggle_{{select_row}}">
+            <label class="custom-control-label per90label" for="select_per90_toggle_{{select_row}}">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -328,7 +329,7 @@
         {% endif %}
             <input type="checkbox" class="custom-control-input" id="stat_per90_toggle_{{filter_row}}"
               name="stat_per90_toggle_{{filter_row}}">
-            <label class="custom-control-label" for="stat_per90_toggle_{{filter_row}}">
+            <label class="custom-control-label per90label" for="stat_per90_toggle_{{filter_row}}">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -376,7 +377,7 @@
           <div class="custom-control custom-switch toggle">
             <input type="checkbox" class="custom-control-input" name="order_per90_toggle"
               id="order_per90_toggle">
-            <label class="custom-control-label" for="order_per90_toggle">
+            <label class="custom-control-label per90label" for="order_per90_toggle">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -385,7 +386,7 @@
           <div class="custom-control custom-switch toggle">
             <input type="checkbox" class="custom-control-input" name="asc_toggle"
               id="asc_toggle">
-            <label class="custom-control-label" for="asc_toggle">
+            <label class="custom-control-label orderlabel" for="asc_toggle">
               <fine>Low to High</fine>
             </label>
           </div>

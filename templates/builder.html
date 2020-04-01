@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
+  <!-- Scripts that require Jinja parameters -->
   <script>
     $(document).ready( function () {
       // season to league and club action
@@ -37,30 +38,26 @@
     });
   </script>
 
-  <style>
-    h6 { font-size: calc(100% + .1vw + .1vh) }
-  </style>
-
   <!-- StatBuilder Wrapper -->
-  <div class="justify-content-center" style="padding-top: 10px; padding-bottom: 10px; width: 100%">
+  <div class="justify-content-center" id="builder_wrapper">
     <!-- StatBuilder Row Start -->
-    <div class="row justify-content-center ml-auto mr-auto" style="width: 100%">
+    <div class="row justify-content-center ml-auto mr-auto">
       <!-- StatBuilder Card Start -->
-      <div class="card col-xs-12 col-sm-12 col-lg-10" style="font-size: x-small">
+      <div class="card col-xs-12 col-sm-12 col-lg-10">
 
         <!-- StatBuilder Header Card Body Start -->
         <div class="card-body">
           
           <!-- StatBuilder Header Card Title Start -->
           <div class="card-title">
-            <h6 class="text-center text-success">
-              YOUR STAT
+            <div class="text-center text-success customizelabel h6">
+               CUSTOMIZE 
               <div id="filter_button">
-                <a class="text-success" style="cursor: pointer">
-                {% include "filter_icon.html" %}
+                <a class="text-success filtericon">
+                  {% include "filter_icon.html" %}
                 </a>
               </div>
-            </h6>
+            </div>
             <!-- Customization Section Contents -->
             {% include "customize.html" %}
           </div>

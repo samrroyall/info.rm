@@ -19,5 +19,28 @@ fine { font-size: calc(70% + .1vw + .1vh); }
 .toggle { font-size: 1.4em; font-height: 1.3em; }
 
 #page_wrapper { position:relative; max-width: 1000px; }
-
 #content_wrapper { position:absolute; top:0; left:0; width:100%; }
+#builder_wrapper { padding-top: 10px; padding-bottom: 10px; width: 100%; font-size: x-small; }
+#dashboard_section_wrapper { padding-bottom: 5% }
+#player_wrapper { padding-top: 10px; padding-bottom: 10px; width: 100%; }
+
+select { cursor: pointer; }
+
+.per90label { cursor: pointer; font-size: .7em; line-height: 2em; }
+.orderlabel { cursor: pointer; }
+
+.seasonselect { font-size: .7em; }
+
+.arrowlink { cursor: pointer; }
+.prevarrow { padding-right: .7%; }
+.nextarrow { padding-left: .7%; }
+.dashcard { font-size: x-small; }
+.page-link { cursor: pointer; }
+.filtericon { cursor: pointer; }
+
+.builder_header { padding-left: 0; padding-right: 0; }
+
+.customizelabel { font-size: calc(100% + .1vw + .1vh); }
+
+.playerpage_card {  font-size: x-small; margin-bottom: 15px; }
+.playerpage_title {  margin-top: 10px; margin-bottom: 10px; }

@@ -1,96 +1,52 @@
-{% extends "player.html" %}
-{% block player_info %}
+{% set stat_cards = ["player_bio.html", "player_stats.html", "player_fouling.html", "player_gameplay.html"] %}
 
-<div class="col-5">
-  <div class="h6 text-success text-center">
-    INFO
+{% for card in stat_cards %}
+  {% set card_num = loop.index - 1%}
+
+  <!-- Previous Button -->
+  {% if card_num == 0 %}
+    <div class="col-1 align-self-center text-right prevarrow"
+      onclick="changeStat('player', {{card_num}}, {{stat_cards|length}}, 'prev');"
+      id="player_prev_{{card_num}}">
+  <!-- Prev Button Hidden -->
+  {% else %}
+    <div class="col-1 align-self-center text-right prevarrow hidden"
+      onclick="changeStat('player', {{card_num}}, {{stat_cards|length}}, 'prev');"
+      id="player_prev_{{card_num}}">
+  {% endif %}
+      <a class="text-secondary arrowlink">
+        {% include "prev_arrow.html" %}
+      </a>
+    </div>
+  <!-- End of Prev Button -->
+
+
+  <!-- Player Card -->
+  {% if card_num == 0 %}
+    <div class="col-10" id="player_card_{{card_num}}">
+  {% else %}
+    <div class="col-10 hidden" id="player_card_{{card_num}}">
+  {% endif %}
+    {% include card %}
   </div>
-  <ul class="list-group" style="width: 100%; font-size: 1.3em">
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-4 text-secondary text-left">
-          <strong>Position</strong>
-        </div>
-        <div class="col-8 text-right">
-          {{player_data.get("position")}}
-        </div>
-      </div>
-    </li>
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-4 text-secondary text-left">
-          <strong>Team</strong>
-        </div>
-        <div class="col-8 text-right">
-          {{player_data.get("team_name")}}&nbsp
-          <img src="{{team_data.get('logo')}}" height="20px" width="20px">
-        </div>
-      </div>
-    </li>
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-4 text-secondary text-left">
-          <strong>League</strong>
-        </div>
-        <div class="col-8 text-right">
-          {{player_data.get("league_name")}}&nbsp
-          <img src="{{league_data.get('flag')}}" height="15px" width="auto">
-        </div>
-      </div>
-    </li>
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-5 text-secondary text-left">
-          <strong>Nationality</strong>
-        </div>
-        <div class="col-7 text-right">
-          {{player_data.get("nationality")}}&nbsp
-          <img src="{{player_data.get('flag')}}" height="15px" width="auto">
-        </div>
-      </div>
-    </li>
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-5 text-secondary text-left">
-          <strong>Date of Birth</strong>
-        </div>
-        <div class="col-7 text-right">
-          {% set birthdate_list = player_data.get("birth_date").split("-") %}
-          {{birthdate_list[1]|int}}/{{birthdate_list[2]|int}}/{{birthdate_list[0]}} ({{player_data.get("age")}})
-        </div>
-      </div>
-    </li>
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-5 text-secondary text-left">
-          <strong>Height</strong>
-        </div>
-        <div class="col-7 text-right">
-          {{player_data.get("height")}}
-        </div>
-      </div>
-    </li>
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-5 text-secondary text-left">
-          <strong>Weight</strong>
-        </div>
-        <div class="col-7 text-right">
-          {{player_data.get("weight")}}
-        </div>
-      </div>
-    </li>
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-5 text-secondary text-left">
-          <strong>Rating</strong>
-        </div>
-        <div class="col-7 text-right">
-          {{player_data.get("rating")|float|round(2)}}
-        </div>
-      </div>
-    </li>
-  </ul>
-</div>
 
-{% endblock %}
+  <!-- Next Button -->
+  {% if card_num == 0 %}
+    <div class="col-1 align-self-center nextarrow text-left"
+      onclick="changeStat('player', {{card_num}}, {{stat_cards|length}}, 'next');"
+      id="player_next_{{card_num}}">
+  <!-- Next Button Hidden -->
+  {% else %}
+    <div class="col-1 align-self-center text-left nextarrow hidden"
+      onclick="changeStat('player', {{card_num}}, {{stat_cards|length}}, 'next');"
+      id="player_next_{{card_num}}">
+  {% endif %}
+        <a class="text-secondary arrowlink">
+          {% include "next_arrow.html" %}
+        </a>
+    </div>
+  <!-- End of Next Button -->
+
+{% endfor %}
+
+

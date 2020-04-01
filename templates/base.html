@@ -26,8 +26,10 @@
     <!-- SELF-DEFINED JS -->
     <script type="text/javascript" src="{{ url_for('static', filename='builder.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='player.js') }}"></script>
     <!-- SELF-DEFINED CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <!-- title -->
     <title>info.rm - statistics on players in the top five leagues</title>
   </head>
 
@@ -39,7 +41,7 @@
         {% include "navbar.html" %}
 
         <!-- Content -->
-        <div class="container-fluid ml-auto mr-auto" style="min-height: 100%;">
+        <div class="container-fluid ml-auto mr-auto">
           {% block content %}{% endblock %}
         </div>
 

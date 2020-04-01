@@ -1,494 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
 
-<script>
-  $(document).ready( function() {
-    $("#player-season-select").change( function() {
-      var season = $(this).val();
-      var split_href = window.location.href.split("/");
-      if (split_href[split_href.length - 1] == "per-90") {
-        split_href[split_href.length - 2] = season;
-      } else {
-        split_href[split_href.length - 1] = season;
-      }
-      window.location.href = split_href.join("/");
-    });
-  });
-</script>
-
-<div class="justify-content-center" style="padding-top: 10px; padding-bottom: 10px; width: 100%">
-  <div class="row justify-content-center ml-auto mr-auto" style="width: 100%">
+<!-- Player Wrapper -->
+<div class="justify-content-center" id="player_wrapper">
+  <!-- Player Row -->
+  <div class="row justify-content-center ml-auto mr-auto">
+    <!-- Player Card -->
     <div class="card col-xs-12 col-sm-12 col-lg-10">
+      <!-- Player Card Body -->
       <div class="card-body">
+
         <div class="row" style="padding-left: 12px">
-          <div class="col-4 col-sm-2 mr-auto custom-control custom-switch" style="padding-top: 1%">
-            <input type="checkbox" class="custom-control-input" id="player_per90_toggle">
-            <label class="custom-control-label text-secondary align-self-center" 
-              for="player_per90_toggle" id="player_per90_toggle_label" 
-              style="font-size: .7em; line-height: 2em;">
-              <strong>Per 90</strong>
-            </label>
+          <!-- Per 90 Toggler -->
+          <div class="col-4 col-xs-3 col-md-2 mr-auto custom-control custom-switch"
+            style="padding-top: 1%">
+              <input type="checkbox" class="custom-control-input"
+                id="player_per90_toggle">
+              <label class="custom-control-label align-self-center per90label" 
+                for="player_per90_toggle" id="player_per90_toggle_label">
+                  <strong class="text-secondary">Per 90</strong>
+              </label>
           </div>
 
-          <div class="col-4 col-sm-2 ml-auto" style="padding-top: 1%">
-            <select class="custom-select" id="player-season-select" value=""
-              style="font-size: .7em">
-              <option>{{current_season}}</option>
-              {% for season in seasons %}
-                {% if season != current_season %}
-                  <option>{{season}}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
+          <!-- Seasons Dropdown -->
+          <div class="col-4 col-xs-3 col-md-2 ml-auto"
+            style="padding-top: 1%">
+              <select class="custom-select custom-select-sm seasonselect" 
+                id="player-season-select" value="">
+                  <option>{{current_season}}</option>
+                  {% for season in seasons %}
+                    {% if season != current_season %}
+                      <option>{{season}}</option>
+                    {% endif %}
+                  {% endfor %}
+              </select>
           </div>
         </div>
 
+        <!-- Player Card Title -->
         <div class="card-title">
-          <div class="text-center h3 text-secondary" id="player-name" style="margin-bottom: 30px">
+          <div class="text-center h3 text-secondary playerpage_title">
             {{player_data.get("firstname")}}
             {{player_data.get("lastname")}}
           </div>
         </div>
 
-        <div class="row py0 justify-content-left" id="header" style="font-size: x-small">
-          {% block player_info %}{% endblock %}
-          <div class="col-7">
-            <!-- scoring -->
-            <div class="h6 text-success text-center">
-              SHOOTING
-            </div>
-            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 15px">
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Goals</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("goals")|int}}
-                      ({{player_stats.get("penalties_scored")|int}})
-                    {% else %}
-                      {{player_stats.get("goals")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Goals Conceded</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                  {% if player_data.get("position") != "Goalkeeper" %}
-                    <span class="text-secondary">n/a</span>
-                  {% else %}
-                    {% if per_90 == false %}
-                      {{player_stats.get("goals_conceded")|int}}
-                    {% else %}
-                      {{player_stats.get("goals_conceded")}}
-                   {% endif %}
-                  {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Assists</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("assists")|int}}
-                    {% else %}
-                      {{player_stats.get("assists")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Shots</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("shots")|int}}
-                    {% else %}
-                      {{player_stats.get("shots")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Shots on Target</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("shots_on")|int}}
-                    {% else %}
-                      {{player_stats.get("shots_on")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-            </ul>
+        <!-- Player Cards Wrapper -->
+        <div class="row" id="playercards_wrapper">
 
-            <!-- passing -->
-            <div class="h6 text-success text-center">
-              PASSING
-            </div>
-            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Passes</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("passes")|int}}
-                    {% else %}
-                      {{player_stats.get("passes")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Key Passes</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("passes_key")|int}}
-                    {% else %}
-                      {{player_stats.get("passes_key")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Pass Accuracy</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("passes_accuracy")|int}}%
-                  </div>
-                </div>
-              </li>
-            </ul>
+          <!-- Player Info -->
+          {% include "player_info.html" %}
 
-            <!-- dribbling -->
-            <div class="h6 text-success text-center">
-              DRIBBLING
-            </div>
-            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Successful Dribbles</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("dribbles_succeeded")|int}}
-                    {% else %}
-                      {{player_stats.get("dribbles_succeeded")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Attempted Dribbles</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("dribbles_attempted")|int}}
-                    {% else %}
-                      {{player_stats.get("dribbles_attempted")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Dribble Success Rate</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("dribbles_succeeded_pct")|int}}%
-                  </div>
-                </div>
-              </li>
-            </ul>
-
-            <!-- defending -->
-            <div class="h6 text-success text-center">
-              DEFENDING
-            </div>
-            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Tackles</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if current_season|int > 2016%}
-                      {% if per_90 == false %}
-                        {{player_stats.get("tackles")|int}}
-                      {% else %}
-                        {{player_stats.get("tackles")}}
-                      {% endif %}
-                    {% else %}
-                      <span class="text-secondary">n/a</span>
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Interceptions</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("interceptions")|int}}
-                    {% else %}
-                      {{player_stats.get("interceptions")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Blocks</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if current_season|int > 2016%}
-                      {% if per_90 == false %}
-                        {{player_stats.get("blocks")|int}}
-                      {% else %}
-                        {{player_stats.get("blocks")}}
-                      {% endif %}
-                    {% else %}
-                      <span class="text-secondary">n/a</span>
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-            </ul>
-
-            <!-- Fouling -->
-            <div class="h6 text-success text-center">
-              FOULING
-            </div>
-            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Fouls Committed</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("fouls_committed")|int}}
-                    {% else %}
-                      {{player_stats.get("fouls_committed")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Fouls Drawn</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if per_90 == false %}
-                      {{player_stats.get("fouls_drawn")|int}}
-                    {% else %}
-                      {{player_stats.get("fouls_drawn")}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Red Cards</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("cards_red")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Yellow Cards</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("cards_yellow")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Straight Red Cards</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("cards_straight_red")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Second Yellow Cards</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("cards_second_yellow")|int}}
-                  </div>
-                </div>
-              </li>
-            </ul>
-
-            <!-- Penalties -->
-            <div class="h6 text-success text-center">
-              PENALTIES
-            </div>
-            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Penalties Scored</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("penalties_scored")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Penalties Missed</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("penalties_missed")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Penalties Committed</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("penalties_committed")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Penalties Drawn</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("penalties_won")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Penalties Saved</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {% if player_data.get("position") != "Goalkeeper" %}
-                      <span class="text-secondary">n/a</span>
-                    {% else %}
-                      {{player_stats.get("penalties_saved")|int}}
-                    {% endif %}
-                  </div>
-                </div>
-              </li>
-            </ul>
-
-            <!-- Gameplay -->
-            <div class="h6 text-success text-center">
-              GAMEPLAY
-            </div>
-            <ul class="list-group" style="width: 100%; font-size: 1.3em; margin-bottom: 10px">
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Minutes Played</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("minutes_played")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Games Started</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("games_started")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Games Benched</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("games_bench")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Game Appearances</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("games_appearances")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Substitutions In</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("substitutions_in")|int}}
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-9 text-secondary text-left">
-                    <strong>Substitutions Out</strong>
-                  </div>
-                  <div class="col-3 text-right">
-                    {{player_stats.get("substitutions_out")|int}}
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
         </div>
+        <!-- Player Cards Wrapper End -->
+
       </div>
+      <!-- Player Card Body End -->
     </div>
+    <!-- Player Card End -->
   </div>
+  <!-- Player Row End -->
 </div>
+<!-- Player Wrapper End -->
 
 {% endblock %}

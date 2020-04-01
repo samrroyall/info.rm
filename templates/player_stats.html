@@ -1,0 +1,212 @@
+<div class="h6 text-success text-center">
+  STATS
+</div>
+<ul class="list-group playerpage_card">
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Goals</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("goals")|int}}
+          ({{player_stats.get("penalties_scored")|int}})
+        {% else %}
+          {{player_stats.get("goals")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Goals Conceded</strong>
+      </div>
+      <div class="col-3 text-right">
+      {% if player_data.get("position") != "Goalkeeper" %}
+        <span class="text-secondary">n/a</span>
+      {% else %}
+        {% if per_90 == false %}
+          {{player_stats.get("goals_conceded")|int}}
+        {% else %}
+          {{player_stats.get("goals_conceded")}}
+       {% endif %}
+      {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Assists</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("assists")|int}}
+        {% else %}
+          {{player_stats.get("assists")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Shots</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("shots")|int}}
+        {% else %}
+          {{player_stats.get("shots")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Shots on Target</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("shots_on")|int}}
+        {% else %}
+          {{player_stats.get("shots_on")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+
+  <!-- passing -->
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Passes</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("passes")|int}}
+        {% else %}
+          {{player_stats.get("passes")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Key Passes</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("passes_key")|int}}
+        {% else %}
+          {{player_stats.get("passes_key")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Pass Accuracy</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("passes_accuracy")|int}}%
+      </div>
+    </div>
+  </li>
+
+  <!-- dribbling -->
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Successful Dribbles</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("dribbles_succeeded")|int}}
+        {% else %}
+          {{player_stats.get("dribbles_succeeded")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Attempted Dribbles</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("dribbles_attempted")|int}}
+        {% else %}
+          {{player_stats.get("dribbles_attempted")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Dribble Success Rate</strong>
+      </div>
+      <div class="col-3 text-right">
+        {{player_stats.get("dribbles_succeeded_pct")|int}}%
+      </div>
+    </div>
+  </li>
+
+  <!-- defending -->
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Tackles</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if current_season|int > 2016%}
+          {% if per_90 == false %}
+            {{player_stats.get("tackles")|int}}
+          {% else %}
+            {{player_stats.get("tackles")}}
+          {% endif %}
+        {% else %}
+          <span class="text-secondary">n/a</span>
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Interceptions</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if per_90 == false %}
+          {{player_stats.get("interceptions")|int}}
+        {% else %}
+          {{player_stats.get("interceptions")}}
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-9 text-secondary text-left">
+        <strong>Blocks</strong>
+      </div>
+      <div class="col-3 text-right">
+        {% if current_season|int > 2016%}
+          {% if per_90 == false %}
+            {{player_stats.get("blocks")|int}}
+          {% else %}
+            {{player_stats.get("blocks")}}
+          {% endif %}
+        {% else %}
+          <span class="text-secondary">n/a</span>
+        {% endif %}
+      </div>
+    </div>
+  </li>
+</ul>

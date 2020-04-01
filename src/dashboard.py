@@ -37,7 +37,7 @@ def shooting_stats(league, season, per_90):
     query_result = dict()
     max_minutes_played = get_max("players.minutes_played", season)
     for stat in ["shots", "shots_on"]:
-        select_fields = ([f"({select_fields[0]})/(players.minutes_played/90)"]
+        select_fields = ([f"(players.{stat})/(players.minutes_played/90)"]
                              if per_90 is True else [f"players.{stat}"])
         if per_90 is True:
             filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
