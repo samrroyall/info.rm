@@ -55,8 +55,8 @@
       <!-- Beginning Card Body -->
       <div class="card-body" style="padding-bottom: 0">
         <!-- Dashboard Title -->
-        <h6 class="card-title text-center text-secondary">
-          {{section_names.get(substat)}}
+        <h6 class="card-title text-center text-secondary dashboard_card_title">
+          <strong>{{section_names.get(substat)}}</strong>
         </h6>
     {% endif %}
     <!-- Custom Stats End -->
@@ -110,29 +110,30 @@
 
                 <!-- N/A Rank -->
                 {% if row.get('rank') == 'N/A.' %}
-                  <strong class="text-danger">{{row.get("rank")}}</strong>&nbsp
+                  <strong class="text-danger">{{row.get("rank")}}
                 <!-- Regular Rank -->
                 {% else %}
-                  <strong>{{row.get("rank")}}</strong>&nbsp
+                  <strong>{{row.get("rank")}}
                 {% endif %}
 
                 <!-- Custom Stat Player Link -->
                 {% if custom_season %}
                   <a href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
-                    <strong>{{row.get("name")}}</strong>
+                    {{row.get("name")}}
                   </a>
                 <!-- Regular Player Link -->
                 {% else %}
                   <a href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
-                    <strong>{{row.get("name")}}</strong>
+                    {{row.get("name")}}
                   </a>
                 {% endif %}
+                  </strong>
 
               </div>
               <!-- Player Name Row End -->
                 
               <!-- Player Team Row -->
-              <div class="row">
+              <div class="row player_team_name">
                 <fine>{{row.get("team_name")}}</fine>
               </div>
 
@@ -143,17 +144,19 @@
             {% for stat in row.get('stats') %}
               <!-- Builder Stat Column -->
               {% if "header" in query_result.keys() %}
-                <div class="col-2 px0 text-center">
+                <div class="col-2 px0 text-center player_stat">
               <!-- Regular Stat Column -->
               {% else %}
-                <div class="col-3 px0 text-right">
+                <div class="col-3 px0 text-right player_stat">
               {% endif %}
                 <!-- N/A Player Stat -->
                 {% if stat == 'n/a' %}
-                  <fine class="text-danger">{{stat}}</fine>
+                  <fine class="text-danger">
+                    <strong>{{stat}}</strong>
+                  </fine>
                 <!-- Regular Player Stat -->
                 {% else %}
-                  <fine>{{stat}}</fine>
+                  <strong>{{stat}}</strong>
                 {% endif %}
               </div>
             {% endfor %}
