@@ -18,10 +18,22 @@ h5 {
   font-size: calc(110% + .1vw + .1vh); 
 } 
 
-h6, strong, fine, .player_name_rank, .builder_header
-{ 
+h6, strong, fine, .builder_header { 
   font-size: calc(70% + .1vw + .1vh); 
 } 
+
+.player_name_rank {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: calc(80% + .1vw + .1vh); 
+  line-height: 1em;
+}
+
+#brand {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 30px;
+  margin-top: -5px;
+  margin-bottom: 0;
+}
 
 .team_logo { 
   height: 23px;
@@ -30,7 +42,6 @@ h6, strong, fine, .player_name_rank, .builder_header
 
 #league_nav {
   height: 40px;
-  left: -30px;
 }
 
 #league_nav_link {
@@ -46,7 +57,6 @@ h6, strong, fine, .player_name_rank, .builder_header
 }
 .league_logo:hover {
   margin-top: -5px;
-  margin-left: 0;
   height: 35px;
 }
 
