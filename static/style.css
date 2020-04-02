@@ -28,8 +28,26 @@ h6, strong, fine, .player_name_rank, .builder_header
   width: 23px; 
 }
 
+#league_nav {
+  height: 40px;
+  left: -30px;
+}
+
+#league_nav_link {
+  width: 50px;
+}
+
+#prem_league_nav_link {
+  width: 450px;
+}
+
 .league_logo { 
   height: 25px; 
+}
+.league_logo:hover {
+  margin-top: -5px;
+  margin-left: 0;
+  height: 35px;
 }
 
 .select_input { 

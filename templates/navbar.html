@@ -1,4 +1,4 @@
-<nav class="navbar navbar-fixed-top navbar-light bg-light border navbar-expand-lg">
+<nav class="navbar navbar-fixed-top bg-light border navbar-expand-lg">
   <!-- Logo -->
   <a class="navbar-brand text-success" href="{{ url_for('home') }}">INFO.RM</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main_nav_collapse" aria-controls="main_nav_collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -8,7 +8,7 @@
   <div class="collapse navbar-collapse text-left" id="main_nav_collapse">
     <div class="navbar-nav">
       <!-- Builder -->
-      <a class="nav-item nav-link" href="{{ url_for('builder') }}">
+      <a class="nav-item nav-link text-secondary" href="{{ url_for('builder') }}">
         StatBuilder
         {% include "builder_icon.html" %} 
       </a>
