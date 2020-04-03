@@ -1,12 +1,12 @@
 $(document).ready(function() {
   // trigger custom stat dropdown
-  $("#filter_button").click(function() {
-    if ($("#custom_stat").hasClass("hidden")) {
-      $("#custom_stat").removeClass("hidden");
-    } else {
-      $("#custom_stat").addClass("hidden");
-    }
-  });
+  //$("#filter_button").click(function() {
+  // if ($("#custom_stat").hasClass("hidden")) {
+  //   $("#custom_stat").removeClass("hidden");
+  // } else {
+  //   $("#custom_stat").addClass("hidden");
+  // }
+  //});
   // add select option
   $("#select_plus_1").click(function() {
     if ($("#select_div_2").hasClass("hidden")) {

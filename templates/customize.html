@@ -8,8 +8,8 @@
 -->
 
 <!-- Customization Dropdown -->
-<div class="alert alert-light hidden" id="custom_stat" role="alert">
-  <h5 class="alert-heading">Customize Your Stat</h5>
+<div class="dropdown-menu border" aria-labelledby="custom_stat_button">
+  <h5>Customize Your Stat</h5>
   <strong>Use the options below to generate your own custom statistic.</strong>
   <hr>
   <form action="{{ url_for('custom_stat') }}" method="post" class="needs-validation"

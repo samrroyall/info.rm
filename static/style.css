@@ -140,6 +140,9 @@ h6, strong, fine {
 /*                  CARD                       */
 /***********************************************/
 
+#cardlist {
+}
+
 .team_logo { 
   height: 23px;
   width: 23px; 
@@ -193,6 +196,7 @@ h6, strong, fine {
 
 #builderheader {
   background: #F5F5F5;
+  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
 }
 
 .builder_header {
@@ -204,6 +208,9 @@ h6, strong, fine {
 /***********************************************/
 /*                CUSTOMIZER                   */
 /***********************************************/
+
+#custom_stats {
+}
 
 .select_input { 
   font-size: 1em; 
