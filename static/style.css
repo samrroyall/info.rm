@@ -34,18 +34,29 @@ h6, strong, fine {
   min-height: 100%;
  }
 
-#content_wrapper {
+#main_wrapper {
   position:absolute; 
   min-height: 100%;
-  width:100%; 
+  width: 100%; 
   padding-bottom: 5%;
   top:0; 
   left:0; 
-  background: blue;
+}
+
+#content_wrapper {
+  /*background: blue;*/
+}
+
+#per90_season_wrapper {
+  background: #F5F5F5;
+  padding-left: 50px;
+  padding-right: 38px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 #builder_wrapper { 
-  padding-top: 10px; 
+  padding-top: 30px; 
   padding-bottom: 10px; 
   width: 100%; 
   font-size: x-small; 
@@ -56,9 +67,13 @@ h6, strong, fine {
 }
 
 #player_wrapper { 
-  padding-top: 10px; 
   padding-bottom: 10px; 
   width: 100%; 
+}
+
+#playercards_wrapper {
+  margin-top: 25px;
+  background: #F5F5F5;
 }
 
 /***********************************************/
@@ -74,7 +89,7 @@ h6, strong, fine {
 } 
 
 #brand {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
   font-size: 30px;
   margin-top: -5px;
   margin-bottom: 0;
@@ -105,17 +120,20 @@ h6, strong, fine {
 /***********************************************/
 
 .dashboard_section {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
   font-size: calc(80% + .1vw + .1vh);
+  /*color: white;*/
 }
 
 .dashboard_card_title {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
   font-size: calc(90% + .1vw + .1vh); 
 }
 
 .dashcard { 
+  padding-bottom: 0px;
   font-size: x-small; 
+  background: #F5F5F5;
 }
 
 /***********************************************/
@@ -128,18 +146,22 @@ h6, strong, fine {
 }
 
 .player_name_rank {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
   font-size: calc(80% + .1vw + .1vh); 
   line-height: 1em;
+  color: black;
 }
 
 .player_stat {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
   font-size: calc(90% + .1vw + .1vh); 
 }
 
+#card_row {
+}
+
 #playerpage_row { 
-  padding-top: 5%; 
+  margin-top: 10px;
 }
 
 .playerpage_card {  
@@ -152,9 +174,26 @@ h6, strong, fine {
   margin-bottom: 20px; 
 }
 
+#pagination_div {
+  background: #F5F5F5;
+}
+
 /***********************************************/
 /*                 BUILDER                     */
 /***********************************************/
+
+#buildertitle {
+  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
+  font-size: calc(120% + .1vw + .1vh);
+}
+
+#buildercard {
+  background: #F5F5F5;
+}
+
+#builderheader {
+  background: #F5F5F5;
+}
 
 .builder_header {
   font-size: calc(70% + .1vw + .1vh); 

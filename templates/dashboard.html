@@ -4,10 +4,9 @@
 
 {% set section_names = {"goals": "Goals","assists": "Assists","goal_contributions": "Goal Contributions","shots_on": "Shots On Target","shots": "Shots","goals_per_shot":  "Goals Per Shot","passes_key": "Key Passes","passes": "Passes","passes_accuracy": "Pass Accuracy","dribbles_succeeded": "Successful Dribbles","dribbles_attempted": "Attempted Dribbles","dribbles_succeeded_pct": "Dribble Success Rate","tackles": "Tackles","interceptions": "Interceptions","blocks": "Blocks","rating": "Player Rating","goals_conceded": "Goals Conceded","penalties_saved": "Penalties Saved"} %}
 
-<div class="row" style="padding-left: 50px; padding-right: 38px">
+<div class="row align-items-center border-bottom" id="per90_season_wrapper">
   <!-- Dashboard Per 90 Toggle -->
-  <div class="col-4 col-3-xs col-md-2 mr-auto custom-control custom-switch" 
-    style="padding-top: 12px">
+  <div class="col-4 col-3-xs col-md-2 mr-auto custom-control custom-switch">
       <input type="checkbox" class="custom-control-input" 
         id="main_per90_toggle">
       <label class="custom-control-label align-self-center per90label"
@@ -17,8 +16,7 @@
   </div>
 
   <!-- Dashboard Season Dropdown -->
-  <div class="col-4 col-xs-3 col-md-2 ml-auto" 
-    style="padding-top: 10px">
+  <div class="col-4 col-xs-3 col-md-2 ml-auto">
       <select class="custom-select custom-select-sm seasonselect" 
         id="season-select" value="">
           <option>{{current_season}}</option>
@@ -36,7 +34,7 @@
   <!-- Section Wrapper -->
   <div id="dashboard_section_wrapper">
     <!-- Section Heading -->
-    <h6 class="text-center text-success dashboard_section">
+    <h6 class="text-center dashboard_section">
       <strong>{{stat.upper()}}</strong>
     </h6>
     <!-- Card Row -->
