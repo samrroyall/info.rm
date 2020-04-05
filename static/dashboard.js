@@ -43,34 +43,20 @@ function changePage(stat, substat, page) {
 }
 // Per 90 Toggler and Season Dropdown JS
 $(document).ready( function() {
-  $(function () {
-    var split_loc = window.location.href.split("/");
-    if (split_loc[split_loc.length - 1] == "per-90") {
-      $("#main_per90_toggle").prop("checked", true);
-      $("#main_per90_toggle_label").toggleClass("text-secondary text-primary");
-    }
-  });
   $(function() {
     $("#main_per90_toggle").change(function () {
-      $("#main_per90_toggle_label").toggleClass("text-secondary text-primary");
-      var split_loc = window.location.href.split("/");
-      if (split_loc[split_loc.length - 1] == "per-90") {
-        window.location.href = window.location.href.split("/per-90")[0];
-      } else {
-        window.location.href = window.location.href + "/per-90";
-      }
+      $(".cardList").toggleClass("hidden")
+      $(".per90CardList").toggleClass("hidden")
     });
   });
   $(function () {
     var split_loc = window.location.href.split("/");
     if (split_loc[split_loc.length - 1] == "per-90") {
       $("#player_per90_toggle").prop("checked", true);
-      $("#player_per90_toggle_label").toggleClass("text-secondary text-primary");
     }
   });
   $(function() {
     $("#player_per90_toggle").change(function () {
-      $("#player_per90_toggle_label").toggleClass("text-secondary text-primary");
       var split_loc = window.location.href.split("/");
       if (split_loc[split_loc.length - 1] == "per-90") {
         window.location.href = window.location.href.split("/per-90")[0];

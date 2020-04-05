@@ -6,8 +6,15 @@ join_params = {
         "teams": "id",
     }
 floats = [
-        "players.rating",
-    ]
+    "players.rating",
+]
+pcts = [
+    "players.shots_on_pct",
+    "players.passes_accuracy",
+    "players.duels_won_pct",
+    "players.dribbles_succeeded_pct",
+    "players.penalties_scored_pct",
+]
 
 def stmt(select_fields, filter_fields, order_field):
     select_fields = default_select_fields + select_fields
@@ -82,6 +89,11 @@ def rank_response(select_fields, filter_fields, order_field, season):
                 value = str(round(float(tup[stat_idx]), 2)).ljust(4,"0")
             else:
                 value = round(float(tup[stat_idx]))
+
+            # add % at the end if needed
+            if fields[stat_idx] in pcts and value != "n/a":
+                value = f"{value}%"
+
             stats.append(value)
 
         # can only order by selected fields
@@ -113,7 +125,7 @@ def rank_response(select_fields, filter_fields, order_field, season):
             "id": id,
             "team_name": team_name,
             "team_logo": team_logo,
-            "stats":  stats
+            "stats": stats
         }
         ranked_result["data"].append(ranked_tup)
     return ranked_result

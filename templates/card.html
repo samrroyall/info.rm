@@ -17,20 +17,21 @@
 
 <!-- Regular Card -->
 {% else %}
-  <ul class="list-group">
+  <ul class="list-group cardList">
     
     <!-- Custom Stats Header -->
     {% if "header" in query_result.keys() %}
+
       <!-- Set Page Constants -->
       {% set pagemod = query_result.get("data")|length % 10 %}
       {% set pagediv = query_result.get("data")|length // 10 %}
-      {% set header = query_result.get('header')[4:] %}
+      {% set header = query_result.get("header")[4:] %}
 
       <!-- Builder Title -->
-      <li class="list-group-item py0 px0 border-0"
-        id="builderheader">
+      <li class="list-group-item border-0"
+        id="builderHeader">
           <div class="row justify-content-center">
-            <div class="col-5 px0">
+            <div class="col-6">
             </div>
             {% set num_stats = header|length %}
             {% for i in range(num_stats) %}
@@ -42,7 +43,7 @@
                     });
                   });
                 </script>
-                <div class="col-2 text-center text-secondary builder_header">
+                <div class="col-2 px-0 text-center text-secondary">
                   <strong id="custom_stat_heading_{{i}}">''</strong>
                 </div>
             {% endfor %}
@@ -51,13 +52,54 @@
     <!-- Card Label -->
     {% else %}
       <!-- Set Page Constants -->
-      {% set pagemod = query_result.get(stat).get(substat).get('data')|length % 10 %}
-      {% set pagediv = query_result.get(stat).get(substat).get('data')|length // 10 %}
+      {% set pagemod = query_result.get(stat).get(substat).get("data")|length % 10 %}
+      {% set pagediv = query_result.get(stat).get(substat).get("data")|length // 10 %}
       <!-- Beginning Card Body -->
       <div class="card-body">
         <!-- Dashboard Title -->
-        <h6 class="card-title text-center text-secondary dashboard_card_title">
-          <strong>{{section_names.get(substat)}}</strong>
+        <h6 class="card-title row text-secondary"
+          id="dashCardTitle">
+
+            <!-- Prev Button -->
+            {% if card_num == 0 %}
+              <div class="col prevarrow text-right"
+                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');"
+                id="{{stat}}_prev_{{card_num}}">
+            <!-- Prev Button Hidden -->
+            {% else %}
+              <div class="col prevarrow text-right hidden"
+                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');"
+                id="{{stat}}_prev_{{card_num}}">
+            {% endif %}
+                <a class="text-secondary arrowlink" role="button">
+                  {% include "prev_arrow.html" %}
+                </a>
+              </div>
+            <!-- End of Prev Button -->
+
+            <div class="col-6 text-center">
+              <strong>
+                {{section_names.get(substat)}}
+              </strong>
+            </div>
+
+            <!-- Next Button -->
+            {% if card_num == 0 %}
+              <div class="col nextarrow text-left"
+                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');"
+                id="{{stat}}_next_{{card_num}}">
+            <!-- Next Button Hidden -->
+            {% else %}
+              <div class="col nextarrow text-left hidden"
+                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');"
+                id="{{stat}}_next_{{card_num}}">
+            {% endif %}
+                  <a class="text-secondary arrowlink" role="button">
+                    {% include "next_arrow.html" %}
+                  </a>
+              </div>
+            <!-- End of Next Button -->
+
         </h6>
     {% endif %}
     <!-- Custom Stats End -->
@@ -83,31 +125,31 @@
 
       <!-- Loop through Page Rows -->
       {% for row in stat_list[10 * (page - 1) : 10 * page] %}
+
         <!-- Beginning of Player Row -->
-        <li class="list-group-item py0 px0" id="card_row">
-          <div class="row align-items-center justify-content-center">
+        <li class="list-group-item px-3 py-2" id="cardItem">
+          <div class="row justify-content-center" id="cardRow">
 
             <!-- Team Logo Column -->
-            <div class="col-1 text-right px0">
-              <img class="team_logo" src={{row.get("team_logo")}} height="28px"/>
+            <div class="col-2 text-center justify-content-left px-0">
+              <img class="teamLogo" src={{row.get("team_logo")}} height="28px"/>
             </div>
 
-            <!-- Filler Column -->
-            <div class="col-1"></div>
-
+            <!-- Filler Column
+            <div class="col-1"></div>-->
 
             <!-- Player Name/Team Column -->
 
             <!-- Builder Column -->
             {% if "header" in query_result.keys() %}
-              <div class="col-3 text-left px0">
+              <div class="col-4 text-left px-0">
             <!-- Dashboard Column -->
             {% else %}
-              <div class="col-4 col-xs-3 text-left px0">
+              <div class="col-6 text-left px-0">
             {% endif %}
 
               <!-- Player Name Row -->
-              <div class="row player_name_rank">
+              <div class="playerNameRank">
 
                 <!-- N/A Rank -->
                 {% if row.get('rank') == 'N/A.' %}
@@ -138,7 +180,7 @@
               <!-- Player Name Row End -->
                 
               <!-- Player Team Row -->
-              <div class="row player_team_name">
+              <div class="teamName">
                 <fine>{{row.get("team_name")}}</fine>
               </div>
 
@@ -149,13 +191,13 @@
             {% for stat in row.get('stats') %}
               <!-- Builder Stat Column -->
               {% if "header" in query_result.keys() %}
-                <div class="col-2 px0 text-center player_stat">
+                <div class="col-2 px-0 text-center playerStat">
               <!-- Regular Stat Column -->
               {% else %}
-                <div class="col-3 col-xs-2 col-md-1 px0 text-center player_stat">
+                <div class="col-3 px-0 text-right playerStat">
               {% endif %}
                 <!-- N/A Player Stat -->
-                {% if stat == 'n/a' %}
+                {% if stat == "n/a" %}
                   <strong class="text-danger">
                     {{stat}}
                   </strong>
@@ -178,7 +220,7 @@
     {% endfor %}
     
     <!-- Pagination List Item Beginning -->
-    <li class="list-group-item border-0" id="pagination_div">
+    <li class="list-group-item border-0" id="paginationDiv">
       <!-- Pagination Row -->
       <div class="row h-100">
         <!-- Pagination Div -->

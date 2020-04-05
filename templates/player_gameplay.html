@@ -1,65 +1,69 @@
-<!-- Gameplay -->
-<h6 class="text-success text-center">
-  GAMEPLAY
-</h6>
-<ul class="list-group playerpage_card">
+<!-- Header -->
+<div class="row justify-content-center" id="playerCardHeader">
+  <div class="col-6 text-secondary text-center" id="playerCardTitle">
+    <strong>Gameplay</strong>
+  </div>
+</div>
+<!-- Header End -->
+
+<ul class="list-group playerCard">
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Minutes Played</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("minutes_played")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("minutes_played")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Games Started</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("games_started")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("games_started")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Games Benched</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("games_bench")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("games_bench")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Game Appearances</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("games_appearances")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("games_appearances")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Substitutions In</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("substitutions_in")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("substitutions_in")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Substitutions Out</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("substitutions_out")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("substitutions_out")|int}}</strong>
       </div>
     </div>
   </li>

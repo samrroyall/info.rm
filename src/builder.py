@@ -195,6 +195,8 @@ def custom_stats(form_data):
 
     # get season in scope 
     season = form_data_dict.get("season_select")
+    # make query
+    leagues, clubs_dict, nations = get_data()
 
     # get club, league, nationality, position values
     for key in ["club", "league", "nationality", "position"]:
@@ -207,11 +209,13 @@ def custom_stats(form_data):
         elif (key == "club" and form_data_dict.get("club_league_select") and
             value in clubs_dict.get(form_data_dict.get("club_league_select"))):
             key_string = "teams.name"
-        elif key == "nationality" and value and value in nations:
-            key_string = "players.nationality"
+        elif key == "nationality" and value and value in nations.get(season):
+              key_string = "players.nationality"
         else:
             continue
         filter_fields.append( (key_string, "=", value) )
+    
+    print(filter_fields)
 
     # get filter by stats
     stat_values = get_stat_values(form_data_dict, "filter")
@@ -226,9 +230,7 @@ def custom_stats(form_data):
     order_field = get_stat_values(form_data_dict, "order")
     if len(order_field) == 0:
         order_field = ([select_fields[0]], True)
-
-    # make query
-    leagues, clubs_dict, nations = get_data()
+    
     try:
         query_result = rank_response(select_fields, filter_fields, order_field, season)
     except:

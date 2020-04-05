@@ -21,30 +21,15 @@ def home():
             ))
 
 @info_rm.route("/league/<league>/season/<season>")
-def dashboard(league, season = CURRENT_SEASON, per_90 = False):
+def dashboard(league, season = CURRENT_SEASON):
     if league in LEAGUES and season in SEASONS:
         return render_template(
                     "dashboard.html",
-                    query_result = dashboard_stats(league, season, per_90),
+                    query_result = dashboard_stats(league, season, False),
+                    query_result_per90 = dashboard_stats(league, season, True),
                     current_league = league,
                     current_season = season,
-                    current_per90 = per_90,
-                    seasons = SEASONS
-                )
-    else:
-        return redirect(url_for(
-                "dashboard",
-                league="top-5",
-                season=CURRENT_SEASON
-            ))
-
-@info_rm.route("/league/<league>/season/<season>/per-90")
-def dashboard_per90(league, season = CURRENT_SEASON):
-    if league in LEAGUES and season in SEASONS:
-        return dashboard(
-                    league=league,
-                    season=season,
-                    per_90=True
+                    seasons = SEASONS,
                 )
     else:
         return redirect(url_for(

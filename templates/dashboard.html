@@ -9,8 +9,8 @@
   <div class="col-4 col-3-xs col-md-2 mr-auto custom-control custom-switch">
       <input type="checkbox" class="custom-control-input" 
         id="main_per90_toggle">
-      <label class="custom-control-label align-self-center per90label"
-        for="main_per90_toggle" id="main_per90_toggle_label">
+      <label class="custom-control-label align-self-center per90Label"
+        for="main_per90_toggle">
           <strong class="text-secondary">Per 90</strong>
       </label>
   </div>
@@ -29,16 +29,17 @@
   </div>
 </div>
 
+<div class="row justify-content-center">
 <!-- Loop Through Stat Sections -->
 {% for stat in query_result.keys() %}
   <!-- Section Wrapper -->
   <div id="dashboard_section_wrapper">
     <!-- Section Heading -->
-    <h6 class="text-center dashboard_section">
+    <div class="ml-auto mr-auto text-left" id="dashboardSectionTitle">
       <strong>{{stat.upper()}}</strong>
-    </h6>
+    </div>
     <!-- Card Row -->
-    <div class="row justify-content-center">
+    <!--<div class="row justify-content-center">-->
 
       <!-- Number of Cards in Given Section -->
       {% set num_cards = query_result.get(stat).keys()|length %}
@@ -49,59 +50,27 @@
         <!-- Iteration Number -->
         {% set card_num = loop.index - 1 %}
 
-        <!-- Prev Button -->
-        {% if card_num == 0 %}
-          <div class="col-1 align-self-center text-right prevarrow"
-            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'prev');"
-            id="{{stat}}_prev_{{card_num}}">
-        <!-- Prev Button Hidden -->
-        {% else %}
-          <div class="col-1 align-self-center text-right prevarrow hidden"
-            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'prev');"
-            id="{{stat}}_prev_{{card_num}}">
-        {% endif %}
-            <a class="text-secondary arrowlink">
-              {% include "prev_arrow.html" %}
-            </a>
-          </div>
-        <!-- End of Prev Button -->
-
         <!-- Card Content Beginning -->
         {% if card_num == 0 %}
-          <div class="card col-10 dashcard" 
+          <div class="card dashCard shadow-sm rounded" 
             id="{{stat}}_card_{{card_num}}">
         {% else %}
-          <div class="card col-10 dashcard hidden" 
+          <div class="card dashCard shadow-sm rounded hidden" 
             id="{{stat}}_card_{{card_num}}">
         {% endif %}
             {% include "card.html" %}
+            {% include "per90_card.html" %}
           </div>
         <!-- Card Content End -->
 
-        <!-- Next Button -->
-        {% if card_num == 0 %}
-          <div class="col-1 align-self-center nextarrow text-left"
-            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'next');"
-            id="{{stat}}_next_{{card_num}}">
-        <!-- Next Button Hidden -->
-        {% else %}
-          <div class="col-1 align-self-center text-left nextarrow hidden"
-            onclick="changeStat('{{stat}}', {{card_num}}, {{num_cards}}, 'next');"
-            id="{{stat}}_next_{{card_num}}">
-        {% endif %}
-              <a class="text-secondary arrowlink">
-                {% include "next_arrow.html" %}
-              </a>
-          </div>
-        <!-- End of Next Button -->
-
       {% endfor %}
 
-    </div>
+      <!--</div>-->
     <!-- Card Row End -->
   </div>
   <!-- Section Wrapper End --> 
 
 {% endfor %}
+</div>
 
 {% endblock %}

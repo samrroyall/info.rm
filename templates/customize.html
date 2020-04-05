@@ -8,8 +8,8 @@
 -->
 
 <!-- Customization Dropdown -->
-<div class="alert alert-light hidden" id="custom_stat" role="alert">
-  <h5 class="alert-heading">Customize Your Stat</h5>
+<div class="alert alert-light border hidden" id="customStat" role="alert">
+  <h6 class="alert-heading">Customize Your Stat</h6>
   <strong>Use the options below to generate your own custom statistic.</strong>
   <hr>
   <form action="{{ url_for('custom_stat') }}" method="post" class="needs-validation"
@@ -17,7 +17,9 @@
 
     <!-- SELECT FIELDS -->
     <div class="form-group">
-      <label for="season_select"><h6>Choose Season:</h6></label>
+      <label for="season_select" class="customLabel">
+        Choose Season:
+      </label>
       <div class="form-row justify-content-left">
         <div class="col-4">
           <select class="custom-select custom-select-sm select_input" id="season_select" name="season_select" value="{{current_season}}">
@@ -30,9 +32,10 @@
     </div>
 
     <div class="form-group" style="margin-top: 15px">
-      <label for="select_field_1_1"><h6>Choose Stat to Show:</h6>
-        <p><strong>Tip: This is the only required field!</strong></p>
+      <label for="select_field_1_1" class="customLabel">
+        Choose Stat to Show:
       </label>
+      <p><fine>Tip: This is the only required field!</fine></p>
       {% for select_row in range(1,4) %}
         {% if select_row != 1 %}
           <div class="form-row justify-content-left hidden" id="select_div_{{select_row}}">
@@ -82,7 +85,7 @@
         {% endif %}
             <input type="checkbox" class="custom-control-input" id="select_per90_toggle_{{select_row}}"
               name="select_per90_toggle_{{select_row}}">
-            <label class="custom-control-label per90label" for="select_per90_toggle_{{select_row}}">
+            <label class="custom-control-label per90Label" for="select_per90_toggle_{{select_row}}">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -91,9 +94,10 @@
 
     <!-- FILTER FIELDS -->
     <div class="form-group" style="margin-top: 15px">
-      <label for="select_field_1"><h6>Choose Filter Types:</h6>
-        <p><strong>Tip: For desirable per 90 results, try filtering by minutes played!</strong></p>
+      <label for="select_field_1" class="customLabel">
+        Choose Filter Types:
       </label>
+      <p><fine>Tip: For desirable per 90 results, try filtering by minutes played!</fine></p>
       <div class="form-row">
         <div class="col-5 col-xs-3">
           <select class="custom-select custom-select-sm select_input" id="filter_type">
@@ -329,7 +333,7 @@
         {% endif %}
             <input type="checkbox" class="custom-control-input" id="stat_per90_toggle_{{filter_row}}"
               name="stat_per90_toggle_{{filter_row}}">
-            <label class="custom-control-label per90label" for="stat_per90_toggle_{{filter_row}}">
+            <label class="custom-control-label per90Label" for="stat_per90_toggle_{{filter_row}}">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -340,9 +344,10 @@
     <!-- ORDER BY FIELDS -->
     <div class="form-group" style="margin-top: 15px">
 
-      <label for="order_field1"><h6>Choose Stat to Order By:</h6>
-        <p><strong>Tip: Must be one of your selected stats! (This is an optional parameter. The default is your first selected stat.)</strong></p>
+      <label for="order_field1" class="customLabel">
+        Choose Stat to Order By:
       </label>
+      <p><fine>Tip: Must be one of your selected stats! (This is an optional parameter. The default is your first selected stat.)</fine></p>
 
       <div  class="form-row">
         <div class="col-5">
@@ -377,7 +382,7 @@
           <div class="custom-control custom-switch toggle">
             <input type="checkbox" class="custom-control-input" name="order_per90_toggle"
               id="order_per90_toggle">
-            <label class="custom-control-label per90label" for="order_per90_toggle">
+            <label class="custom-control-label per90Label" for="order_per90_toggle">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -386,7 +391,7 @@
           <div class="custom-control custom-switch toggle">
             <input type="checkbox" class="custom-control-input" name="asc_toggle"
               id="asc_toggle">
-            <label class="custom-control-label orderlabel" for="asc_toggle">
+            <label class="custom-control-label orderLabel" for="asc_toggle">
               <fine>Low to High</fine>
             </label>
           </div>

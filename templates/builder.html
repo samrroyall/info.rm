@@ -43,31 +43,31 @@
     <!-- StatBuilder Row Start -->
     <div class="row justify-content-center ml-auto mr-auto">
       <!-- StatBuilder Card Start -->
-      <div class="card col-xs-12 col-sm-12 col-lg-10" id="buildercard">
+      <div class="card col shadow-sm rounded" 
+        id="builderCard">
 
-        <!-- StatBuilder Header Card Body Start -->
-        <div class="card-body" style="padding-bottom: 0">
-          
-          <!-- StatBuilder Header Card Title Start -->
-          <div class="card-title">
-            <div class="text-center customizelabel" id="buildertitle">
-              <strong>CUSTOMIZE</strong>
-              <div id="filter_button">
-                <a class="filtericon">
-                  {% include "filter_icon.html" %}
-                </a>
+          <!-- StatBuilder Header Card Body Start -->
+          <div class="card-body" id="builderCardBody">
+            
+            <!-- StatBuilder Header Card Title Start -->
+            <div class="card-title">
+              <div class="text-center text-secondary" id="builderTitle">
+                <div id="filter_button">
+                  <a class="filtericon">
+                    {% include "filter_icon.html" %}
+                  </a>
+                </div>
               </div>
+              <!-- Customization Section Contents -->
+              {% include "customize.html" %}
             </div>
-            <!-- Customization Section Contents -->
-            {% include "customize.html" %}
+            <!-- StatBuilder Header Card Title End -->
+          
+            <!-- Card Contents -->
+            {% include "card.html" %}
+          
           </div>
-          <!-- StatBuilder Header Card Title End -->
-        
-          <!-- Card Contents -->
-          {% include "card.html" %}
-        
-        </div>
-        <!-- StatBuilder Header Card Body End -->
+          <!-- StatBuilder Header Card Body End -->
       </div>
       <!-- StatBuilder Card End -->
     </div>

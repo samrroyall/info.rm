@@ -1,72 +1,77 @@
-<h6 class="text-success text-center">
-  FOULING
-</h6>
-<ul class="list-group playerpage_card">
+<!-- Header -->
+<div class="row justify-content-center" id="playerCardHeader">
+  <div class="col-6 text-secondary text-center" id="playerCardTitle">
+    <strong>Fouling</strong>
+  </div>
+</div>
+<!-- Header End -->
+
+<ul class="list-group playerCard">
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Fouls Committed</strong>
       </div>
-      <div class="col-5 text-right">
+      <div class="col-5 text-success text-right playerStat">
         {% if per_90 == false %}
-          {{player_stats.get("fouls_committed")|int}}
+          <strong>{{player_stats.get("fouls_committed")|int}}</strong>
         {% else %}
-          {{player_stats.get("fouls_committed")}}
+          <strong>{{player_stats.get("fouls_committed")}}</strong>
         {% endif %}
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Fouls Drawn</strong>
       </div>
-      <div class="col-5 text-right">
+      <div class="col-5 text-success text-right playerStat">
         {% if per_90 == false %}
-          {{player_stats.get("fouls_drawn")|int}}
+          <strong>{{player_stats.get("fouls_drawn")|int}}</strong>
         {% else %}
-          {{player_stats.get("fouls_drawn")}}
+          <strong>{{player_stats.get("fouls_drawn")}}</strong>
         {% endif %}
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Red Cards</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("cards_red")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("cards_red")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Yellow Cards</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("cards_yellow")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("cards_yellow")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Straight Red Cards</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("cards_straight_red")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("cards_straight_red")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Second Yellow Cards</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("cards_second_yellow")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("cards_second_yellow")|int}}</strong>
       </div>
     </div>
   </li>
@@ -74,54 +79,54 @@
   <!-- Penalties -->
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Penalties Scored</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("penalties_scored")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("penalties_scored")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Penalties Missed</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("penalties_missed")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("penalties_missed")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Penalties Committed</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("penalties_committed")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("penalties_committed")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Penalties Drawn</strong>
       </div>
-      <div class="col-5 text-right">
-        {{player_stats.get("penalties_won")|int}}
+      <div class="col-5 text-success text-right playerStat">
+        <strong>{{player_stats.get("penalties_won")|int}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-7 text-secondary text-left">
+      <div class="col-7 text-secondary text-left playerStatName">
         <strong>Penalties Saved</strong>
       </div>
-      <div class="col-5 text-right">
+      <div class="col-5 text-success text-right playerStat">
         {% if player_data.get("position") != "Goalkeeper" %}
-          <span class="text-secondary">n/a</span>
+          <strong class="text-secondary">n/a</strong>
         {% else %}
-          {{player_stats.get("penalties_saved")|int}}
+          <strong>{{player_stats.get("penalties_saved")|int}}</strong>
         {% endif %}
       </div>
     </div>

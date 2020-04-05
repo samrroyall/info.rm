@@ -10,14 +10,6 @@ body, html {
   display: none; 
 } 
 
-h5 { 
-  font-size: calc(110% + .1vw + .1vh); 
-} 
-
-h6, strong, fine { 
-  font-size: calc(70% + .1vw + .1vh); 
-} 
-
 .toggle { 
   font-size: 1.4em; 
   font-height: 1.3em; 
@@ -38,65 +30,80 @@ h6, strong, fine {
   position:absolute; 
   min-height: 100%;
   width: 100%; 
-  padding-bottom: 5%;
   top:0; 
   left:0; 
 }
 
 #content_wrapper {
-  /*background: blue;*/
+  padding-bottom: 5%;
 }
 
 #per90_season_wrapper {
   background: #F5F5F5;
-  padding-left: 50px;
-  padding-right: 38px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-left: 45px;
+  padding-right: 30px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-bottom: 3%;
 }
 
+/* Dashboard */
+
+#dashboard_section_wrapper { 
+  padding-top: 2%;
+  padding-bottom: 0px;
+  margin: 5%;
+}
+
+/* Builder */
+
 #builder_wrapper { 
-  padding-top: 30px; 
-  padding-bottom: 10px; 
-  width: 100%; 
+  margin-top: 5%;
+  padding: 10px; 
   font-size: x-small; 
 }
 
-#dashboard_section_wrapper { 
-  padding-top: 3%;
-}
-
-#player_wrapper { 
-  padding-bottom: 10px; 
-  width: 100%; 
-}
+/* Player Page */
 
 #playercards_wrapper {
-  margin-top: 25px;
-  background: #F5F5F5;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  width: 345px;
+  background: #FAFAFA;
+  margin-bottom: 3%
 }
 
 /***********************************************/
 /*                  NAVBAR                     */
 /***********************************************/
 
-.navbar-brand { 
-  font-size: calc(70% + .3vw + .5vh); 
-} 
+#mainNav {
+}
+
+.navbar-toggler {
+  padding-top: 0px !important;
+  padding-bottom: 1px !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+}  
+
+.navbar-toggler-icon {
+  font-size: 0.7em;
+}
 
 .nav-item { 
-  font-size: calc(60% + .10vw + .10vh); 
+  /* font-size: calc(60% + .10vw + .10vh); */
 } 
 
 #brand {
   font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
-  font-size: 30px;
+  font-size: 1.5em;
   margin-top: -5px;
   margin-bottom: 0;
 }
 
 #league_nav {
-  height: 40px;
+  height: 35px;
 }
 
 #league_nav_link {
@@ -108,97 +115,139 @@ h6, strong, fine {
 }
 
 .league_logo { 
-  height: 25px; 
+  height: 20px; 
 }
 .league_logo:hover {
   margin-top: -5px;
-  height: 35px;
+  height: 30px;
 }
 
 /***********************************************/
 /*                DASHBOARD                    */
 /***********************************************/
 
-.dashboard_section {
-  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
-  font-size: calc(80% + .1vw + .1vh);
-  /*color: white;*/
+#dashboardSectionTitle {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 0.9em;
+  width: 325px;
+  margin-bottom: 5px;
 }
 
-.dashboard_card_title {
-  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
-  font-size: calc(90% + .1vw + .1vh); 
+#dashCardTitle {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1.3em;
 }
 
-.dashcard { 
-  padding-bottom: 0px;
+.dashCard { 
+  padding-top: 10px;
   font-size: x-small; 
-  background: #F5F5F5;
+  background: #FAFAFA;
 }
 
 /***********************************************/
 /*                  CARD                       */
 /***********************************************/
 
-.team_logo { 
+/* Dashboard Card */
+
+.card-body {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.teamLogo { 
   height: 23px;
   width: 23px; 
 }
 
-.player_name_rank {
-  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
-  font-size: calc(80% + .1vw + .1vh); 
+.teamName {
+  font-size: 1em;
+}
+
+.playerNameRank {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1em;
   line-height: 1em;
   color: black;
 }
 
-.player_stat {
-  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
-  font-size: calc(90% + .1vw + .1vh); 
+.playerStat {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1.1em;
 }
 
-#card_row {
+#paginationDiv {
+  background: #FAFAFA;
 }
 
-#playerpage_row { 
-  margin-top: 10px;
+#cardItem {
+  min-width: 325px;
 }
 
-.playerpage_card {  
+#cardRow {
+  padding-right: 0px;
+}
+
+/* Player Page Card */
+
+#playerCardHeader { 
+  margin-bottom: 5px;
+}
+
+.playerCard {  
   font-size: x-small; 
-  margin-bottom: 20px; 
 }
 
-.playerpage_title { 
+.playerStatName {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1.1em;
+}
+
+#playerPageName { 
   margin-top: 10px; 
   margin-bottom: 20px; 
 }
 
-#pagination_div {
-  background: #F5F5F5;
+#playerCardTitle {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: .9em;
+}
+
+.playerCol {
+  padding-left: 5%;
+  padding-right: 5%;
 }
 
 /***********************************************/
 /*                 BUILDER                     */
 /***********************************************/
 
-#buildertitle {
-  font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
+#builderTitle {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: calc(120% + .1vw + .1vh);
+  padding-top: 2%;
 }
 
-#buildercard {
-  background: #F5F5F5;
+#builderCard {
+  background: #FAFAFA;
 }
 
-#builderheader {
-  background: #F5F5F5;
+#builderCardBody {
+  padding-bottom: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
-.builder_header {
+#builderHeader {
+  background: #FAFAFA;
   font-size: calc(70% + .1vw + .1vh); 
-  padding-left: 0; 
-  padding-right: 0; 
 }
 
 /***********************************************/
@@ -214,8 +263,8 @@ h6, strong, fine {
   height: 100%; 
 }
 
-.customizelabel { 
-  font-size: calc(100% + .1vw + .1vh); 
+.customLabel {
+  font-size: 1.3em;
 }
 
 /***********************************************/
@@ -226,7 +275,7 @@ select, .orderlabel, .arrowlink, .page-link, .filtericon {
   cursor: pointer; 
 }
 
-.per90label { 
+.per90Label, .orderLabel { 
   cursor: pointer; 
   font-size: .7em; 
   line-height: 2em; 
@@ -237,10 +286,8 @@ select, .orderlabel, .arrowlink, .page-link, .filtericon {
 }
 
 .prevarrow { 
-  padding-right: .7%; 
 }
 
 .nextarrow { 
-  padding-left: .7%; 
 }
 

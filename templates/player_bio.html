@@ -1,88 +1,96 @@
-<h6 class="text-success text-center">
-  BIO
-</h6>
-<ul class="list-group playerpage_card">
+<!-- Header -->
+<div class="row justify-content-center" id="playerCardHeader">
+
+  <div class="col-6 text-secondary text-center" id="playerCardTitle">
+    <strong>Bio</strong>
+  </div>
+
+</div>
+<!-- Header End -->
+
+<ul class="list-group playerCard">
   <li class="list-group-item">
     <div class="row">
-      <div class="col-4 text-secondary text-left">
+      <div class="col-4 text-secondary text-left playerStatName">
         <strong>Position</strong>
       </div>
-      <div class="col-8 text-right">
-        {{player_data.get("position")}}
+      <div class="col-8 text-right playerStat">
+        <strong>{{player_data.get("position")}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-4 text-secondary text-left">
+      <div class="col-4 text-secondary text-left playerStatName">
         <strong>Team</strong>
       </div>
-      <div class="col-8 text-right">
-        {{player_data.get("team_name")}}&nbsp
+      <div class="col-8 text-right playerStat">
+        <strong>{{player_data.get("team_name")}}</strong>&nbsp
         <img src="{{team_data.get('logo')}}" height="20px" width="20px">
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-4 text-secondary text-left">
+      <div class="col-4 text-secondary text-left playerStatName">
         <strong>League</strong>
       </div>
-      <div class="col-8 text-right">
-        {{player_data.get("league_name")}}&nbsp
+      <div class="col-8 text-right playerStat">
+        <strong>{{player_data.get("league_name")}}</strong>&nbsp
         <img src="{{league_data.get('flag')}}" height="15px" width="auto">
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-5 text-secondary text-left">
+      <div class="col-5 text-secondary text-left playerStatName">
         <strong>Nationality</strong>
       </div>
-      <div class="col-7 text-right">
-        {{player_data.get("nationality")}}&nbsp
+      <div class="col-7 text-right playerStat">
+        <strong>{{player_data.get("nationality")}}</strong>&nbsp
         <img src="{{player_data.get('flag')}}" height="15px" width="auto">
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-5 text-secondary text-left">
+      <div class="col-5 text-secondary text-left playerStatName">
         <strong>Date of Birth</strong>
       </div>
-      <div class="col-7 text-right">
+      <div class="col-7 text-right playerStat">
         {% set birthdate_list = player_data.get("birth_date").split("-") %}
-        {{birthdate_list[1]|int}}/{{birthdate_list[2]|int}}/{{birthdate_list[0]}} ({{player_data.get("age")}})
+        <strong>{{birthdate_list[1]|int}}/{{birthdate_list[2]|int}}/{{birthdate_list[0]}}</strong>
+        <strong>({{player_data.get("age")}})</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-5 text-secondary text-left">
+      <div class="col-5 text-secondary text-left playerStatName">
         <strong>Height</strong>
       </div>
-      <div class="col-7 text-right">
-        {{player_data.get("height")}}
+      <div class="col-7 text-right playerStat">
+        <strong>{{player_data.get("height")}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-5 text-secondary text-left">
+      <div class="col-5 text-secondary text-left playerStatName">
         <strong>Weight</strong>
       </div>
-      <div class="col-7 text-right">
-        {{player_data.get("weight")}}
+      <div class="col-7 text-right playerStat">
+        <strong>{{player_data.get("weight")}}</strong>
       </div>
     </div>
   </li>
   <li class="list-group-item">
     <div class="row">
-      <div class="col-5 text-secondary text-left">
+      <div class="col-5 text-secondary text-left playerStatName">
         <strong>Rating</strong>
       </div>
-      <div class="col-7 text-right">
-        {{player_data.get("rating")|float|round(2)}}
+      <div class="col-7 text-right playerStat">
+        <strong>{{player_data.get("rating")|float|round(2)}}</strong>
       </div>
     </div>
   </li>

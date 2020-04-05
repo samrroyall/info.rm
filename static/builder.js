@@ -1,10 +1,10 @@
 $(document).ready(function() {
   // trigger custom stat dropdown
   $("#filter_button").click(function() {
-    if ($("#custom_stat").hasClass("hidden")) {
-      $("#custom_stat").removeClass("hidden");
+    if ($("#customStat").hasClass("hidden")) {
+      $("#customStat").removeClass("hidden");
     } else {
-      $("#custom_stat").addClass("hidden");
+      $("#customStat").addClass("hidden");
     }
   });
   // add select option

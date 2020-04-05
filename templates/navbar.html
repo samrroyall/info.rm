@@ -1,23 +1,24 @@
-<nav class="navbar navbar-light navbar-fixed-top bg-light border-bottom navbar-expand-lg">
-  <!-- Logo -->
-  <a class="navbar-brand text-secondary" id="brand" 
-    href="{{ url_for('home') }}">
-      <strong>info.rm</strong>
-  </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main_nav_collapse" aria-controls="main_nav_collapse" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <!-- Collapse Div Start -->
-  <div class="collapse navbar-collapse text-left" id="main_nav_collapse">
-    <div class="navbar-nav">
-      <!-- Builder -->
-      <a class="nav-item nav-link text-secondary" href="{{ url_for('builder') }}">
-        StatBuilder
-        {% include "builder_icon.html" %} 
-      </a>
+<nav class="navbar navbar-light navbar-fixed-top bg-light border-bottom navbar-expand-lg align-items-center"
+  id="mainNav">
+    <!-- Logo -->
+    <a class="navbar-brand text-secondary" id="brand" 
+      href="{{ url_for('home') }}">
+        <strong>info.rm</strong>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main_nav_collapse" aria-controls="main_nav_collapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Collapse Div Start -->
+    <div class="collapse navbar-collapse text-left" id="main_nav_collapse">
+      <div class="navbar-nav">
+        <!-- Builder -->
+        <a class="nav-item nav-link text-secondary" href="{{ url_for('builder') }}">
+          StatBuilder
+          {% include "builder_icon.html" %} 
+        </a>
+      </div>
+      <!-- Leagues -->
+      {% include "league_nav.html" %} 
     </div>
-    <!-- Leagues -->
-    {% include "league_nav.html" %} 
-  </div>
   <!-- Collapse Div End -->
 </nav>
