@@ -17,14 +17,12 @@
 
       <!-- Prev Button -->
       {% if card_num == 0 %}
-        <div class="col prevarrow text-right"
-          onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');"
-          id="{{stat}}_prev_{{card_num}}">
+        <div class="col prevarrow text-right {{stat}}_prev_{{card_num}}"
+           onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');">
       <!-- Prev Button Hidden -->
       {% else %}
-        <div class="col prevarrow text-right hidden"
-          onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');"
-          id="{{stat}}_prev_{{card_num}}">
+        <div class="col prevarrow text-right {{stat}}_prev_{{card_num}} hidden"
+           onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');">
       {% endif %}
           <a class="text-secondary arrowlink" role="button">
             {% include "prev_arrow.html" %}
@@ -40,14 +38,12 @@
 
       <!-- Next Button -->
       {% if card_num == 0 %}
-        <div class="col nextarrow text-left"
-          onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');"
-          id="{{stat}}_next_{{card_num}}">
+        <div class="col nextarrow text-left {{stat}}_next_{{card_num}}"
+           onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');">
       <!-- Next Button Hidden -->
       {% else %}
-        <div class="col nextarrow text-left hidden"
-          onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');"
-          id="{{stat}}_next_{{card_num}}">
+        <div class="col nextarrow text-left {{stat}}_next_{{card_num}} hidden"
+          onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');">
       {% endif %}
             <a class="text-secondary arrowlink" role="button">
               {% include "next_arrow.html" %}

@@ -18,7 +18,7 @@
 <!-- Regular Card -->
 {% else %}
   <ul class="list-group cardList">
-    
+
     <!-- Custom Stats Header -->
     {% if "header" in query_result.keys() %}
 
@@ -62,14 +62,12 @@
 
             <!-- Prev Button -->
             {% if card_num == 0 %}
-              <div class="col prevarrow text-right"
-                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');"
-                id="{{stat}}_prev_{{card_num}}">
+              <div class="col prevarrow text-right {{stat}}_prev_{{card_num}}"
+                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');">
             <!-- Prev Button Hidden -->
             {% else %}
-              <div class="col prevarrow text-right hidden"
-                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');"
-                id="{{stat}}_prev_{{card_num}}">
+              <div class="col prevarrow text-right {{stat}}_prev_{{card_num}} hidden"
+                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');">
             {% endif %}
                 <a class="text-secondary arrowlink" role="button">
                   {% include "prev_arrow.html" %}
@@ -85,14 +83,12 @@
 
             <!-- Next Button -->
             {% if card_num == 0 %}
-              <div class="col nextarrow text-left"
-                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');"
-                id="{{stat}}_next_{{card_num}}">
+              <div class="col nextarrow text-left {{stat}}_next_{{card_num}}"
+                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');">
             <!-- Next Button Hidden -->
             {% else %}
-              <div class="col nextarrow text-left hidden"
-                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');"
-                id="{{stat}}_next_{{card_num}}">
+              <div class="col nextarrow text-left {{stat}}_next_{{card_num}} hidden"
+                onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');">
             {% endif %}
                   <a class="text-secondary arrowlink" role="button">
                     {% include "next_arrow.html" %}
@@ -103,7 +99,7 @@
         </h6>
     {% endif %}
     <!-- Custom Stats End -->
-    
+
     <!-- Get Number of Pages in Substat -->
     {% set num_pages = pagediv + 1 if pagemod > 0 else pagediv %}
 
@@ -178,7 +174,7 @@
 
               </div>
               <!-- Player Name Row End -->
-                
+
               <!-- Player Team Row -->
               <div class="teamName">
                 <fine>{{row.get("team_name")}}</fine>
@@ -218,7 +214,7 @@
       </div>
       <!-- Card Page Div End -->
     {% endfor %}
-    
+
     <!-- Pagination List Item Beginning -->
     <li class="list-group-item border-0" id="paginationDiv">
       <!-- Pagination Row -->
@@ -227,12 +223,12 @@
         <div class="col-12">
           <!-- Page Buttons Beginning -->
           <nav class="nav justify-content-center">
-            
+
             <ul class="pagination pagination-md">
               {% for i in range(1, num_pages + 1) %}
                 <!-- At first, make page 1 active -->
                 {% if i == 1 %}
-                  <li class="page-item text-primary active" 
+                  <li class="page-item text-primary active"
                     id="{{page_div_id1}}_{{page_div_id2}}_pagination_{{i}}">
                 {% else %}
                   <li class="page-item text-primary"

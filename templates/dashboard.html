@@ -52,11 +52,9 @@
 
         <!-- Card Content Beginning -->
         {% if card_num == 0 %}
-          <div class="card dashCard shadow-sm rounded" 
-            id="{{stat}}_card_{{card_num}}">
+          <div class="card dashCard {{stat}}_card_{{card_num}} shadow-sm rounded">
         {% else %}
-          <div class="card dashCard shadow-sm rounded hidden" 
-            id="{{stat}}_card_{{card_num}}">
+          <div class="card dashCard {{stat}}_card_{{card_num}} shadow-sm rounded hidden">
         {% endif %}
             {% include "card.html" %}
             {% include "per90_card.html" %}

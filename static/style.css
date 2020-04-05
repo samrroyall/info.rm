@@ -2,36 +2,36 @@
 /*                  GENERAL                    */
 /***********************************************/
 
-body, html { 
-  height: 100%; 
+body, html {
+  height: 100%;
 }
 
-.hidden { 
-  display: none; 
-} 
+.hidden {
+  display: none;
+}
 
-.toggle { 
-  font-size: 1.4em; 
-  font-height: 1.3em; 
+.toggle {
+  font-size: 1.4em;
+  font-height: 1.3em;
 }
 
 /***********************************************/
 /*                WRAPPERS                     */
 /***********************************************/
 
-#page_wrapper { 
+#page_wrapper {
   position:relative;
-  max-width: 1000px; 
-  height: auto; 
+  max-width: 1000px;
+  height: auto;
   min-height: 100%;
  }
 
 #main_wrapper {
-  position:absolute; 
+  position:absolute;
   min-height: 100%;
-  width: 100%; 
-  top:0; 
-  left:0; 
+  width: 100%;
+  top:0;
+  left:0;
 }
 
 #content_wrapper {
@@ -49,7 +49,7 @@ body, html {
 
 /* Dashboard */
 
-#dashboard_section_wrapper { 
+#dashboard_section_wrapper {
   padding-top: 2%;
   padding-bottom: 0px;
   margin: 5%;
@@ -57,10 +57,10 @@ body, html {
 
 /* Builder */
 
-#builder_wrapper { 
+#builder_wrapper {
   margin-top: 5%;
-  padding: 10px; 
-  font-size: x-small; 
+  padding: 10px;
+  font-size: x-small;
 }
 
 /* Player Page */
@@ -85,15 +85,15 @@ body, html {
   padding-bottom: 1px !important;
   padding-left: 2px !important;
   padding-right: 2px !important;
-}  
+}
 
 .navbar-toggler-icon {
   font-size: 0.7em;
 }
 
-.nav-item { 
+.nav-item {
   /* font-size: calc(60% + .10vw + .10vh); */
-} 
+}
 
 #brand {
   font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
@@ -114,8 +114,8 @@ body, html {
   width: 450px;
 }
 
-.league_logo { 
-  height: 20px; 
+.league_logo {
+  height: 20px;
 }
 .league_logo:hover {
   margin-top: -5px;
@@ -140,9 +140,9 @@ body, html {
   font-size: 1.3em;
 }
 
-.dashCard { 
+.dashCard {
   padding-top: 10px;
-  font-size: x-small; 
+  font-size: x-small;
   background: #FAFAFA;
 }
 
@@ -157,9 +157,9 @@ body, html {
   padding-bottom: 0px;
 }
 
-.teamLogo { 
+.teamLogo {
   height: 23px;
-  width: 23px; 
+  width: 23px;
 }
 
 .teamName {
@@ -194,12 +194,12 @@ body, html {
 
 /* Player Page Card */
 
-#playerCardHeader { 
+#playerCardHeader {
   margin-bottom: 5px;
 }
 
-.playerCard {  
-  font-size: x-small; 
+.playerCard {
+  font-size: x-small;
 }
 
 .playerStatName {
@@ -208,9 +208,9 @@ body, html {
   font-size: 1.1em;
 }
 
-#playerPageName { 
-  margin-top: 10px; 
-  margin-bottom: 20px; 
+#playerPageName {
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 #playerCardTitle {
@@ -247,20 +247,23 @@ body, html {
 
 #builderHeader {
   background: #FAFAFA;
-  font-size: calc(70% + .1vw + .1vh); 
+  font-size: calc(70% + .1vw + .1vh);
 }
 
 /***********************************************/
 /*                CUSTOMIZER                   */
 /***********************************************/
 
-.select_input { 
-  font-size: 1em; 
+#custom_stats {
 }
 
-.text_input { 
+.select_input {
+  font-size: 1em;
+}
+
+.text_input {
   font-size: .8em;
-  height: 100%; 
+  height: 100%;
 }
 
 .customLabel {
@@ -271,23 +274,22 @@ body, html {
 /*                   OTHER                     */
 /***********************************************/
 
-select, .orderlabel, .arrowlink, .page-link, .filtericon { 
-  cursor: pointer; 
+select, .orderlabel, .arrowlink, .page-link, .filtericon {
+  cursor: pointer;
 }
 
-.per90Label, .orderLabel { 
-  cursor: pointer; 
-  font-size: .7em; 
-  line-height: 2em; 
+.per90Label, .orderLabel {
+  cursor: pointer;
+  font-size: .7em;
+  line-height: 2em;
 }
 
-.seasonselect { 
-  font-size: .7em; 
+.seasonselect {
+  font-size: .7em;
 }
 
-.prevarrow { 
+.prevarrow {
 }
 
-.nextarrow { 
+.nextarrow {
 }
-
