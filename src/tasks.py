@@ -15,8 +15,14 @@ def get_data(action, engine, season):
     action_type = action.split("_")[0]
     request_type = Request.get_registry().get(f"{endpoint.capitalize()}Request")
 
+    # for league and teams endpoint
     response_ids = dict()
     processed_data = dict()
+
+    # for players endpoint
+    processed_players = dict()
+    processed_stats = dict()
+
     # league requests do not require ids from prior calls
     if endpoint == "leagues":
         result = request_type(season).update()
@@ -31,20 +37,25 @@ def get_data(action, engine, season):
         ids = eval(get_config_arg(id_type, season))
         # make requests
         for id in ids.keys():
+
+            # check DB before inserting
             if action_type == "insert":
                 # ensure data has not been previously inserted into database
-                assert not previously_inserted(engine, action, id), \
-                    "ERROR: Attempt to insert data already present in DB stopped."
+                #assert not previously_inserted(engine, action, id), \
+                    #"ERROR: Attempt to insert data already present in DB stopped."
+                pass
+            # check DB before updating
             elif action_type == "update":
                 # ensure data has been previously inserted into database
-                assert previously_inserted(engine, action, id), \
-                    "ERROR: Attempt to update data not present in DB stopped."
+                #assert previously_inserted(engine, action, id), \
+                    #"ERROR: Attempt to update data not present in DB stopped."
+                pass
 
             if endpoint == "players":
-                result = request_type(id, processed_data, season).update()
+                processed_players, processed_stats = request_type(id, processed_players, processed_stats, season).update()
                 print("INFO: Response for {0} Obtained Successfully.".\
                     format(ids.get(id).get("team_name")))
-                processed_data.update(result)
+
             elif endpoint == "teams":
                 result = request_type(id, season).update()
                 response_ids.update(result.get("ids"))
@@ -55,12 +66,12 @@ def get_data(action, engine, season):
                 
     # update config.ini with new IDs
     if endpoint == "players": 
-        processed_data = processed_data.values()
+        return {"players": processed_players.values(), "stats": processed_stats.values()}
     else:
         config_arg = f"{endpoint[:-1]}_ids"
         set_config_arg(config_arg, response_ids, season)
         processed_data = processed_data.get("processed_data")
-    return processed_data
+        return processed_data
 
 def setup(config_args):
     """ Function for writing CLI arguments to config file.

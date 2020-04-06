@@ -4,7 +4,7 @@ from datetime import datetime, date
 from hashlib import md5
 
 from config import get_config_arg
-from orm import Leagues, Teams, Players
+from orm import Leagues, Teams, Players, Stats
 import sys
 
 ###########################
@@ -348,13 +348,17 @@ def not_null(value):
     """ Function to turn quantitative stats to 0 if currently null. """
     return 0 if value is None else value
 
+def generate_uid(id, season, team_id):
+    text = f"{id}{season}{team_id}"
+    ciphertext = md5(text.encode()).hexdigest()
+    return ciphertext
+
 # no type checking on functions dealing with JSON data
-def process_stats(stats, temp_player):
+def process_stats(stats, temp_player, previous_data):
     # games
     player_game_info = stats.get("games")
     temp_player["position"] = player_game_info.get("position")
     temp_player["rating"] = player_game_info.get("rating")
-    temp_player["captain"] = player_game_info.get("captain")
     temp_player["minutes_played"] = not_null(player_game_info.get("minutes"))
     temp_player["games_appearances"] = not_null(player_game_info.get("appearences")) #sic
     temp_player["games_started"] = not_null(player_game_info.get("lineups"))
@@ -368,10 +372,7 @@ def process_stats(stats, temp_player):
     temp_player["shots"] = not_null(player_shot_info.get("total"))
     temp_player["shots_on"] = not_null(player_shot_info.get("on"))
     temp_player["shots_on_pct"] = None
-    # ensure >= 0 shots
-    if temp_player.get("shots") > 0:
-        temp_player["shots_on_pct"] = round(temp_player.get("shots_on") * 100
-                                            / temp_player.get("shots"))
+    
     # goals
     player_goal_info = stats.get("goals")
     temp_player["goals"] = not_null(player_goal_info.get("total"))
@@ -391,24 +392,13 @@ def process_stats(stats, temp_player):
     player_duel_info = stats.get("duels")
     temp_player["duels"] = not_null(player_duel_info.get("total"))
     temp_player["duels_won"] = not_null(player_duel_info.get("won"))
-    temp_player["duels_won_pct"] = None
-    # ensure >= 0 duels
-    if temp_player.get("duels") > 0:
-        temp_player["duels_won_pct"] = round(temp_player.get("duels_won") * 100
-                                                / temp_player.get("duels"))
+    
     # dribbles
     player_dribble_info = stats.get("dribbles")
     temp_player["dribbles_past"] = not_null(player_dribble_info.get("past"))
     temp_player["dribbles_attempted"] = not_null(player_dribble_info.get("attempts"))
     temp_player["dribbles_succeeded"] = not_null(player_dribble_info.get("success"))
-    temp_player["dribbles_succeeded_pct"] = None
-    # ensure >= 0 dribbles_attempted
-    if temp_player.get("dribbles_attempted") > 0:
-        temp_player["dribbles_succeeded_pct"] = round(
-                                            temp_player.get("dribbles_succeeded")
-                                            / temp_player.get("dribbles_attempted")
-                                            * 100
-                                        )
+    
     # fouls
     player_foul_info = stats.get("fouls")
     temp_player["fouls_drawn"] = not_null(player_foul_info.get("drawn"))
@@ -417,9 +407,7 @@ def process_stats(stats, temp_player):
     player_card_info = stats.get("cards")
     temp_player["cards_yellow"] = not_null(player_card_info.get("yellow"))
     temp_player["cards_red"] = not_null(player_card_info.get("red"))
-    temp_player["cards_second_yellow"] = not_null(player_card_info.get("yellowred"))
-    temp_player["cards_straight_red"] = (temp_player.get("cards_red")
-                                        - temp_player.get("cards_second_yellow"))
+    
     # penalty
     player_pen_info = stats.get("penalty")
     temp_player["penalties_won"] = not_null(player_pen_info.get("won"))
@@ -427,6 +415,44 @@ def process_stats(stats, temp_player):
     temp_player["penalties_missed"] = not_null(player_pen_info.get("missed"))
     temp_player["penalties_saved"] = not_null(player_pen_info.get("saved"))
     temp_player["penalties_committed"] = not_null(player_pen_info.get("commited")) #sic
+
+
+    if previous_data:
+        static_keys = ([
+            "id", "player_id", "name", "firstname", "lastname", 
+            "league_name", "team_id", "team_name", "season",
+            "rating", "position"
+        ])
+        for key, value in previous_data.items():   
+            if key not in static_keys and key in temp_player.keys():
+                if value is not None:
+                    current_value = temp_player.get(key)
+                    if current_value is None:
+                        current_value = 0
+                    if value != float(current_value):
+                        temp_player[key] = current_value + value
+
+    # Calculate values
+
+    # ensure >= 0 shots
+    if temp_player.get("shots") > 0:
+        temp_player["shots_on_pct"] = round(temp_player.get("shots_on") * 100
+                                            / temp_player.get("shots"))
+    temp_player["duels_won_pct"] = None
+    # ensure >= 0 duels
+    if temp_player.get("duels") > 0:
+        temp_player["duels_won_pct"] = round(temp_player.get("duels_won") * 100
+                                                / temp_player.get("duels"))
+
+    temp_player["dribbles_succeeded_pct"] = None
+    # ensure >= 0 dribbles_attempted
+    if temp_player.get("dribbles_attempted") > 0:
+        temp_player["dribbles_succeeded_pct"] = round(
+                                            temp_player.get("dribbles_succeeded")
+                                            / temp_player.get("dribbles_attempted")
+                                            * 100
+                                        )
+
     temp_player["penalties_scored_pct"] = None
     if (temp_player.get("penalties_scored") > 0 or
         temp_player.get("penalties_missed") > 0):
@@ -436,6 +462,7 @@ def process_stats(stats, temp_player):
                                                 + temp_player.get("penalties_missed"))
                                             * 100
                                         )
+
     return temp_player
 
 #############################
@@ -457,25 +484,17 @@ def process_leagues(leagues, _, season):
         league_country = league.get("country").get("name")
         if f"{league_name},{league_country}" in current_leagues:
             temp_league = dict()
-            # seasons
-            temp_league["season"] = league.get("seasons")[0].get("year")
-            temp_league["season_start"] = datetime.strptime(
-                                              league.get("seasons")[0].get("start"),
-                                              "%Y-%m-%d"
-                                          ).date()
-            temp_league["season_end"] = datetime.strptime(
-                                            league.get("seasons")[0].get("end"),
-                                            "%Y-%m-%d"
-                                        ).date()
-            temp_league["is_current"] = bool(league.get("seasons")[0].get("current"))
+
             # league
             temp_league["name"] = league_name
             temp_league["id"] = league.get("league").get("id")
             temp_league["logo"] = league.get("league").get("logo")
             temp_league["type"] = league.get("league").get("type")
+
             # country
             temp_league["country"] = league_country
             temp_league["flag"] = league.get("country").get("flag")
+
             # generate output dict
             league_ids[temp_league.get("id")] = temp_league.get("name")
             filtered_leagues.append(check_keys(temp_league, attributes))
@@ -494,19 +513,12 @@ def process_teams(teams, league_id, season):
         temp_team = dict()
         temp_team["league_id"] = league_id
         temp_team["league_name"] = league_name
+
         # team
         temp_team["id"] = team.get("team").get("id")
         temp_team["name"] = team.get("team").get("name")
         temp_team["logo"] = team.get("team").get("logo")
-        temp_team["founded"] = team.get("team").get("founded")
-        # coach
-        temp_team["coach_name"] = team.get("coach").get("name")
-        temp_team["coach_firstname"] = team.get("coach").get("firstname")
-        temp_team["coach_lastname"] = team.get("coach").get("lastname")
-        # venue
-        temp_team["venue_name"] = team.get("venue").get("name")
-        temp_team["venue_city"] = team.get("venue").get("city")
-        temp_team["venue_capacity"] = team.get("venue").get("capacity")
+
         # generate output dict
         teams[idx] = check_keys(temp_team, attributes)
         team_ids[temp_team.get("id")] = {
@@ -516,95 +528,92 @@ def process_teams(teams, league_id, season):
         }
     return {"ids":team_ids,"processed_data":teams}
 
-def process_players(players, team_id, season, filtered_players, request_instance):
+def process_players(players, team_id, season, filtered_players, filtered_stats, request_instance):
     """ Function to process the API response regarding player data. """
     config_values = eval(get_config_arg("team_ids", season)).get(team_id)
     league_name = config_values.get("league_name", season)
     alt_league_name = get_alternative_league(league_name)
-    orm_class = Players
+    orm_class = Stats
     attributes = getattr(orm_class, "_TYPES")
 
     for idx in range(len(players)):
         player = players[idx]
-        # check player
-        # ensure only player stats for current leagues are being processed
+
         if isinstance(player.get("statistics"), list):
             player_stats = player.get("statistics")
         else:
             player_stats = [player.get("statistics")]
+
         for stats in player_stats:
             temp_player = dict()
+
+            # ensure only player stats for current leagues are being processed
             temp_league_name = stats.get("league").get("name")
             if temp_league_name != league_name and (alt_league_name is None or
                 temp_league_name != alt_league_name):
                 continue
-            # use consistent league name
+
             # only store statistics on players that have played
             if (not stats.get("games").get("minutes") or
                 float(stats.get("games").get("minutes")) == 0.0):
                 continue
 
-            temp_player["id"] = player.get("player").get("id")
+            # player info needed for players table
+            player_info = player.get("player")
+            temp_player["player_id"] = player.get("player").get("id")
+            temp_player["name"] = player_info.get("name").replace("&apos;","'")
+            temp_player["firstname"] = player_info.get("firstname")
+            temp_player["lastname"] = player_info.get("lastname")
+
+            # only store one record in players table
+            if temp_player.get("player_id") not in filtered_players.keys() :
+
+                # get player flag
+                country_abbrev = flags_dict.get(player_info.get("nationality"))
+                if country_abbrev is None:
+                    print(f"INFO: No Flag Found For {player_info.get('nationality')}.")
+                    flag = "#"
+                else:
+                    flag = f"https://media.api-sports.io/flags/{country_abbrev.lower()}.svg"
+
+                # get player height and weight
+                height, weight = process_height_weight(
+                                            player_info.get("height"),
+                                            player_info.get("weight")
+                                        )
+
+                # update filtered_players
+                filtered_players[temp_player.get("player_id")] = {
+                        "id": temp_player.get("player_id"),
+                        "name": temp_player.get("name"),
+                        "firstname": temp_player.get("firstname"),
+                        "lastname": temp_player.get("lastname"),
+                        "age": player_info.get("age"),
+                        "birth_date": process_birthdate(
+                                            player_info.get("birth").get("date")
+                                        ),
+                        "nationality": player_info.get("nationality"),
+                        "flag": flag,
+                        "height": height,
+                        "weight": weight
+                    }
+
+            # player info
             temp_player["league_id"] = stats.get("league").get("id")
             temp_player["league_name"] = league_name
             temp_player["team_id"] = stats.get("team").get("id")
             temp_player["team_name"] = stats.get("team").get("name")
-            # check for duplicates, only process most recent versions
-            if temp_player.get("id") in filtered_players.keys() :
-                # find most recent transfered-to-club
-                api_response = request_instance.make_call(
-                                                    "transfers",
-                                                    {"player": temp_player.get("id")}
-                                                ).get("response")
-                if len(api_response) > 0:
-                    player_transfers = api_response[0].get("transfers")
-                    most_recent_transfer_date = None
-                    most_recent_team_id = None
-                    for transfer in player_transfers:
-                        try:
-                            transfer_date = datetime.strptime(transfer.get("date"),"%Y-%m-%d").date()
-                        except:
-                            print("ERROR: Could Not Format Transfer Date: {}, {}.".format(
-                                                                                transfer.get("date"),
-                                                                                temp_player.get("id")
-                                                                            ))
-                            sys.exit(1)
-                        if (most_recent_transfer_date is None or 
-                            transfer_date > most_recent_transfer_date):
-                            # ensure not a future transfer
-                            if ((transfer_date.year == int(season) + 1 and transfer_date.month < 3) or 
-                                (transfer_date.year <= int(season))):
-                                most_recent_transfer_date = transfer_date
-                                most_recent_team_id = transfer.get("teams").get("in").get("id")
-                    # if we already have the most recent version, don't process
-                    filtered_players_team_id = int(filtered_players.get(temp_player.get("id")).\
-                                                                    get("team_id"))
-                    if filtered_players_team_id == most_recent_team_id:
-                        continue
-                    # if this isn't the most recent version, don't process
-                    elif int(temp_player.get("team_id")) != most_recent_team_id:
-                        continue
-            # player
-            player_info = player.get("player")
-            temp_player["name"] = player_info.get("name").replace("&apos;","'")
-            temp_player["firstname"] = player_info.get("firstname")
-            temp_player["lastname"] = player_info.get("lastname")
-            temp_player["age"] = player_info.get("age")
-            temp_player["nationality"] = player_info.get("nationality")
-            country_abbrev = flags_dict.get(temp_player.get("nationality"))
-            if country_abbrev is None:
-                print(f"INFO: No Flag Found For {temp_player.get('nationality')}.")
-                temp_player["flag"] = "#"
+            temp_player["season"] = int(season)
+            temp_player["id"] = generate_uid(
+                                    temp_player.get("player_id"),
+                                    temp_player.get("season"),
+                                    temp_player.get("team_id")
+                                )
+
+            if temp_player.get("id") in filtered_stats.keys():
+                temp_player = process_stats(stats, temp_player, filtered_stats.get(temp_player.get("id")))
             else:
-                temp_player["flag"] = f"https://media.api-sports.io/flags/{country_abbrev.lower()}.svg"
-            temp_player["height"], temp_player["weight"] = process_height_weight(
-                                                               player_info.get("height"),
-                                                               player_info.get("weight")
-                                                           )
-            temp_player["birth_date"] = process_birthdate(
-                                            player_info.get("birth").get("date")
-                                        )
-            temp_player = process_stats(stats, temp_player)
+                temp_player = process_stats(stats, temp_player, None)
             processed_player = check_keys(temp_player, attributes)
-            filtered_players[processed_player.get("id")] = processed_player
-    return filtered_players
+            filtered_stats[processed_player.get("id")] = processed_player
+    return filtered_players, filtered_stats

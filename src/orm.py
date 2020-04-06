@@ -36,28 +36,20 @@ class Leagues(Base):
         "name": str,
         "type": str,
         "country": str,
-        "season": int,
-        "season_start": date,
-        "season_end": date,
         "logo": str,
-        "flag": str,
-        "is_current": bool,
+        "flag": str
     }
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
     type = Column(String)
     country = Column(String)
-    season = Column(Integer) 
-    season_start = Column(Date) 
-    season_end = Column(Date) 
     logo = Column(String)
     flag = Column(String)
-    is_current = Column(Boolean)
 
     def __repr__(self):
         """ Instance to print class objects """
-        return f"<Leagues(league_id={self.id}, name={self.name}, country={self.country}, season={self.season}, ...)>"
+        return f"<Leagues(league_id={self.id}, name={self.name}, country={self.country} ...)>"
 
 
 class Teams(Base):
@@ -65,59 +57,72 @@ class Teams(Base):
 
     _TYPES = {
         "id": int,
+        "name": str,
         "league_id": int,
         "league_name": str,
-        "name": str,
-        "logo": str,
-        "founded": str,
-        "coach_name": str,
-        "coach_firstname": str,
-        "coach_lastname": str,
-        "venue_name": str,
-        "venue_city": str,
-        "venue_capacity": int,
+        "logo": str
     }
 
 
     id = Column(Integer, primary_key=True)
+    name = Column(String)
     league_id = Column(Integer, ForeignKey("leagues.id"), nullable=False)
     league_name = Column(String)
-    name = Column(String)
     logo = Column(String)
-    founded = Column(Integer)
-    coach_name = Column(String)
-    coach_firstname = Column(String)
-    coach_lastname = Column(String)
-    venue_name = Column(String)
-    venue_city = Column(String)
-    venue_capacity = Column(Integer)
 
     def __repr__(self):
         """ Instance to print class objects """
-        return f"<Teams(team_id={self.id}, league_id={self.league_id}, name={self.name}, country={self.country}, ...)>"
-
+        return f"<Teams(team_id={self.id}, league_id={self.league_id}, name={self.name} ...)>"
 
 class Players(Base):
     """ ORM Class defining attributes for players table. """
 
     _TYPES = {
-        "league_id": int,
-        "league_name": str,
-        "team_id": int,
-        "team_name": str,
         "id": int,
         "name": str,
         "firstname": str,
         "lastname": str,
-        "position": str,
         "age": int,
         "birth_date": date,
         "nationality": str,
         "flag": str,
         "height": str,
-        "weight": str,
+        "weight": str
+    }
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    firstname = Column(String)
+    lastname = Column(String)
+    age = Column(Integer)
+    birth_date = Column(Date) 
+    nationality = Column(String)
+    flag = Column(String)
+    height = Column(String)  
+    weight = Column(String) 
+ 
+    def __repr__(self):
+        """ Instance to print class objects """
+        return f"""<Players(player_id={self.id}, name={self.name}, nationality={self.nationality} ...)>"""
+
+
+
+class Stats(Base):
+    """ ORM Class defining attributes for players stats. """
+
+    _TYPES = {
+        "id": str, # hash of id, team_id, and season
+        "player_id": int,
+        "name": str,
+        "firstname": str,
+        "lastname": str,
+        "season": int,
+        "league_id": int,
+        "league_name": str,
+        "team_id": int,
+        "team_name": str,
+        "position": str,
         "rating": float,
-        "captain": bool,
         "shots": float,
         "shots_on": float,
         "shots_on_pct": float,
@@ -141,8 +146,6 @@ class Players(Base):
         "fouls_committed": float,
         "cards_yellow": float,
         "cards_red": float,
-        "cards_second_yellow": float,
-        "cards_straight_red": float,
         "penalties_won": float,
         "penalties_committed": float,
         "penalties_scored": float,
@@ -157,23 +160,18 @@ class Players(Base):
         "substitutions_out": float,
     }
 
-    id = Column(Integer, primary_key=True) # hash of id, team_id, league_id
+    id = Column(String, primary_key=True) # hash of id, team_id, season
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False)
+    name = Column(String)
+    firstname = Column(String)
+    lastname = Column(String)
+    season = Column(Integer)
     league_id = Column(Integer, ForeignKey("leagues.id"), nullable=False) 
     league_name = Column(String)
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=False) 
     team_name = Column(String)
-    name = Column(String)
-    firstname = Column(String)
-    lastname = Column(String)
     position = Column(String) # Attacker, Defender, Midfielder, Goalkeeper
-    age = Column(Integer)
-    birth_date = Column(Date) 
-    nationality = Column(String)
-    flag = Column(String)
-    height = Column(String)  
-    weight = Column(String) 
     rating = Column(Float) 
-    captain = Column(Boolean) 
     # "shots": {"total":x,"on":y}
     shots = Column(Float)
     shots_on = Column(Float)
@@ -205,8 +203,6 @@ class Players(Base):
     # "cards": {"yellow":x,"yellowred":y,"red":z}
     cards_yellow = Column(Float)
     cards_red = Column(Float)
-    cards_second_yellow = Column(Float)
-    cards_straight_red = Column(Float) 
     # "penalty": {"won":x,"commited":y,"success":z,"missed":za,"saved":zb} [sic]
     penalties_won = Column(Float)
     penalties_committed = Column(Float)
@@ -225,5 +221,6 @@ class Players(Base):
 
     def __repr__(self):
         """ Instance to print class objects """
-        return f"""<Players(player_id={self.id}, name={self.name}, team_id={self.team_id}, league={self.league_name},
-                age={self.age}, position={self.position}, nationality={self.nationality}, ...)>"""
+        return f"""<Stats(player_id={self.player_id}, season={self.season}, team_id={self.team_id} ...)>"""
+
+   

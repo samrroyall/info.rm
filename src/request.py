@@ -142,12 +142,13 @@ class Request(metaclass=Registry):
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
         response_type = self.__class__.__name__.lower().split("request")[0]
         process_func = eval(f"process_{response_type}")
-        if hasattr(self, "processed_data"):
+        if hasattr(self, "processed_players") and hasattr(self, "processed_stats"):
             return process_func(
                             response_data.get("response"),
                             self.foreign_key,
                             self.current_season_short,
-                            self.processed_data,
+                            self.processed_players,
+                            self.processed_stats,
                             self
                         )
         else:
@@ -194,7 +195,13 @@ class PlayersRequest(Request):
     data through API requests regarding Teams data. """
     _REGISTER: bool = True
 
-    def __init__(self, team_id: int, processed_data: Dict[str, Any], season: str) -> None:
+    def __init__(
+            self, 
+            team_id: int, 
+            processed_players: Dict[str, Any], 
+            processed_stats: Dict[str, Any], 
+            season: str
+        ) -> None:
         super().__init__(season)
         self.endpoint: str = "players"
         self.foreign_key: int = team_id
@@ -202,4 +209,5 @@ class PlayersRequest(Request):
             "team": team_id,
             "season": self.current_season_short
         }
-        self.processed_data = processed_data
+        self.processed_players = processed_players
+        self.processed_stats = processed_stats

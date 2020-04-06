@@ -7,7 +7,7 @@ from .config import get_config_arg
 from .orm import Leagues, Teams, Players
 
 file_path = pathlib.Path(__file__).parent.absolute()
-CURRENT_SEASON = "2019"
+db_path = os.path.join(str(file_path), f"../db/info.rm.db")
 
 ###########################
 ###### Query Classes ######
@@ -24,7 +24,7 @@ class Filter:
         self.field, self.operator, self.value = self.check_tables_values(field, operator, value)
 
     def check_tables_values(self, field, operator, value):
-        db_tables = ["players","teams","leagues"]
+        db_tables = ["stats", "players","teams","leagues"]
         column = grab_columns(field)[0]
         split_column = column.split(".")
         table_name = split_column[0]
@@ -117,7 +117,7 @@ class Select:
         self.check_tables(table_names)
 
     def check_tables(self, table_names: List[Tuple[str,str]]) -> None:
-        db_tables = ["players","teams","leagues"]
+        db_tables = ["stats", "players", "teams","leagues"]
         # handle tables
         if len(table_names) == 1:
             self.table_names = [table_names[0][0]]
@@ -172,9 +172,8 @@ class Query:
     def __init__(
         self,
         statement: Statement,
-        season: str = CURRENT_SEASON
     ) -> None:
-        self.db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
+        self.db_path = db_path 
         assert isinstance(statement, Statement),\
             "ERROR: Query class not supplied with Statement object."
         self.statement = statement
@@ -219,52 +218,98 @@ def grab_columns(string: str) -> List[str]:
             result.append(temp_col)
     return result
 
+################################
+#### Public Query Functions ####
+################################
+
+stats_keys = {
+        0: "id", 
+        1: "player_id",
+        2: "name", 
+        3: "firstname", 
+        4: "lastname", 
+        5: "season", 
+        6: "league_id", 
+        7: "league_name", 
+        8: "team_id", 
+        9: "team_name", 
+        10: "position", 
+        11: "rating", 
+        12: "shots", 
+        13: "shots_on", 
+        14: "shots_on_pct",
+        15: "goals",
+        16: "goals_conceded",
+        17: "assists",
+        18: "passes",
+        19: "passes_key",
+        20: "passes_accuracy",
+        21: "tackles",
+        22: "blocks",
+        23: "interceptions",
+        24: "duels",
+        25: "duels_won",
+        26: "duels_won_pct",
+        27: "dribbles_past",
+        28: "dribbles_attempted",
+        29: "dribbles_succeeded",
+        30: "dribbles_succeeded_pct",
+        31: "fouls_drawn",
+        32: "fouls_committed",
+        33: "cards_yellow",
+        34: "cards_red",
+        35: "penalties_won",
+        36: "penalties_committed",
+        37: "penalties_scored",
+        38: "penalties_missed",
+        39: "penalties_scored_pct",
+        40: "penalties_saved",
+        41: "games_appearances",
+        42: "minutes_played",
+        43: "games_started",
+        44: "substitutions_in",
+        45: "substitutions_out",
+        46: "games_bench"
+    }
+
+players_keys = {
+        0: "id",
+        1: "name",
+        2: "firstname",
+        3: "lastname",
+        4: "age",
+        5: "birth_date",
+        6: "nationality",
+        7: "flag",
+        8: "height",
+        9: "weight"
+    }
+
+teams_keys = {
+        0: "id",
+        1: "name",
+        2: "league_id",
+        3: "league_name",
+        4: "logo"
+    }
+
+leagues_keys = {
+        0: "id",
+        1: "name",
+        2: "type",
+        3: "country",
+        4: "logo",
+        5: "flag"
+    }
+
 def get_max(
         stat: str,
         season: str = CURRENT_SEASON
     ) -> float:
-    db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
-    cursor.execute(f"SELECT max({stat}) FROM players;")
+    cursor.execute(f"SELECT max({stat}) FROM stats WHERE season = {season};")
     query_result = cursor.fetchall()[0][0]
-    connection.commit()
-    connection.close()
-    return query_result
-
-def get_by(
-        col1: str,
-        table1: str,
-        where_param: str,
-        col2: str,
-        table2: str,
-        season: str = CURRENT_SEASON
-    ) -> Dict[str, List[str]]:
-    db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
-    connection = sqlite3.connect(db_path)
-    cursor = connection.cursor()
-    result = dict()
-    cursor.execute(f"SELECT DISTINCT {col2} FROM {table2};")
-    values = [tup[0] for tup in cursor.fetchall()]
-    connection.commit()
-    for value in values:
-        query_string = f"SELECT DISTINCT {col1} FROM {table1} WHERE {where_param}=\"{value}\";"
-        cursor.execute(query_string)
-        result[value] = [tup[0] for tup in cursor.fetchall()]
-        connection.commit()
-    connection.close()
-    return result
-
-def get_column(
-        col: str,
-        table: str,
-        season: str = CURRENT_SEASON
-    ) -> List[str]:
-    db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
-    connection = sqlite3.connect(db_path)
-    cursor = connection.cursor()
-    cursor.execute(f"SELECT DISTINCT {col} FROM {table};")
-    query_result = [tup[0] for tup in cursor.fetchall()]
     connection.commit()
     connection.close()
     return query_result
@@ -273,13 +318,23 @@ def get_player_data(
         id: str,
         season: str = CURRENT_SEASON
     ) -> List[str]:
-    db_path = os.path.join(str(file_path), f"../db/info-rm-{season}.db")
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
 
     cursor.execute(f"SELECT * FROM players WHERE id = {id};")
     player_result = cursor.fetchall()
     player_result = list(player_result[0])
+    connection.commit()
+
+    cursor.execute(f"SELECT * FROM stats WHERE player_id = {id};")
+    stats_result = list(cursor.fetchall())
+
+    data = dict() 
+    for stat_result in stats_result:
+        season = 
+        team = 
+        
+
     connection.commit()
 
     team_id = player_result[3]
