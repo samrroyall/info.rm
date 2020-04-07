@@ -1,39 +1,35 @@
-from .query import Query, Statement, grab_columns
+from .query import Query, Statement, grab_columns, get_pct_stats, get_float_stats
 
 default_select_fields = ["teams.logo", "players.name", "players.id", "teams.name"]
-join_params = {
-        "players": "team_id",
-        "teams": "id",
-    }
-floats = [
-    "players.rating",
-]
-pcts = [
-    "players.shots_on_pct",
-    "players.passes_accuracy",
-    "players.duels_won_pct",
-    "players.dribbles_succeeded_pct",
-    "players.penalties_scored_pct",
-]
+floats = get_float_stats()
+pcts = get_pct_stats()
+
 
 def stmt(select_fields, filter_fields, order_field):
     select_fields = default_select_fields + select_fields
-    table_names = []
+
+    # compile select fields and filter fields
     fields = []
     if filter_fields is not None:
         for filter_field in filter_fields[0][0]:
             filter_column = filter_field[0]
             fields.append(filter_column)
     fields += select_fields
+
+    # grab table names (besides stats) from fields
+    temp_table_names = []
     for sel_field in fields:
         columns = grab_columns(sel_field)
         for column in columns:
             table = column.split(".")[0]
-            table_names.append((
-                    table,
-                    join_params.get(table)
-                ))
-    table_names = list(set(table_names))
+            if table != "stats":
+                temp_table_names.append(table)
+
+    # dedup table names
+    temp_table_names = list(set(table_names))
+
+    # create table_names list 
+    table_names = ["stats", temp_table_names]
 
     stmt = Statement(
         table_names = table_names,
@@ -51,8 +47,8 @@ def field_logical(field):
             return True
     return False
 
-def rank_response(select_fields, filter_fields, order_field, season):
-    query_result = Query(stmt(select_fields, filter_fields, order_field), season).query_db()
+def rank_response(select_fields, filter_fields, order_field):
+    query_result = Query(stmt(select_fields, filter_fields, order_field)).query_db()
     order_by_field = order_field[0][0]
     desc = order_field[1]
     fields = default_select_fields + select_fields

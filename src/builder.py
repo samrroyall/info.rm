@@ -1,73 +1,44 @@
-from .query import get_max, get_column, get_by, grab_columns
+from .query import get_max, get_select_data, get_current_season, get_positions
 from .web_query import rank_response
 
 ########################
 ##### FORM INPUTS ######
 ########################
 
-CURRENT_SEASON = "2019"
-SEASONS = ["2019", "2018", "2017", "2016", "2015"]
+positions = get_positions()
+CURRENT_SEASON = get_current_season()
 lops = ["+","-","*","/"]
 cops = ["<",">","=","><"]
-positions = ["Attacker", "Midfielder", "Defender", "Goalkeeper"]
 stats = {
-    "Assists": "players.assists",
-    "Successful_Dribbles": "players.dribbles_succeeded",
-    "Successful_Dribbles_Percentage": "players.dribbles_succeeded_pct",
-    "Attempted_Dribbles": "players.dribbles_attempted",
-    "Goals": "players.goals",
-    "Shots": "players.shots",
-    "Shots_on_Target": "players.shots_on",
-    "Shots_on_Target_Percentage": "players.shots_on_pct",
-    "Penalties_Won": "players.penalties_won",
-    "Penalties_Scored": "players.penalties_scored",
-    "Penalties_Scored_Percentage": "players.penalties_scored_pct",
-    "Penalties_Missed": "players.penalties_missed",
-    "Passes": "players.passes",
-    "Pass_Accuracy": "players.passes_accuracy",
-    "Key_Passes": "players.passes_key",
-    "Blocks": "players.blocks",
-    "Interceptions": "players.interceptions",
-    "Tackles": "players.tackles",
-    "Penalties_Committed": "players.penalties_committed",
-    "Goals_Conceded": "players.goals_conceded",
-    "Player_Rating": "players.rating",
-    "Penalties_Saved": "players.penalties_saved",
-    "Red_Cards": "players.cards_red",
-    "Straight_Red_Cards": "players.cards_straight_red",
-    "Yellow_Cards": "players.cards_yellow",
-    "Second_Yellow_Cards": "players.cards_second_yellow"
+    "Assists": "stats.assists",
+    "Successful_Dribbles": "stats.dribbles_succeeded",
+    "Successful_Dribbles_Percentage": "stats.dribbles_succeeded_pct",
+    "Attempted_Dribbles": "stats.dribbles_attempted",
+    "Goals": "stats.goals",
+    "Shots": "stats.shots",
+    "Shots_on_Target": "stats.shots_on",
+    "Shots_on_Target_Percentage": "stats.shots_on_pct",
+    "Penalties_Won": "stats.penalties_won",
+    "Penalties_Scored": "stats.penalties_scored",
+    "Penalties_Scored_Percentage": "stats.penalties_scored_pct",
+    "Penalties_Missed": "stats.penalties_missed",
+    "Passes": "stats.passes",
+    "Pass_Accuracy": "stats.passes_accuracy",
+    "Key_Passes": "stats.passes_key",
+    "Blocks": "stats.blocks",
+    "Interceptions": "stats.interceptions",
+    "Tackles": "stats.tackles",
+    "Penalties_Committed": "stats.penalties_committed",
+    "Goals_Conceded": "stats.goals_conceded",
+    "Player_Rating": "stats.rating",
+    "Penalties_Saved": "stats.penalties_saved",
+    "Red_Cards": "stats.cards_red",
+    "Yellow_Cards": "stats.cards_yellow",
 }
 
-##############################
-##### HELPER FUNCTIONS #######
-##############################
-
-def get_data():
-    nations = dict()
-    clubs_dict = dict()
-
-    leagues = get_column("name", "leagues")
-    leagues.sort()
-
-    for season in SEASONS:
-        temp_clubs = get_by(
-                        "name",
-                        "teams",
-                        "league_name",
-                        "name",
-                        "leagues",
-                        season
-                    )
-        for league in leagues:
-            temp_clubs[league].sort()
-        clubs_dict[season] = temp_clubs
-
-        temp_nations = get_column("nationality", "players", season)
-        temp_nations.sort()
-        nations[season] = temp_nations
-
-    return leagues, clubs_dict, nations
+#################################
+##### CUSTOM STAT HELPERS #######
+#################################
 
 def check_input_value(input, type):
     if type == "stats":
@@ -133,7 +104,7 @@ def get_stat_values(form_data_dict, type = "select"):
             else:
                 continue
             if per90:
-                select_string = f"({select_string})/(players.minutes_played/90.0)"
+                select_string = f"({select_string})/(stats.minutes_played/90.0)"
             if type == "select":
                 values.append(select_string)
             elif type == "order":
@@ -154,20 +125,26 @@ def get_stat_values(form_data_dict, type = "select"):
 #############################
 
 def default_stats():
-    leagues, clubs_dict, nations = get_data()
-    select_fields = [
-        "players.rating",
-        "players.goals",
-        "players.assists"
-    ]
-    max_minutes_played = get_max("players.minutes_played", CURRENT_SEASON)
-    filter_fields = [
-        ([("players.minutes_played",">",str(max_minutes_played/3))],"")
-    ]
-    order_field = (["players.rating"], True)
+    season_data = get_select_data()
+    clubs_dict = season_data.get("clubs")
+    leagues = season_data.get("leagues")
+    nations = season_data.get("nations")
 
-    query_result = rank_response(select_fields, filter_fields, order_field, CURRENT_SEASON)
-    return query_result, leagues, clubs_dict, nations
+    select_fields = [
+        "stats.rating",
+        "stats.goals",
+        "stats.assists"
+    ]
+    max_minutes_played = get_max("stats.minutes_played")
+    filter_fields = [
+        ([("stats.minutes_played",">",str(max_minutes_played/3)), ("stats.season", "=", CURRENT_SEASON)],"")
+    ]
+    order_field = (["stats.rating"], True)
+
+    # ******include season in filter*****
+
+    query_result = rank_response(select_fields, filter_fields, order_field)
+    return query_result, season_data
 
 def custom_stats(form_data):
     form_data_dict = dict()
@@ -177,15 +154,17 @@ def custom_stats(form_data):
         form_data_dict[field] = value
     # get select values
     select_fields = get_stat_values(form_data_dict, "select")
+    # get season in scope 
+    season = form_data_dict.get("season_select")
     # get filter values
-    filter_fields = []
+    filter_fields = [("stats.season", "=", season)]
 
     # get age and minutes_played values
     for key in ["age", "minutes_played"]:
         cop = form_data_dict[f"{key}_op"]
         input_one = form_data_dict[f"{key}_input1"]
         input_two = form_data_dict[f"{key}_input2"]
-        key_string = f"players.{key}"
+        key_string = f"players.{key}" if key == "age" else f"stats.{key}"
         cop_values = check_cop_values(cop, input_one, input_two)
         if cop_values == 2:
             filter_fields.append( (key_string, ">", input_one) )
@@ -193,22 +172,25 @@ def custom_stats(form_data):
         elif cop_values == 1:
             filter_fields.append( (key_string, cop, input_one) )
 
-    # get season in scope 
-    season = form_data_dict.get("season_select")
+    
+
     # make query
-    leagues, clubs_dict, nations = get_data()
+    season_data = get_select_data()
+    clubs_dict = season_data.get("clubs")
+    leagues = season_data.get("leagues")
+    nations = season_data.get("nations")
 
     # get club, league, nationality, position values
     for key in ["club", "league", "nationality", "position"]:
         if key != "club":
             value = form_data_dict.get(f"{key}_select")
         if key == "position" and value and value in positions:
-            key_string = "players.position"
+            key_string = "stats.position"
         elif key == "league" and value and value in leagues:
-            key_string = "teams.league_name"
+            key_string = "stats.league_name"
         elif (key == "club" and form_data_dict.get("club_league_select") and
-            value in clubs_dict.get(form_data_dict.get("club_league_select"))):
-            key_string = "teams.name"
+            value in clubs_dict.get(season).get(form_data_dict.get("club_league_select"))):
+            key_string = "stats.team_name"
         elif key == "nationality" and value and value in nations.get(season):
               key_string = "players.nationality"
         else:
@@ -231,8 +213,9 @@ def custom_stats(form_data):
     if len(order_field) == 0:
         order_field = ([select_fields[0]], True)
     
+
     try:
-        query_result = rank_response(select_fields, filter_fields, order_field, season)
+        query_result = rank_response(select_fields, filter_fields, order_field)
     except:
         query_result = "ERROR"
-    return query_result, leagues, clubs_dict, nations, season
+    return query_result, season_data, season

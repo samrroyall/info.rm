@@ -1,191 +1,179 @@
-from .query import Query, get_max, get_column, get_by, grab_columns
+from .query import Query, get_max
 from .web_query import rank_response
 
-def scoring_stats(league, season, per_90):
-    query_result = dict()
-    max_minutes_played = get_max("players.minutes_played", season)
-    max_shots = get_max("players.shots", season)
+DEFAULT_FILTER = None
+MP_FILTER = None
+PASS_FILTER = None 
+SHOT_FILTER = None 
+PER_90 = None
+
+##########################
+###### QUERY HELPERS #####
+##########################
+
+def finalize_query(select_fields, filter_fields):
+        # finalize filters
+        filter_fields = [(filter_fields, "AND")]
+
+        # order by
+        order_by_stat = select_fields[0]
+        order_field = ([order_by_stat], True)
+        return rank_response(select_fields, filter_fields, order_field)
+
+##########################
+###### MAIN HELPERS ######
+##########################
+
+def scoring_stats():
+    scoring_query = dict()
     for stat in ["goals", "assists", "goal_contributions", "goals_per_shot"]:
+        # select fields
         if stat == "goal_contributions":
-            select_fields = ["players.goals+players.assists"]
+            select_fields = ["stats.goals+stats.assists"]
         elif stat == "goals_per_shot":
-            select_fields = ["players.goals/players.shots"]
+            select_fields = ["stats.goals/stats.shots"]
         else:
-            select_fields = [f"players.{stat}"]
-        select_fields = ([f"({select_fields[0]})/(players.minutes_played/90)"] 
-                         if per_90 is True and stat != "goals_per_shot"
-                         else select_fields)
-        if per_90 is True and stat != "goals_per_shot":
-            filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
-        elif stat == "goals_per_shot":
-            filter_fields = [ ("players.shots", ">", str(max_shots/3)) ]
-        else:
-            filter_fields = None
-        if league is not None:
-            if filter_fields is not None:
-                filter_fields.append( ("teams.league_name", "=", league) )
-            else:
-                filter_fields = [ ("teams.league_name", "=", league) ]
-        if filter_fields is not None:
-            filter_fields = [(filter_fields, "AND")]
-        order_by_stat = select_fields[0]
-        order_field = ([order_by_stat], True)
-        query_result[stat] = rank_response(select_fields, filter_fields, order_field, season)
-    return query_result
+            select_fields = [f"stats.{stat}"]
 
-def shooting_stats(league, season, per_90):
-    query_result = dict()
-    max_minutes_played = get_max("players.minutes_played", season)
+        # handle goals per shot filter
+        if stat == "goals_per_shot":
+            filter_fields = DEFAULT_FILTER + [("stats.shots", ">", SHOT_FILTER)]
+        # handle per 90
+        elif PER_90 is True:
+            select_fields = [f"(select_fields[0])/(stats.minutes_played/90)"]
+            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FILTER)]
+
+        scoring_query[stat] = finalize_query(select_fields, filter_fields)
+    return scoring_query
+
+def shooting_stats():
+    shooting_query = dict()
     for stat in ["shots", "shots_on"]:
-        select_fields = ([f"(players.{stat})/(players.minutes_played/90)"]
-                             if per_90 is True else [f"players.{stat}"])
-        if per_90 is True:
-            filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
-        else:
-            filter_fields = None
-        if league is not None:
-            if filter_fields is not None:
-                filter_fields.append( ("teams.league_name", "=", league) )
-            else:
-                filter_fields = [ ("teams.league_name", "=", league) ]
-        if filter_fields is not None:
-            filter_fields = [(filter_fields, "AND")]
-        order_by_stat = select_fields[0]
-        order_field = ([order_by_stat], True)
-        query_result[stat] = rank_response(select_fields, filter_fields, order_field, season)
-    return query_result
+        # select fields
+        select_fields = [f"stats.{stat}"]
 
-def passing_stats(league, season, per_90):
-    query_result = dict()
-    max_minutes_played = get_max("players.minutes_played", season)
-    max_passes = get_max("players.passes", season)
+        # handle per 90
+        if PER_90 is True:
+            select_fields = [f"(select_fields[0])/(stats.minutes_played/90)"]
+            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FITLER)]
+
+        shooting_query[stat] = finalize_query(select_fields, filter_fields)
+    return shooting_query
+
+def passing_stats():
+    passing_query = dict()
     for stat in ["passes_key", "passes", "passes_accuracy"]:
+        # select_fields
         select_fields = [f"players.{stat}"]
-        select_fields = ([f"({select_fields[0]})/(players.minutes_played/90)"]
-                             if per_90 is True and stat != "passes_accuracy"
-                             else select_fields)
-        filter_fields = (None if stat != "passes_accuracy"
-                             else [("players.passes", ">", str(max_passes/3))])
-        if per_90 is True and stat != "passes_accuracy":
-            if filter_fields is not None:
-                filter_fields.append( ("players.minutes_played", ">", str(max_minutes_played/3)) )
-            else:
-                filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
-        if league is not None:
-            if filter_fields is not None:
-                filter_fields.append( ("teams.league_name", "=", league) )
-            else:
-                filter_fields = [ ("teams.league_name", "=", league) ]
-        if filter_fields is not None:
-            filter_fields = [(filter_fields, "AND")]
-        order_by_stat = select_fields[0]
-        order_field = ([order_by_stat], True)
-        query_result[stat] = rank_response(select_fields, filter_fields, order_field, season)
-    return query_result
 
-def dribbling_stats(league, season, per_90):
-    query_result = dict()
-    max_minutes_played = get_max("players.minutes_played", season)
-    max_dribbles_attempted = get_max("players.dribbles_attempted", season)
+        # handle passes accuracy
+        if stat == "passes_accuracy":
+            filter_fields = DEFAULT_FILTER + [("stats.passes", ">", PASS_FILTER)]
+        # handle per 90
+        elif PER_90 is True:
+            select_fields = [f"({select_fields[0]})/(players.minutes_played/90)"]
+            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FITLER)]
+
+        passing_query[stat] = finalize_query(select_fields, filter_fields)
+    return passing_query
+
+def dribbling_stats():
+    dribbling_query = dict()
     for stat in ["dribbles_succeeded", "dribbles_attempted", "dribbles_succeeded_pct"]:
+        # select_fields
         select_fields = [f"players.{stat}"]
-        select_fields = ([f"({select_fields[0]})/(players.minutes_played/90)"]
-                             if per_90 is True and stat != "dribbles_succeeded_pct"
-                             else select_fields)
-        filter_fields = (None if stat != "dribbles_succeeded_pct"
-                             else [("players.dribbles_attempted", ">", str(max_dribbles_attempted/3))])
-        if per_90 is True and stat != "dribbles_succeeded_pct":
-            if filter_fields is not None:
-                filter_fields.append( ("players.minutes_played", ">", str(max_minutes_played/3)) )
-            else:
-                filter_fields = [ ("players.minutes_played", ">", str(max_minutes_played/3)) ]
-        if league is not None:
-            if filter_fields is not None:
-                filter_fields.append( ("teams.league_name", "=", league) )
-            else:
-                filter_fields = [ ("teams.league_name", "=", league) ]
-        if filter_fields is not None:
-            filter_fields = [(filter_fields, "AND")]
-        order_by_stat = select_fields[0]
-        order_field = ([order_by_stat], True)
-        query_result[stat] = rank_response(select_fields, filter_fields, order_field, season)
-    return query_result
 
-def defending_stats(league, season, per_90):
-    query_result = dict()
-    max_minutes_played = get_max("players.minutes_played", season)
+        # handle dribbles succeeded pct
+        if stat == "dribbles_succeeded_pct":
+            filter_fields = DEFAULT_FILTER + [("stats.dribbles_attempted", ">", DRIBBLE_FILTER)]
+        # handle per 90
+        elif PER_90 is True:
+            select_fields = [f"({select_fields[0]})/(players.minutes_played/90)"]
+            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FITLER)]
+
+        dribbling_query[stat] = finalize_query(select_fields, filter_fields)
+    return dribbling_query 
+
+def defending_stats():
+    defending_query = dict()
     if int(season) < 2017:
         stats = ["interceptions"]
     else:
         stats = ["tackles", "interceptions", "blocks"]
     for stat in stats:
         select_fields = [f"players.{stat}"]
-        select_fields = (select_fields if per_90 is False
-                         else [f"({select_fields[0]})/(players.minutes_played/90)"])
-        filter_fields = (None if per_90 is False
-                         else [("players.minutes_played", ">", str(max_minutes_played/3))])
-        if league is not None:
-            if filter_fields is not None:
-                filter_fields.append( ("teams.league_name", "=", league) )
-            else:
-                filter_fields = [ ("teams.league_name", "=", league) ]
-        if filter_fields is not None:
-            filter_fields = [(filter_fields, "AND")]
-        order_by_stat = select_fields[0]
-        order_field = ([order_by_stat], True)
-        query_result[stat] = rank_response(select_fields, filter_fields, order_field, season)
-    return query_result
 
-def other_stats(league, season, per_90):
-    query_result = dict()
-    max_minutes_played = get_max("players.minutes_played", season)
+        # handle per 90
+        if PER_90 is True:
+            select_fields = [f"({select_fields[0]})/(players.minutes_played/90)"]
+            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FITLER)]
+
+        defending_query[stat] = finalize_query(select_fields, filter_fields)
+    return defending_query
+
+def other_stats():
+    other_query = dict()
     for stat in ["rating", "goals_conceded", "penalties_saved"]:
-        select_fields = ([f"(players.{stat})/(players.minutes_played/90)"]
-                         if per_90 is True and stat == "goals_conceded"
-                         else [f"players.{stat}"])
-        filter_fields = None
-        if stat != "penalties_saved":
-            filter_fields = [("players.minutes_played", ">", str(max_minutes_played/3))]
-        # other two stats are only for keepers
+        # select_fields
+        select_fields = [f"players.{stat}"]
+
+        # initialize filters
+        filter_fields = DEFAULT_FILTER
+
+        # handle per 90
+        if per_90 is True and stat != "penalties_saved":
+            filter_fields += [("stats.minutes_played", ">", MP_FITLER)]
+        if PER_90 is True and stat == "goals_conceded":
+            select_fields += [f"({select_fields[0]})/(players.minutes_played/90)"]
+
         if stat != "rating":
-            if filter_fields is not None:
-                filter_fields.append( ("players.position", "=", "Goalkeeper") )
-            else:
-                filter_fields = [ ("players.position", "=", "Goalkeeper") ]
-        if league is not None:
-            if filter_fields is not None:
-                filter_fields.append( ("teams.league_name", "=", league) )
-            else:
-                filter_fields = [ ("teams.league_name", "=", league) ]
-        if filter_fields is not None:
-            filter_fields = [(filter_fields, "AND")]
+            filter_fields += [("players.position", "=", "Goalkeeper"] 
+
+        # finalize filters 
+        filter_fields = [(filter_fields, "AND")]
+
+        # order_by 
         order_by_stat = select_fields[0]
         order_field = (([order_by_stat], True)
                        if stat != "goals_conceded"
                        else ([order_by_stat], False))
-        query_result[stat] = rank_response(select_fields, filter_fields, order_field, season)
-    return query_result
+
+        other_query[stat] = rank_response(select_fields, filter_fields, order_field)
+    return other_query
 
 ##########################
+##### MAIN FUNCTION ######
 ##########################
-##########################
-
-LEAGUE_LOOKUP = {
-        "top-5": None,
-        "bundesliga": "Bundesliga 1",
-        "ligue-1": "Ligue 1",
-        "premier-league": "Premier League",
-        "la-liga": "Primera Division",
-        "serie-a": "Serie A"
-    }
 
 def dashboard_stats(league, season, per_90):
-    league = LEAGUE_LOOKUP.get(league)
+
+    global PER_90
+    PER_90 = per_90
+
+    global DEFAULT_FILTER
+    DEFAULT_FILTER = [("stats.season", "=", season)]
+
+    if league is not None:
+        DEFAULT_FILTER.append( ("stats.league_name", "=", league) )
+
+    global DRIBBLE_FILTER
+    DRIBBLE_FILTER = (get_max("players.dribbles_attempted", season)/3)
+
+    global MP_FILTER
+    MP_FILTER = str(get_max("stats.minutes_played", season)/3)
+
+    global PASS_FILTER
+    PASS_FILTER = str(get_max("stats.passes", season)/3)
+
+    global SHOT_FILTER
+    SHOT_FILTER = str(get_max("stats.shots", season)/3)
+
     query_result = dict()
-    query_result["scoring"] = scoring_stats(league, season, per_90)
-    query_result["shooting"] = shooting_stats(league, season, per_90)
-    query_result["passing"] = passing_stats(league, season, per_90)
-    query_result["dribbling"] = dribbling_stats(league, season, per_90)
-    query_result["defending"] = defending_stats(league, season, per_90)
-    query_result["other"] = other_stats(league, season, per_90)
+    query_result["scoring"] = scoring_stats()
+    query_result["shooting"] = shooting_stats()
+    query_result["passing"] = passing_stats()
+    query_result["dribbling"] = dribbling_stats()
+    query_result["defending"] = defending_stats()
+    query_result["other"] = other_stats()
+
     return query_result

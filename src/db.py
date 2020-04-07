@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 from orm import Leagues, Teams, Players, Stats, Base
+
+import pathlib
 from sqlalchemy import and_, create_engine
 from sqlalchemy.orm import sessionmaker, session, Query
-from sqlalchemy_utils import create_database, database_exists
-
-import sys
-import pathlib
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy_utils import create_database, database_exists
+import sys
 
 def initialize_engine():
     db_path = pathlib.Path(__file__).parent.parent.absolute()
@@ -24,7 +24,7 @@ def update_table(engine, data, table):
     Session = sessionmaker(bind=engine)
     session = Session()
     # update database tables with api response data
-    query_result = session.query(data).filter(table.id == data.get("id"))
+    query_result = session.query(table).filter(table.id == data.get("id"))
     if len(list(query_result)) == 0:
         try:
             session.query(table).\
@@ -58,23 +58,24 @@ def insert_into_table(engine, data, table):
 
 def previously_inserted(engine, action, id):
     """ Function for ensuring duplicate DB insertions are not made"""
-    # initialize DB session
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    query_result = False
-    # handle updates to/inserts into tables for team and player data differently
-    sub_action = action.split("_")[1]
-    if sub_action == "teams":
-        # check if tables in DB
-        if engine.has_table("Teams"):
-            query_result = session.query(Teams.league_id).\
-                    filter( Teams.league_id == id )
-    elif sub_action == "players":
-        # check if tables in DB
-        if engine.has_table("Stats") and engine.has_table("Teams"):
-            query_result = session.query(Stats.id).\
-                    filter( Stats.team_id == id )
-    if query_result and len(list(query_result)) > 0:
-        return True # matching DB rows were found
-    else:
-        return False # matching DB rows were not found
+    pass
+    # # initialize DB session
+    # Session = sessionmaker(bind=engine)
+    # session = Session()
+    # query_result = False
+    # # handle updates to/inserts into tables for team and player data differently
+    # sub_action = action.split("_")[1]
+    # if sub_action == "teams":
+    #     # check if tables in DB
+    #     if engine.has_table("Teams"):
+    #         query_result = session.query(Teams.league_id).\
+    #                 filter( Teams.league_id == id )
+    # elif sub_action == "players":
+    #     # check if tables in DB
+    #     if engine.has_table("Stats") and engine.has_table("Teams"):
+    #         query_result = session.query(Stats.id).\
+    #                 filter( Stats.team_id == id )
+    # if query_result and len(list(query_result)) > 0:
+    #     return True # matching DB rows were found
+    # else:
+    #     return False # matching DB rows were not found

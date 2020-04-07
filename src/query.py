@@ -9,6 +9,34 @@ from .orm import Leagues, Teams, Players
 file_path = pathlib.Path(__file__).parent.absolute()
 db_path = os.path.join(str(file_path), f"../db/info.rm.db")
 
+# make this automated
+SEASONS = ["2019", "2018", "2017", "2016", "2015"]
+LEAGUES = [
+    "premier-league", 
+    "serie-a", 
+    "ligue-1", 
+    "la-liga", 
+    "bundesliga"
+]
+CURRENT_SEASON = "2019"
+FLOAT_STATS = [
+    "stats.rating",
+]
+PCT_STATS = [
+    "stats.shots_on_pct",
+    "stats.passes_accuracy",
+    "stats.duels_won_pct",
+    "stats.dribbles_succeeded_pct",
+    "stats.penalties_scored_pct",
+]
+POSITIONS = [
+    "Attacker", 
+    "Midfielder", 
+    "Defender", 
+    "Goalkeeper"
+]
+
+
 ###########################
 ###### Query Classes ######
 ###########################
@@ -107,37 +135,36 @@ class Select:
     def __init__(
             self,
             select_fields: List[str],
-            table_names: List[Tuple[str,str]], # table name and join parameter
+            table_names: List[str, List[str]], 
         ) -> None:
         self.select_fields = select_fields
         assert len(table_names) > 0,\
             "ERROR: Statement class requires at least one table."
-        assert len(table_names) < 3,\
-            "ERROR: Statement class cannot take more than two tables."
+        assert len(table_names) < 4,\
+            "ERROR: Statement class cannot take more than four tables."
         self.check_tables(table_names)
 
-    def check_tables(self, table_names: List[Tuple[str,str]]) -> None:
-        db_tables = ["stats", "players", "teams","leagues"]
+    def check_tables(self, table_names: List[str, List[str]]) -> None:
+        db_tables = ["stats", "players", "teams", "leagues"]
         # handle tables
-        if len(table_names) == 1:
-            self.table_names = [table_names[0][0]]
-        elif len(table_names) == 2:
-            assert table_names[0][0] != table_names[1][0], \
-                "ERROR: Cannot perform join on the same table."
-            self.table_names = [table_names[0][0], table_names[1][0]]
-            self.join_params = [table_names[0][1], table_names[1][1]]
-        for table in table_names:
-            assert table[0] in db_tables, "ERROR: Invalid table name supplied."
+        # for now, all queries go through stats
+        table_one = table_names[0]
+        assert table_one == "stats", \
+            f"ERROR: Expected stats as primary table. Got: {table_one}."
+        join_tables = table_names[2]
+        for table in join_tables:
+            assert table != "stats", \
+                f"ERROR: Received stats as a join table."
+            assert table in db_tables, \
+                "ERROR: Invalid table name supplied."
+        self.primary_table = table_one
+        self.join_tables = join_tables
 
     def to_str(self) -> str:
         select_list = ", ".join(self.select_fields)
-        if len(self.table_names) == 1:
-            query_string = f"SELECT {select_list} FROM {self.table_names[0]}"
-        else:
-            query_string = f"SELECT {select_list} FROM {self.table_names[0]} JOIN {self.table_names[1]}"
-            join_param_one = f"{self.table_names[0]}.{self.join_params[0]}"
-            join_param_two = f"{self.table_names[1]}.{self.join_params[1]}"
-            query_string += f" ON {join_param_one} = {join_param_two}"
+        query_string = f"SELECT {select_list} FROM {self.primary_table}"
+        for table in len(join_tables):
+            query_string += f" JOIN {table} ON {primary_table}.{table[:-1]}_id = {table}.id"
         return query_string
 
 
@@ -145,7 +172,7 @@ class Statement:
 
     def __init__(
         self,
-        table_names: List[Tuple[str,str]],
+        table_names: List[str,List[str]],
         select_fields: List[str],
         order_field: Tuple[List[str], bool],
         filter_fields: Optional[List[Tuple[List[Tuple[str,str,str]], str]]] = None
@@ -187,9 +214,9 @@ class Query:
         connection.close()
         return query_result
 
-##########################
-#### Public Functions ####
-##########################
+#######################
+#### Query Helpers ####
+#######################
 
 def check_col(col: str) -> bool:
     if "." not in col:
@@ -218,9 +245,9 @@ def grab_columns(string: str) -> List[str]:
             result.append(temp_col)
     return result
 
-################################
-#### Public Query Functions ####
-################################
+#################################
+#### Public Function Helpers ####
+#################################
 
 stats_keys = {
         0: "id", 
@@ -302,6 +329,56 @@ leagues_keys = {
         5: "flag"
     }
 
+static_keys = [
+        "id", 
+        "player_id",
+        "name", 
+        "firstname", 
+        "lastname", 
+        "season", 
+        "league_id", 
+        "league_name", 
+        "team_id", 
+        "team_name", 
+         "position", 
+         "rating"
+    ]
+
+pct_keys = [
+        "shots_on_pct", 
+        "passes_accuracy", 
+        "duels_won_pct", 
+        "dribbles_succeeded_pct",
+        "penalties_scored_pct"
+    ]
+        
+
+# format query result into a dict
+def result_to_dict(
+        query_result: List[str], 
+        index_dict: Dict[int, str]
+    ) -> Dict[str,str]:
+    result = dict()
+    for index, colname in index_dict:
+        result[colname] = query_result[index]
+    return result
+
+def stats_to_per90( 
+        formatted_result: List[str]
+    ) -> Dict[str,Any]:
+    minutes_played = float(formatted_result.get("minutes_played"))
+    for key, value in formatted_result.items():
+        if (key not in static_keys and
+            key not in pct_keys and
+            key != "minutes_played"):
+            formatted_result[key] = flat(value) / (minutes_played / 90.0)
+    return formatted_result
+
+##########################
+#### Public Functions ####
+##########################
+
+# used for default queries 
 def get_max(
         stat: str,
         season: str = CURRENT_SEASON
@@ -309,44 +386,129 @@ def get_max(
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute(f"SELECT max({stat}) FROM stats WHERE season = {season};")
-    query_result = cursor.fetchall()[0][0]
+    query_result = list(cursor.fetchall()[0])[0]
     connection.commit()
     connection.close()
     return query_result
 
+# used for player pages
 def get_player_data(
         id: str,
-        season: str = CURRENT_SEASON
-    ) -> List[str]:
+        per_90: bool
+    ) -> Dict[str, Any]:
+    # open DB connection
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
+    result = dict() 
 
+    # player info 
     cursor.execute(f"SELECT * FROM players WHERE id = {id};")
-    player_result = cursor.fetchall()
-    player_result = list(player_result[0])
+    player_result = list(cursor.fetchall()[0])
     connection.commit()
+    if len(player_result) == 0:
+        return None
+    result["player"] = result_to_dict(player_result)
+
+
+    result["stats"] = dict()
 
     cursor.execute(f"SELECT * FROM stats WHERE player_id = {id};")
     stats_result = list(cursor.fetchall())
-
-    data = dict() 
-    for stat_result in stats_result:
-        season = 
-        team = 
-        
-
     connection.commit()
 
-    team_id = player_result[3]
-    cursor.execute(f"SELECT * FROM teams WHERE id = {team_id};")
-    team_result = list(cursor.fetchall()[0])
-    connection.commit()
+    current_season = None
+    current_index = None
+    for i in range(len(stats_result)):
+        stats_row = list(stats_result[i])
+        formatted_row = result_to_dict(stats_row)
+        # divide relevant stats by minutes played / 90
+        if per_90 is True:
+            formatted_row = stats_to_per90(formatted_row)
 
-    league_id = player_result[1]
-    cursor.execute(f"SELECT * FROM leagues WHERE id = {league_id};")
-    league_result = list(cursor.fetchall()[0])
-    connection.commit()
+        # get season and set up result dictionary structure
+        season = formatted_row.get("season")
+        if season != current_season:
+            current_season = season
+            current_index = 0
+            result["stats"][current_season] = dict()
+        else:
+            current_index += 1
+
+        result["stats"][current_season][current_index] = dict()
+
+        # get team logo
+        team_id = formatted_row.get("team_id")
+        cursor.execute(f"SELECT logo FROM teams WHERE id = {team_id};")
+        team_logo = list(cursor.fetchall()[0])[0]
+        connection.commit()
+
+        # get league flag
+        league_id = formatted_row.get("league_id")
+        cursor.execute(f"SELECT flag FROM leagues WHERE id = {league_id};")
+        league_flag = list(cursor.fetchall()[0])[0]
+        connection.commit()
+
+        result["stats"][current_season][current_index]["stats"] = formatted_row
+        result["stats"][current_season][current_index]["team"] = team_logo
+        result["stats"][current_season][current_index]["league"] = league_flag
 
 
     connection.close()
-    return player_result, team_result, league_result
+    return result
+
+# used for builder form select fields
+def get_select_data() -> Dict[str, Any]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    result = dict()
+
+    # leagues stay static
+    cursor.execute("SELECT DICTINCT name FROM leagues;")
+    leagues_result = list(cursor.fetchall()[0])
+    connection.commit()
+    sort(leagues_result)
+    result["leagues"] = leagues_result
+
+    # clubs
+    result["clubs"] = dict()
+    for season in SEASONS:
+        result["clubs"][season] = dict()
+        for league in result.get("leagues")
+            # leagues stay static
+            cursor.execute(f"SELECT DICTINCT team_name FROM stats WHERE season = {season} AND league_name = \"{league}\";")
+            clubs_result = list(cursor.fetchall()[0])
+            connection.commit()
+            sort(clubs_result)
+            result["clubs"][season][league] = clubs_result
+
+    # get all nations
+    cursor.execute("SELECT DICTINCT nationality FROM players;")
+    nations_result = list(cursor.fetchall()[0])
+    connection.commit()
+    sort(nations_result)
+    result["nations"] = nations_result
+
+    return result
+
+#################################
+### Global Variable Functions ###
+#################################
+
+def get_current_season() -> str:
+    return CURRENT_SEASON   
+
+def get_seasons() -> List[str]:
+    return SEASONS
+
+def get_pct_stats() -> List[str]:
+    return PCT_STATS
+
+def get_float_stats() -> List[str]:
+    return FLOAT_STATS
+
+def get_positions() -> List[str]:
+    return POSITIONS
+
+def get_leagues() -> List[str]:
+    return LEAGUES
