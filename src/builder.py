@@ -137,7 +137,7 @@ def default_stats():
     ]
     max_minutes_played = get_max("stats.minutes_played")
     filter_fields = [
-        ([("stats.minutes_played",">",str(max_minutes_played/3)), ("stats.season", "=", CURRENT_SEASON)],"")
+        ([("stats.minutes_played",">",str(max_minutes_played/3)), ("stats.season", "=", CURRENT_SEASON)],"AND")
     ]
     order_field = (["stats.rating"], True)
 
@@ -197,8 +197,6 @@ def custom_stats(form_data):
             continue
         filter_fields.append( (key_string, "=", value) )
     
-    print(filter_fields)
-
     # get filter by stats
     stat_values = get_stat_values(form_data_dict, "filter")
     if len(stat_values) > 0:

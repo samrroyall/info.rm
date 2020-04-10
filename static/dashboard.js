@@ -56,16 +56,6 @@ $(document).ready( function() {
     }
   });
   $(function() {
-    $("#player_per90_toggle").change(function () {
-      var split_loc = window.location.href.split("/");
-      if (split_loc[split_loc.length - 1] == "per-90") {
-        window.location.href = window.location.href.split("/per-90")[0];
-      } else {
-        window.location.href = window.location.href + "/per-90";
-      }
-    });
-  });
-  $(function() {
     $("#season-select").change(function () {
       var val = $(this).val();
       var split_loc = window.location.href.split("/");

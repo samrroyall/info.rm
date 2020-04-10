@@ -5,13 +5,13 @@ from flask import Flask, render_template, request, redirect, url_for
 from src.builder import default_stats, custom_stats
 from src.dashboard import dashboard_stats
 from src.player import player_team_data
-form src.query import get_current_season, get_seasons, get_leagues
+from src.query import get_current_season, get_seasons, get_leagues
 
 info_rm = Flask(__name__)
 
-CURRENT_SEASON = get_current_season
-SEASONS = get_seasons
-LEAGUES = get_leagues + ["top-5"]
+CURRENT_SEASON = get_current_season()
+SEASONS = get_seasons()
+LEAGUES = get_leagues() + ["top-5"]
 LEAGUE_LOOKUP = {
         "top-5": None,
         "bundesliga": "Bundesliga 1",
@@ -36,15 +36,15 @@ def dashboard(league, season = CURRENT_SEASON):
         return render_template(
                     "dashboard.html",
                     query_result = dashboard_stats(
-                                            LEAGUE_LOOKUP(league), 
-                                            season, 
-                                            False
-                                        ),
+                                        LEAGUE_LOOKUP.get(league), 
+                                        season, 
+                                        False
+                                    ),
                     query_result_per90 = dashboard_stats(
-                                                    LEAGUE_LOOKUP(league), 
-                                                    season, 
-                                                    True
-                                                ),
+                                                LEAGUE_LOOKUP.get(league), 
+                                                season, 
+                                                True
+                                            ),
                     current_league = league,
                     current_season = season,
                     seasons = SEASONS
@@ -56,18 +56,17 @@ def dashboard(league, season = CURRENT_SEASON):
                 season=CURRENT_SEASON
             ))
 
-@info_rm.route("/player/<id>/season/<season>")
-def player(id = DEFAULT_ID, season = CURRENT_SEASON):
+@info_rm.route("/player/<id>")
+def player(id = DEFAULT_ID):
     data = player_team_data(id, False)
     per90_data = player_team_data(id, True)
     # check that player ID is legit
-    if season in SEASONS and data None and per90_data:
+    if data and per90_data:
         return render_template(
                     "player.html",
                     data=data,
                     per90_data=per90_data,
-                    seasons=SEASONS,
-                    current_season=season,
+                    current_season=CURRENT_SEASON,
                 )
     else:
         return redirect(url_for("player"))

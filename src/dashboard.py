@@ -35,13 +35,16 @@ def scoring_stats():
         else:
             select_fields = [f"stats.{stat}"]
 
+        # initialize filters
+        filter_fields = [] + DEFAULT_FILTER
+
         # handle goals per shot filter
         if stat == "goals_per_shot":
-            filter_fields = DEFAULT_FILTER + [("stats.shots", ">", SHOT_FILTER)]
+            filter_fields.append( ("stats.shots", ">", SHOT_FILTER) )
         # handle per 90
         elif PER_90 is True:
-            select_fields = [f"(select_fields[0])/(stats.minutes_played/90)"]
-            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FILTER)]
+            select_fields = [f"({select_fields[0]})/(stats.minutes_played/90)"]
+            filter_fields.append( ("stats.minutes_played", ">", MP_FILTER) )
 
         scoring_query[stat] = finalize_query(select_fields, filter_fields)
     return scoring_query
@@ -52,10 +55,13 @@ def shooting_stats():
         # select fields
         select_fields = [f"stats.{stat}"]
 
+        # initialize filters
+        filter_fields = [] + DEFAULT_FILTER
+
         # handle per 90
         if PER_90 is True:
-            select_fields = [f"(select_fields[0])/(stats.minutes_played/90)"]
-            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FITLER)]
+            select_fields = [f"({select_fields[0]})/(stats.minutes_played/90)"]
+            filter_fields.append( ("stats.minutes_played", ">", MP_FILTER) )
 
         shooting_query[stat] = finalize_query(select_fields, filter_fields)
     return shooting_query
@@ -64,15 +70,18 @@ def passing_stats():
     passing_query = dict()
     for stat in ["passes_key", "passes", "passes_accuracy"]:
         # select_fields
-        select_fields = [f"players.{stat}"]
+        select_fields = [f"stats.{stat}"]
+
+        # initialize filters
+        filter_fields = [] + DEFAULT_FILTER
 
         # handle passes accuracy
         if stat == "passes_accuracy":
-            filter_fields = DEFAULT_FILTER + [("stats.passes", ">", PASS_FILTER)]
+            filter_fields.append( ("stats.passes", ">", PASS_FILTER) )
         # handle per 90
         elif PER_90 is True:
-            select_fields = [f"({select_fields[0]})/(players.minutes_played/90)"]
-            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FITLER)]
+            select_fields = [f"({select_fields[0]})/(stats.minutes_played/90)"]
+            filter_fields.append( ("stats.minutes_played", ">", MP_FILTER) )
 
         passing_query[stat] = finalize_query(select_fields, filter_fields)
     return passing_query
@@ -81,32 +90,38 @@ def dribbling_stats():
     dribbling_query = dict()
     for stat in ["dribbles_succeeded", "dribbles_attempted", "dribbles_succeeded_pct"]:
         # select_fields
-        select_fields = [f"players.{stat}"]
+        select_fields = [f"stats.{stat}"]
+
+        # initialize filters
+        filter_fields = [] + DEFAULT_FILTER
 
         # handle dribbles succeeded pct
         if stat == "dribbles_succeeded_pct":
-            filter_fields = DEFAULT_FILTER + [("stats.dribbles_attempted", ">", DRIBBLE_FILTER)]
+            filter_fields.append( ("stats.dribbles_attempted", ">", DRIBBLE_FILTER) )
         # handle per 90
         elif PER_90 is True:
-            select_fields = [f"({select_fields[0]})/(players.minutes_played/90)"]
-            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FITLER)]
-
+            select_fields = [f"({select_fields[0]})/(stats.minutes_played/90)"]
+            filter_fields.append( ("stats.minutes_played", ">", MP_FILTER) )
+ 
         dribbling_query[stat] = finalize_query(select_fields, filter_fields)
     return dribbling_query 
 
-def defending_stats():
+def defending_stats(season):
     defending_query = dict()
     if int(season) < 2017:
         stats = ["interceptions"]
     else:
         stats = ["tackles", "interceptions", "blocks"]
     for stat in stats:
-        select_fields = [f"players.{stat}"]
+        select_fields = [f"stats.{stat}"]
+
+        # initialize filters
+        filter_fields = [] + DEFAULT_FILTER
 
         # handle per 90
         if PER_90 is True:
-            select_fields = [f"({select_fields[0]})/(players.minutes_played/90)"]
-            filter_fields = DEFAULT_FILTER + [("stats.minutes_played", ">", MP_FITLER)]
+            select_fields = [f"({select_fields[0]})/(stats.minutes_played/90)"]
+            filter_fields += [("stats.minutes_played", ">", MP_FILTER)]
 
         defending_query[stat] = finalize_query(select_fields, filter_fields)
     return defending_query
@@ -115,19 +130,19 @@ def other_stats():
     other_query = dict()
     for stat in ["rating", "goals_conceded", "penalties_saved"]:
         # select_fields
-        select_fields = [f"players.{stat}"]
+        select_fields = [f"stats.{stat}"]
 
         # initialize filters
-        filter_fields = DEFAULT_FILTER
+        filter_fields = [] + DEFAULT_FILTER
 
         # handle per 90
-        if per_90 is True and stat != "penalties_saved":
-            filter_fields += [("stats.minutes_played", ">", MP_FITLER)]
+        if PER_90 is True or stat != "penalties_saved":
+            filter_fields.append( ("stats.minutes_played", ">", MP_FILTER) )
         if PER_90 is True and stat == "goals_conceded":
-            select_fields += [f"({select_fields[0]})/(players.minutes_played/90)"]
+            select_fields = [f"({select_fields[0]})/(stats.minutes_played/90)"]
 
         if stat != "rating":
-            filter_fields += [("players.position", "=", "Goalkeeper"] 
+            filter_fields.append( ("stats.position", "=", "Goalkeeper") )
 
         # finalize filters 
         filter_fields = [(filter_fields, "AND")]
@@ -157,7 +172,7 @@ def dashboard_stats(league, season, per_90):
         DEFAULT_FILTER.append( ("stats.league_name", "=", league) )
 
     global DRIBBLE_FILTER
-    DRIBBLE_FILTER = (get_max("players.dribbles_attempted", season)/3)
+    DRIBBLE_FILTER = str(get_max("stats.dribbles_attempted", season)/3)
 
     global MP_FILTER
     MP_FILTER = str(get_max("stats.minutes_played", season)/3)
@@ -173,7 +188,7 @@ def dashboard_stats(league, season, per_90):
     query_result["shooting"] = shooting_stats()
     query_result["passing"] = passing_stats()
     query_result["dribbling"] = dribbling_stats()
-    query_result["defending"] = defending_stats()
+    query_result["defending"] = defending_stats(season)
     query_result["other"] = other_stats()
 
     return query_result

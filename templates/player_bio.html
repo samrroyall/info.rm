@@ -14,8 +14,8 @@
       <div class="col-4 text-secondary text-left playerStatName">
         <strong>Position</strong>
       </div>
-      <div class="col-8 text-right playerStat">
-        <strong>{{player_data.get("position")}}</strong>
+      <div class="col-8 text-right playerStatBio">
+        <strong>{{player_stat.get("position")}}</strong>
       </div>
     </div>
   </li>
@@ -24,8 +24,8 @@
       <div class="col-4 text-secondary text-left playerStatName">
         <strong>Team</strong>
       </div>
-      <div class="col-8 text-right playerStat">
-        <strong>{{player_data.get("team_name")}}</strong>&nbsp
+      <div class="col-8 text-right playerStatBio">
+        <strong>{{player_stat.get("team_name")}}</strong>&nbsp
         <img src="{{team_data.get('logo')}}" height="20px" width="20px">
       </div>
     </div>
@@ -35,8 +35,8 @@
       <div class="col-4 text-secondary text-left playerStatName">
         <strong>League</strong>
       </div>
-      <div class="col-8 text-right playerStat">
-        <strong>{{player_data.get("league_name")}}</strong>&nbsp
+      <div class="col-8 text-right playerStatBio">
+        <strong>{{player_stat.get("league_name")}}</strong>&nbsp
         <img src="{{league_data.get('flag')}}" height="15px" width="auto">
       </div>
     </div>
@@ -46,7 +46,7 @@
       <div class="col-5 text-secondary text-left playerStatName">
         <strong>Nationality</strong>
       </div>
-      <div class="col-7 text-right playerStat">
+      <div class="col-7 text-right playerStatBio">
         <strong>{{player_data.get("nationality")}}</strong>&nbsp
         <img src="{{player_data.get('flag')}}" height="15px" width="auto">
       </div>
@@ -57,7 +57,7 @@
       <div class="col-5 text-secondary text-left playerStatName">
         <strong>Date of Birth</strong>
       </div>
-      <div class="col-7 text-right playerStat">
+      <div class="col-7 text-right playerStatBio">
         {% set birthdate_list = player_data.get("birth_date").split("-") %}
         <strong>{{birthdate_list[1]|int}}/{{birthdate_list[2]|int}}/{{birthdate_list[0]}}</strong>
         <strong>({{player_data.get("age")}})</strong>
@@ -69,7 +69,7 @@
       <div class="col-5 text-secondary text-left playerStatName">
         <strong>Height</strong>
       </div>
-      <div class="col-7 text-right playerStat">
+      <div class="col-7 text-right playerStatBio">
         <strong>{{player_data.get("height")}}</strong>
       </div>
     </div>
@@ -79,7 +79,7 @@
       <div class="col-5 text-secondary text-left playerStatName">
         <strong>Weight</strong>
       </div>
-      <div class="col-7 text-right playerStat">
+      <div class="col-7 text-right playerStatBio">
         <strong>{{player_data.get("weight")}}</strong>
       </div>
     </div>
@@ -89,8 +89,8 @@
       <div class="col-5 text-secondary text-left playerStatName">
         <strong>Rating</strong>
       </div>
-      <div class="col-7 text-right playerStat">
-        <strong>{{player_data.get("rating")|float|round(2)}}</strong>
+      <div class="col-7 text-right playerStatBio">
+        <strong>{{player_stat.get("rating")|float|round(2)}}</strong>
       </div>
     </div>
   </li>

@@ -1,6 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
 
+  {% set player_data = data.get("player") %}
+  {% set player_stats = data.get("stats") %}
+  {% set player_stats_per90 = per90_data.get("stats") %}
+  {% set seasons = player_stats.keys() %}
+
+
+<script>
+  $(document).ready( function() {
+    $(function() {
+      $("#player-season-select").change(function () {
+        {% for season in seasons %}
+          $("#{{season}}-wrapper").addClass("hidden");
+        {% endfor %}
+        var season = $(this).val();
+        $("#" + season + "-wrapper").toggleClass("hidden");
+      });
+    });
+  });
+</script>
+
 <div class="row border-bottom" id="per90_season_wrapper">
   <!-- Per 90 Toggler -->
   <div class="col-4 col-xs-3 col-md-2 mr-auto custom-control custom-switch">
@@ -11,11 +31,25 @@
       </label>
   </div>
 
+  {% for season in player_stats.keys() %}
+    {% set num_teams = player_stats.get(season)|length %}
+    {% if num_teams > 1 %}
+      <!-- Seasons Dropdown -->
+      <div class="col-4 col-xs-3 col-md-2 ml-auto">
+          <select class="custom-select custom-select-sm seasonselect" 
+            id="player-{{season}}-select" value="">
+              {% for stat in player_stats.get(season) %}
+                <option value="{{stat}}">{{player_stats.get(season).get(stat).get("stats").get("team_name")}}</option>
+              {% endfor %}
+          </select>
+      </div>   
+    {% endif %}
+  {% endfor %}
+
   <!-- Seasons Dropdown -->
   <div class="col-4 col-xs-3 col-md-2 ml-auto">
       <select class="custom-select custom-select-sm seasonselect" 
         id="player-season-select" value="">
-          <option>{{current_season}}</option>
           {% for season in seasons %}
             {% if season != current_season %}
               <option>{{season}}</option>
@@ -30,57 +64,82 @@
     {{player_data.get("lastname")}}
   </div>
 
-  <div class="row">
+  {% for season in player_stats.keys() %}
+    {% set num_stats = player_stats.get(season).keys()|length %}
+    <!-- Season Wrapper -->
+    {% if season|string == current_season %}
+      <div id="{{season}}-wrapper">
+    {% else %}
+      <div class="hidden" id="{{season}}-wrapper">
+    {% endif %}
+    
+    {% for stat in player_stats.get(season).keys() %}
+      {% set player_stat = player_stats.get(season).get(stat).get("stats") %}
+      {% set player_stat_per90 = player_stats_per90.get(season).get(stat).get("stats") %}
+      {% set team_data = player_stats.get(season).get(stat).get("team") %}
+      {% set league_data = player_stats.get(season).get(stat).get("league") %}
+      
+      {% if stat == 0 %}
+        <div id="{{season}}-{{stat}}-div">
+      {% else %}
+        <div class="hidden" id="{{season}}-{{stat}}-div">
+      {% endif %}
+      
+        <div class="row">
+          <!-- Player First Col -->
+          <div class="col playerCol">
 
-    <!-- Player First Col -->
-    <div class="col playerCol">
-
-      {% for card in ["player_bio.html", "player_gameplay.html"] %}
-        <div class="card ml-auto shadow-sm rounded" id="playercards_wrapper">
-          <!-- Player Card Body -->
-          <div class="card-body">
-            <!-- Player Cards Wrapper -->
-            <div class="row justify-content-center">
-              <!-- Player Card -->
-              <div class="col">
-                {% include card %}
+            {% for card in ["player_bio.html", "player_gameplay.html"] %}
+              <div class="card ml-auto shadow-sm rounded" id="playercards_wrapper">
+                <!-- Player Card Body -->
+                <div class="card-body">
+                  <!-- Player Cards Wrapper -->
+                  <div class="row justify-content-center">
+                    <!-- Player Card -->
+                    <div class="col">
+                      {% include card %}
+                    </div>
+                  </div>
+                  <!-- Player Cards Wrapper End -->
+                </div>
+                <!-- Player Card Body End -->
               </div>
-            </div>
-            <!-- Player Cards Wrapper End -->
+              <!-- Player Card End -->
+            {% endfor %}
+
           </div>
-          <!-- Player Card Body End -->
-        </div>
-        <!-- Player Card End -->
-      {% endfor %}
+          <!-- Player First Col End -->
 
-    </div>
-    <!-- Player First Col End -->
+          <!-- Player Second Col -->
+          <div class="col playerCol">
 
-    <!-- Player Second Col -->
-    <div class="col playerCol">
-
-      {% for card in ["player_stats.html", "player_fouling.html"] %}
-        <div class="card mr-auto shadow-sm rounded" id="playercards_wrapper">
-          <!-- Player Card Body -->
-          <div class="card-body">
-            <!-- Player Cards Wrapper -->
-            <div class="row justify-content-center">
-              <!-- Player Card -->
-              <div class="col">
-                {% include card %}
+            {% for card in ["player_stats.html", "player_fouling.html"] %}
+              <div class="card mr-auto shadow-sm rounded" id="playercards_wrapper">
+                <!-- Player Card Body -->
+                <div class="card-body">
+                  <!-- Player Cards Wrapper -->
+                  <div class="row justify-content-center">
+                    <!-- Player Card -->
+                    <div class="col">
+                      {% include card %}
+                    </div>
+                  </div>
+                  <!-- Player Cards Wrapper End -->
+                </div>
+                <!-- Player Card Body End -->
               </div>
-            </div>
-            <!-- Player Cards Wrapper End -->
+              <!-- Player Card End -->
+            {% endfor %}
+
           </div>
-          <!-- Player Card Body End -->
+         <!-- Player Second Col End -->
         </div>
-        <!-- Player Card End -->
-      {% endfor %}
-
+        <!-- Player Row End -->
+        </div>
+      <!-- End of Stat Wrapper -->
+    {% endfor %}
     </div>
-    <!-- Player Second Col End -->
-
-  </div>
-  <!-- Player Row End -->
+  <!-- End of Season Wrapper -->
+  {% endfor %}
 
 {% endblock %}

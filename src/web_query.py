@@ -26,10 +26,10 @@ def stmt(select_fields, filter_fields, order_field):
                 temp_table_names.append(table)
 
     # dedup table names
-    temp_table_names = list(set(table_names))
+    temp_table_names = list(set(temp_table_names))
 
     # create table_names list 
-    table_names = ["stats", temp_table_names]
+    table_names = ("stats", temp_table_names)
 
     stmt = Statement(
         table_names = table_names,

@@ -180,6 +180,30 @@ body, html {
   font-size: 1.1em;
 }
 
+.playerStatPer90 {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1.1em;
+}
+
+.playerStatGameplay {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1.1em;
+}
+
+.playerStatPens {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1.1em;
+}
+
+.playerStatBio {
+  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1.1em;
+}
+
 #paginationDiv {
   background: #FAFAFA;
 }

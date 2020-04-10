@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
+{% set leagues = season_data.get("leagues") %}
+{% set clubs = season_data.get("clubs") %}
+{% set nations = season_data.get("nations") %}
+
   <!-- Scripts that require Jinja parameters -->
   <script>
     $(document).ready( function () {

@@ -1,4 +1,4 @@
-{% set stats = ["Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Straight Red Cards","Yellow Cards","Second Yellow Cards"] %}
+{% set stats = ["Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Straight Red Cards","Yellow Cards"] %}
 
 <!-- Duels/Dribbles Past
 <option>Dribbles Past</option>
@@ -224,7 +224,7 @@
               <select class="custom-select custom-select-sm select_input"
                 id="nationality_select" name="nationality_select">
                 <option value="">None</option>
-                {% for nation in nations.get(season) %}
+                {% for nation in nations %}
                   <option>{{nation}}</option>
                 {% endfor %}
               </select>
