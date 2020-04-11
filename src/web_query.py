@@ -47,47 +47,58 @@ def field_logical(field):
             return True
     return False
 
+def result_dict(query_result, fields):
+    result = dict()
+    for index in range(len(fields)):
+        result[fields[index]] = query_result[index]
+    return result 
+
+def format_result(query_result, fields):
+    id_dict = dict()
+    for idx in range(len(query_result)):
+        query_result[idx] = result_dict(query_result[idx], fields) 
+        # NEED TO AGGREGATE STATS AND MAKE SURE THIS WORKS PER 90
+        # AAND GET CURRENT TEAM FOR TEAM NAME/LOGO 
+    return query_result
+
 def rank_response(select_fields, filter_fields, order_field):
-    query_result = Query(stmt(select_fields, filter_fields, order_field)).query_db()
+    fields = default_select_fields + select_fields
+    query_result_raw = Query(stmt(select_fields, filter_fields, order_field)).query_db()
+    query_result = format_result(query_result_raw, fields)
     order_by_field = order_field[0][0]
     desc = order_field[1]
-    fields = default_select_fields + select_fields
 
     count = 0
     rank = 0
     prev_result = float("inf") if desc is True else -1.0 * float("inf")
     ranked_result = { "header": fields, "data": []}
     for idx in range(len(query_result)):
-        tup = query_result[idx]
+        player = query_result[idx]
 
-        # handle defaults
-        team_logo = tup[0]
         # fix player name
-        split_name = tup[1].split(" ")
+        split_name = player.get("players.name").split(" ")
         if len(split_name) == 2 and len(split_name[0]) > 2:
             name = split_name[0][0] + ". " + split_name[1]
         else:
-            name = tup[1]
-        id = tup[2]
-        team_name = tup[3]
+            name = player.get("players.name")
 
         # handle stats
         stats = []
-        for stat_idx in range(len(default_select_fields),len(fields)):
-            stat = tup[stat_idx]
+        for field in select_fields:
+            stat = player.get(field)
 
             # values of 0 are only n/a if stats are presented descending
             if stat is None:
                value = "n/a" 
             elif float(stat) == 0.0:
                 value = "n/a"
-            elif fields[stat_idx] in floats or field_logical(fields[stat_idx]):
-                value = str(round(float(tup[stat_idx]), 2)).ljust(4,"0")
+            elif field in floats or field_logical(field):
+                value = str(round(float(stat), 2)).ljust(4,"0")
             else:
-                value = round(float(tup[stat_idx]))
+                value = round(float(stat))
 
             # add % at the end if needed
-            if fields[stat_idx] in pcts and value != "n/a":
+            if field in pcts and value != "n/a":
                 value = f"{value}%"
 
             stats.append(value)
@@ -95,11 +106,11 @@ def rank_response(select_fields, filter_fields, order_field):
         # can only order by selected fields
         assert order_by_field in fields,\
             f"ERROR: invalid order_by_field supplied {order_by_field}"
-        order_by_idx = fields.index(order_by_field)
-        if tup[order_by_idx] is None:
+        order_by_value = player.get(order_by_field) 
+        if order_by_value is None:
             order_by_stat = "n/a"
         else:
-            order_by_stat = float(tup[order_by_idx])
+            order_by_stat = float(order_by_value)
             if order_by_stat == 0.0:
                 order_by_stat = "n/a"
 
@@ -118,9 +129,9 @@ def rank_response(select_fields, filter_fields, order_field):
         ranked_tup = {
             "rank": (str(rank) + ".").ljust(3," ") if rank != "N/A." else rank,
             "name": name,
-            "id": id,
-            "team_name": team_name,
-            "team_logo": team_logo,
+            "id": player.get("players.id"),
+            "team_name": player.get("teams.name"),
+            "team_logo": player.get("teams.logo"),
             "stats": stats
         }
         ranked_result["data"].append(ranked_tup)

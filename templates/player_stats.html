@@ -6,6 +6,8 @@
 </div>
 <!-- Header End -->
 
+{% set pretty_names = {"shots_on": "Shots on Target", "passes_key": "Key Passes", "passes_accuracy": "Pass Accuracy", "dribbles_succeeded": "Dribbles", "dribbles_attemped": "Attempted Dribbles", "dribbles_succeeded_pct": "Dribble Success Rate"} %}
+
 {% set pct_stats = ["passes_accuracy", "dribbles_succeeded_pct"] %}
 
 {% set stats_list = ["goals","goals_conceded", "assists", "shots", "shots_on", "passes", "passes_key", "passes_accuracy", "dribbles_succeeded", "dribbles_attempted", "dribbles_succeeded_pct", "tackles", "interceptions", "blocks"] %}
@@ -15,7 +17,11 @@
     <li class="list-group-item">
       <div class="row">
         <div class="col-7 text-secondary text-left playerStatName">
-          <strong>{{stat_field}}</strong>
+          {% if stat_field in pretty_names.keys() %}
+            <strong>{{ pretty_names.get(stat_field) }}</strong>
+          {% else %}
+            <strong>{{ stat_field.title().replace("_"," ") }}</strong>
+          {% endif %}
         </div>
         <div class="col-5 text-success text-right playerStat">
           {% if stat_field == "goals" %}
