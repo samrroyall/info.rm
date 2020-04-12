@@ -92,7 +92,10 @@ body, html {
 }
 
 .nav-item {
-  /* font-size: calc(60% + .10vw + .10vh); */
+}
+
+#builder-nav-item {
+  margin-right: 100px;
 }
 
 #brand {
@@ -106,12 +109,26 @@ body, html {
   height: 35px;
 }
 
+#main_nav_collapse {
+  width: 100%;
+}
+
 #league_nav_link {
   width: 50px;
 }
 
 #prem_league_nav_link {
   width: 450px;
+}
+
+#league_dropdown_menu {
+}
+
+.league_dropdown_item {
+}
+
+.dropdown_league_logo {
+  height: 20px;
 }
 
 .league_logo {

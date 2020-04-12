@@ -1,32 +1,51 @@
-<div class="nav-item row justify-content-center ml-auto border-left" id="league_nav">
+<div class="nav-item row justify-content-center border-left" id="league_nav">
   <!-- Bundesliga -->
-  <a class="nav-link col-2 col-md px0 text-center" id="league_nav_link"
+  <a class="nav-link col px-0 text-center" id="league_nav_link"
     href="{{url_for('dashboard', league='bundesliga', season=current_season)}}">
       <img class="league_logo" 
         src="https://media.api-football.com/leagues/8.png">
   </a>
   <!-- Ligue 1 -->
-  <a class="nav-link col-2 col-md px0 text-center" id="league_nav_link"
+  <a class="nav-link col px-0 text-center" id="league_nav_link"
     href="{{url_for('dashboard', league='ligue-1', season=current_season)}}">
       <img class="league_logo" 
         src="https://media.api-football.com/leagues/4.svg">
   </a>
   <!-- Premier League -->
-  <a class="nav-link col-3 col-md px0 text-center" id="prem_league_nav_link"
+  <a class="nav-link col px-0 text-center" id="prem_league_nav_link"
     href="{{url_for('dashboard', league='premier-league', season=current_season)}}">
     <img class="league_logo" 
       src="https://media.api-football.com/leagues/2.png">
   </a>
   <!-- La Liga -->
-  <a class="nav-link col-2 col-md px0 text-center" id="league_nav_link"
+  <a class="nav-link col px-0 text-center" id="league_nav_link"
     href="{{url_for('dashboard', league='la-liga', season=current_season)}}">
       <img class="league_logo" 
         src="https://media.api-football.com/leagues/87.png">
   </a>
   <!-- Serie A -->
-  <a class="nav-link col-2 col-md px0 text-center" id="league_nav_link"
+  <a class="nav-link col px-0 text-center" id="league_nav_link"
     href="{{url_for('dashboard', league='serie-a', season=current_season)}}">
       <img class="league_logo" 
         src="https://media.api-football.com/leagues/94.png">
   </a>
+  <!-- Dropdown
+  <div class="nav-link col px-0 text-center dropdown show">
+    <button class="btn btn-secondary btn-sm dropdown-toggle text-center" 
+      type="button" data-toggle="dropdown" aria-haspopup="true" 
+      id="otherLeagueDropdown">
+    </button>
+    <div class="dropdown-menu" 
+      aria-labelledby="otherLeagueDropdown" id="league_dropdown_menu">
+      <a class="dropdown-item px-0 text-center league_dropdown_item" href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-football.com/leagues/94.png">
+
+      </a>
+      <a class="dropdown-item px-0 text-center league_dropdown_item" href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-football.com/leagues/94.png">
+      </a>
+    </div>
+  </div>-->
 </div>
