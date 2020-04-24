@@ -1,4 +1,4 @@
-from .query import Query, get_max
+from .query import Query, get_max, get_top_five
 from .web_query import rank_response
 
 DEFAULT_FILTER = None
@@ -6,6 +6,7 @@ MP_FILTER = None
 PASS_FILTER = None 
 SHOT_FILTER = None 
 PER_90 = None
+TOP_5 = get_top_five()
 
 ##########################
 ###### QUERY HELPERS #####
@@ -168,8 +169,10 @@ def dashboard_stats(league, season, per_90):
     global DEFAULT_FILTER
     DEFAULT_FILTER = [("stats.season", "=", season)]
 
-    if league is not None:
-        DEFAULT_FILTER.append( ("stats.league_name", "=", league) )
+    if league == "Top-5":
+        DEFAULT_FILTER.append( ("stats.league_name", "IN", TOP_5) )
+    else:
+        DEFAULT_FILTER.append( ("stats.league_name", "=", league.replace("-", " ")) )
 
     global DRIBBLE_FILTER
     DRIBBLE_FILTER = str(get_max("stats.dribbles_attempted", season)/3)

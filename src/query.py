@@ -10,15 +10,6 @@ file_path = pathlib.Path(__file__).parent.absolute()
 db_path = os.path.join(str(file_path), f"../db/info.rm.db")
 
 # make this automated
-SEASONS = ["2019", "2018", "2017", "2016", "2015"]
-LEAGUES = [
-    "premier-league", 
-    "serie-a", 
-    "ligue-1", 
-    "la-liga", 
-    "bundesliga"
-]
-CURRENT_SEASON = "2019"
 FLOAT_STATS = [
     "stats.rating",
 ]
@@ -29,20 +20,14 @@ PCT_STATS = [
     "stats.dribbles_succeeded_pct",
     "stats.penalties_scored_pct",
 ]
-POSITIONS = [
-    "Attacker", 
-    "Midfielder", 
-    "Defender", 
-    "Goalkeeper"
-]
-
+TOP_5 = ["Bundesliga 1", "Ligue 1", "Premier League", "Primera Division", "Serie A"]
 
 ###########################
 ###### Query Classes ######
 ###########################
 
 class Filter:
-    _OPS = ["=", "<", "<=", ">", ">="]
+    _OPS = ["=", "<", "<=", ">", ">=", "IN"]
 
     def __init__(self, properties: Tuple[str, str, str]) -> None:
         cls = self.__class__
@@ -51,19 +36,7 @@ class Filter:
             f"ERROR: Filter accepts following operations: {str(cls._OPS)[1:-1]}."
         self.field, self.operator, self.value = self.check_tables_values(field, operator, value)
 
-    def check_tables_values(self, field, operator, value):
-        db_tables = ["stats", "players","teams","leagues"]
-        column = grab_columns(field)[0]
-        split_column = column.split(".")
-        table_name = split_column[0]
-        column_name = split_column[1]
-        # check table
-        assert table_name in db_tables, "ERROR: Invalid table name supplied."
-        # check field
-        orm_class = eval(table_name.capitalize())
-        orm_schema = orm_class._TYPES
-        assert column_name in orm_schema.keys(),\
-            "ERROR: Invalid column name supplied."
+    def check_value(self, value, orm_schema, column_name):
         # check value
         expected_value = str(orm_schema.get(column_name)).split("'")[1]
         if expected_value == "str":
@@ -88,8 +61,30 @@ class Filter:
             split_value = value.split(".")
             assert split_value[0].isdecimal() and split_value[1].isdecimal(),\
                 "ERROR: Invalid float value supplied."
-        return field, operator, value
+        return value
 
+    def check_tables_values(self, field, operator, value):
+        db_tables = ["stats", "players","teams","leagues"]
+        column = grab_columns(field)[0]
+        split_column = column.split(".")
+        table_name = split_column[0]
+        column_name = split_column[1]
+        # check table
+        assert table_name in db_tables, "ERROR: Invalid table name supplied."
+        # check field
+        orm_class = eval(table_name.capitalize())
+        orm_schema = orm_class._TYPES
+        assert column_name in orm_schema.keys(),\
+            "ERROR: Invalid column name supplied."
+        if operator == "IN":
+            new_value = "("
+            for val in value:
+                new_value += self.check_value(val, orm_schema, column_name)
+                new_value += ","
+            value = new_value[:-1] + ")"
+        else:
+            value = self.check_value(value, orm_schema, column_name)
+        return field, operator, value
 
     def to_str(self) -> str:
         return f"{self.field} {self.operator} {self.value}"
@@ -385,7 +380,7 @@ def stats_to_per90(
 # used for default queries 
 def get_max(
         stat: str,
-        season: str = CURRENT_SEASON
+        season: str
     ) -> float:
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -495,15 +490,50 @@ def get_select_data() -> Dict[str, Any]:
 
     return result
 
+def get_leagues() -> List[str]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get leagues
+    cursor.execute("SELECT DISTINCT name FROM leagues;")
+    leagues_result = [tup[0] for tup in cursor.fetchall()]
+    connection.commit()
+    return leagues_result 
+
+def get_positions() -> List[str]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get positions
+    cursor.execute("SELECT DISTINCT position FROM stats;")
+    position_result = [tup[0] for tup in cursor.fetchall()]
+    connection.commit()
+    return position_result
+
+def get_seasons() -> List[str]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get seasons
+    cursor.execute("SELECT DISTINCT season FROM stats;")
+    season_result = [tup[0] for tup in cursor.fetchall()]
+    connection.commit()
+    return season_result 
+
+def get_current_season() -> str:
+    seasons = get_seasons()
+    int_seasons = [int(season) for season in seasons]
+    return max(int_seasons)
+
 #################################
 ### Global Variable Functions ###
 #################################
 
-def get_current_season() -> str:
-    return CURRENT_SEASON   
-
-def get_seasons() -> List[str]:
-    return SEASONS
+def get_top_five() -> List[str]:
+    return TOP_5
 
 def get_pct_stats() -> List[str]:
     return PCT_STATS
@@ -511,8 +541,3 @@ def get_pct_stats() -> List[str]:
 def get_float_stats() -> List[str]:
     return FLOAT_STATS
 
-def get_positions() -> List[str]:
-    return POSITIONS
-
-def get_leagues() -> List[str]:
-    return LEAGUES

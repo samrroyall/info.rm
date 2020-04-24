@@ -104,7 +104,7 @@
 
                 <!-- Regular Player Link -->
                 <a class="text-dark"
-                    href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
+                    href="{{ url_for('player', id=row.get('id')) }}">
                     {{row.get("name")}}
                 </a>
               </strong>

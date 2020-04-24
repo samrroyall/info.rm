@@ -1,51 +1,135 @@
 <div class="nav-item row justify-content-center border-left" id="league_nav">
   <!-- Bundesliga -->
   <a class="nav-link col px-0 text-center" id="league_nav_link"
-    href="{{url_for('dashboard', league='bundesliga', season=current_season)}}">
+    title="German Bundesliga"
+    href="{{url_for('dashboard', league='Bundesliga-1', season=current_season)}}">
       <img class="league_logo" 
-        src="https://media.api-football.com/leagues/8.png">
+        src="https://media.api-sports.io/football/leagues/78.png">
   </a>
   <!-- Ligue 1 -->
   <a class="nav-link col px-0 text-center" id="league_nav_link"
-    href="{{url_for('dashboard', league='ligue-1', season=current_season)}}">
+    title="French Ligue 1"
+    href="{{url_for('dashboard', league='Ligue-1', season=current_season)}}">
       <img class="league_logo" 
-        src="https://media.api-football.com/leagues/4.svg">
+        src="https://media.api-sports.io/football/leagues/61.png">
   </a>
   <!-- Premier League -->
-  <a class="nav-link col px-0 text-center" id="prem_league_nav_link"
-    href="{{url_for('dashboard', league='premier-league', season=current_season)}}">
+  <a class="nav-link col px-0 text-center" id="league_nav_link"
+    title="English Premier League"
+    href="{{url_for('dashboard', league='Premier-League', season=current_season)}}">
     <img class="league_logo" 
-      src="https://media.api-football.com/leagues/2.png">
+      src="https://media.api-sports.io/football/leagues/39.png">
   </a>
   <!-- La Liga -->
   <a class="nav-link col px-0 text-center" id="league_nav_link"
-    href="{{url_for('dashboard', league='la-liga', season=current_season)}}">
+    title="Spanish Primera Division"
+    href="{{url_for('dashboard', league='Primera-Division', season=current_season)}}">
       <img class="league_logo" 
-        src="https://media.api-football.com/leagues/87.png">
+        src="https://media.api-sports.io/football/leagues/140.png">
   </a>
   <!-- Serie A -->
   <a class="nav-link col px-0 text-center" id="league_nav_link"
-    href="{{url_for('dashboard', league='serie-a', season=current_season)}}">
+    title="Italian Serie A"
+    href="{{url_for('dashboard', league='Serie-A', season=current_season)}}">
       <img class="league_logo" 
-        src="https://media.api-football.com/leagues/94.png">
+        src="https://media.api-sports.io/football/leagues/135.png">
   </a>
-  <!-- Dropdown
+  <!-- Dropdown -->
   <div class="nav-link col px-0 text-center dropdown show">
-    <button class="btn btn-secondary btn-sm dropdown-toggle text-center" 
+    <button class="btn btn-secondary btn-sm text-center" 
       type="button" data-toggle="dropdown" aria-haspopup="true" 
       id="otherLeagueDropdown">
     </button>
     <div class="dropdown-menu" 
       aria-labelledby="otherLeagueDropdown" id="league_dropdown_menu">
-      <a class="dropdown-item px-0 text-center league_dropdown_item" href="">
+      <!-- Champions League -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item" 
+	title="UEFA Champions League"
+	href="">
         <img class="dropdown_league_logo"
-          src="https://media.api-football.com/leagues/94.png">
+          src="https://media.api-sports.io/football/leagues/2.png">
 
       </a>
-      <a class="dropdown-item px-0 text-center league_dropdown_item" href="">
+      <!-- Europa League -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item" 
+	title="UEFA Europa League"
+	href="">
         <img class="dropdown_league_logo"
-          src="https://media.api-football.com/leagues/94.png">
+          src="https://media.api-sports.io/football/leagues/3.png">
+      </a>
+      <!-- Portuguese League -->
+      <!-- src="https://media.api-sports.io/football/leagues/94.png" -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item" 
+	title="Portuguese Primeira Liga"
+	href="">
+        <img class="dropdown_league_logo"
+	  src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Liga_NOS_logo.png">
+      </a>
+      <!-- Russian League -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item" 
+	title="Russian Premier League"
+	href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-sports.io/football/leagues/235.png">
+      </a>
+      <!-- Belgian League -->
+      <!-- src="https://media.api-sports.io/football/leagues/144.png" -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item"
+	title="Belgian Pro League"
+	href="">
+        <img class="dropdown_league_logo"
+          src="https://upload.wikimedia.org/wikipedia/en/6/67/Belgianproleague.png">
+      </a>
+      <!-- Eredivisie -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item"
+	title="Dutch Eredivisie"
+	href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-sports.io/football/leagues/88.png">
+      </a>
+      <!-- Ukrainian League -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item" 
+	title="Ukrainian Premier League"
+	href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-sports.io/football/leagues/333.png">
+      </a>
+      <!-- Turkish League -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item"
+	title="Turkish Super Lig"
+	href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-sports.io/football/leagues/203.png">
+      </a>
+      <!-- Austrian Bundesliga -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item" 
+	title="Austrian Bundesliga"
+	href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-sports.io/football/leagues/218.png">
+      </a>
+      <!-- Danish League -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item"
+	title="Danish Superliga"
+	href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-sports.io/football/leagues/119.png">
+      </a>
+      <!-- Scottish Premiership -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item"
+	title="Scottish Premiership"
+	href="">
+        <img class="dropdown_league_logo"
+          src="https://media.api-sports.io/football/leagues/179.png">
+      </a>
+      <!-- Czech League -->
+      <!-- src="https://media.api-sports.io/football/leagues/345.png" -->
+      <a class="dropdown-item px-0 text-center league_dropdown_item"
+	title="Czech First League"
+	href="">
+        <img class="dropdown_league_logo"
+	  src="https://vignette.wikia.nocookie.net/the-football-database/images/2/23/Czech_First_League_Fortuna_logo.png">
       </a>
     </div>
-  </div>-->
+  </div>
 </div>

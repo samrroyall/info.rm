@@ -6,6 +6,32 @@ from orm import Leagues, Teams, Players, Stats
 from parser import initialize_parser
 from tasks import setup, get_data
 
+########################
+### GLOBAL VARIABLES ###
+########################
+
+LEAGUES = [
+    # TOP 5
+    "Bundesliga 1,Germany",
+    "Ligue 1,France",
+    "Premier League,England",
+    "Primera Division,Spain",
+    "Serie A,Italy",
+    # OTHER
+    "UEFA Champions League,World",
+    "UEFA Europa League,World",
+    "Primeira Liga,Portugal",
+    "Premier League,Russia",
+    "Jupiler Pro League,Belgium",
+    "Eredivisie,Netherlands",
+    "Premier League,Ukraine",
+    "Super Lig,Turkey",
+    "Tipp3 Bundesliga,Austria",
+    "Superligaen,Denmark",
+    "Premiership,Scotland",
+    "Czech Liga,Czech-Republic"
+]
+
 #######################
 #### MAIN FUNCTION ####
 #######################
@@ -48,4 +74,5 @@ def main(**kwargs):
 
 if __name__ == "__main__":
     args = vars(initialize_parser())
+    args["leagues"] = LEAGUES
     main(**args)

@@ -5,43 +5,36 @@ from flask import Flask, render_template, request, redirect, url_for
 from src.builder import default_stats, custom_stats
 from src.dashboard import dashboard_stats
 from src.player import player_team_data
-from src.query import get_current_season, get_seasons, get_leagues
+from src.query import get_current_season, get_seasons, get_leagues, get_top_five
 
 info_rm = Flask(__name__)
 
-CURRENT_SEASON = get_current_season()
-SEASONS = get_seasons()
-LEAGUES = get_leagues() + ["top-5"]
-LEAGUE_LOOKUP = {
-        "top-5": None,
-        "bundesliga": "Bundesliga 1",
-        "ligue-1": "Ligue 1",
-        "premier-league": "Premier League",
-        "la-liga": "Primera Division",
-        "serie-a": "Serie A"
-    }
-DEFAULT_ID = 1 # change
+CURRENT_SEASON = str(get_current_season())
+SEASONS = [str(season) for season in get_seasons()]
+LEAGUES = get_leagues()
+TOP_5 = get_top_five()
 
 @info_rm.route("/")
 def home():
     return redirect(url_for(
                 "dashboard",
-                league="top-5",
+                league="Top-5",
                 season=CURRENT_SEASON
             ))
 
 @info_rm.route("/league/<league>/season/<season>")
 def dashboard(league, season = CURRENT_SEASON):
-    if league in LEAGUES and season in SEASONS:
+    if ((league.replace("-", " ") in LEAGUES or league == "Top-5") and 
+        season in SEASONS):
         return render_template(
                     "dashboard.html",
                     query_result = dashboard_stats(
-                                        LEAGUE_LOOKUP.get(league), 
+                                        league, 
                                         season, 
                                         False
                                     ),
                     query_result_per90 = dashboard_stats(
-                                                LEAGUE_LOOKUP.get(league), 
+                                                league, 
                                                 season, 
                                                 True
                                             ),
@@ -52,15 +45,14 @@ def dashboard(league, season = CURRENT_SEASON):
     else:
         return redirect(url_for(
                 "dashboard",
-                league="top-5",
+                league="Top-5",
                 season=CURRENT_SEASON
             ))
 
 @info_rm.route("/player/<id>")
-def player(id = DEFAULT_ID):
+def player(id):
     data = player_team_data(id, False)
     per90_data = player_team_data(id, True)
-    # check that player ID is legit
     if data and per90_data:
         return render_template(
                     "player.html",
@@ -69,7 +61,7 @@ def player(id = DEFAULT_ID):
                     current_season=CURRENT_SEASON,
                 )
     else:
-        return redirect(url_for("player"))
+        return redirect(url_for("home"))
 
 @info_rm.route("/builder")
 def builder():

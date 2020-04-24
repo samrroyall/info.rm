@@ -3,14 +3,6 @@
 import sys
 import argparse
 
-num_to_league = {
-    1: "Premier League,England",
-    2: "Bundesliga 1,Germany",
-    3: "Primera Division,Spain",
-    4: "Ligue 1,France",
-    5: "Serie A,Italy"
-}
-
 def initialize_parser():
     parser = argparse.ArgumentParser(description="""
             _       ____                     
@@ -52,26 +44,16 @@ def initialize_parser():
         dest = "subscription_time",
         help = "(setup only) the hour and minute a user's API-Football subscription began: 'HH:MM'"
     )    
-    parser.add_argument(
-        "-l",
-        "--leagues",
-        type = int,
-        nargs = "*",
-        choices = [1,2,3,4,5],
-        dest = "leagues",
-        help = "(setup only) leagues to be tracked:\n\t1 - Premier League,\n\t2 - Bundesliga,\n\t3 - La Liga,\n\t4 - Ligue 1\n\t5 - Serie A"
-    )
     args = parser.parse_args()
     assert len(args.current_season.split("-")) == 2, \
         "info.rm.py: error: -s/--season must be in form YYYY-YYYY."
     if args.action == "setup":
-        assert args.token and args.current_season and args.subscription_time and args.leagues, \
+        assert args.token and args.current_season and args.subscription_time, \
             "info.rm.py: error: setup procedure requires the following arguments: -t/--token, -s/--season, and -st/--subscription-time"
         assert len(args.subscription_time.split(":")) == 3, \
             "info.rm.py: error: -st/--subscription-time must be in form HH:MM:SS."
-        setattr(args, "leagues", [num_to_league.get(num) for num in getattr(args, "leagues")])
     else: 
-        assert not args.token and not args.subscription_time and not args.leagues, \
+        assert not args.token and not args.subscription_time, \
             f"info.rm.py: error: {args.action} procedure only takes -s/--season as an argument"
         assert args.current_season, \
             f"info.rm.py: error: {args.action} procedure requires -s/--season as an argument"

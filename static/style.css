@@ -95,7 +95,7 @@ body, html {
 }
 
 #builder-nav-item {
-  margin-right: 100px;
+  margin-right: 247px;
 }
 
 #brand {
@@ -106,7 +106,15 @@ body, html {
 }
 
 #league_nav {
-  height: 35px;
+  height: 50px;
+}
+
+#league_dropdown_menu {
+  min-width: 20px !important;
+  right: 0px;
+}
+
+.league_dropdown_item {
 }
 
 #main_nav_collapse {
@@ -114,29 +122,23 @@ body, html {
 }
 
 #league_nav_link {
-  width: 50px;
+  width: 100px;
 }
 
-#prem_league_nav_link {
-  width: 450px;
-}
-
-#league_dropdown_menu {
-}
-
-.league_dropdown_item {
+#otherLeagueDropdown {
+  margin-top: 15px;
 }
 
 .dropdown_league_logo {
-  height: 20px;
+  height: 35px;
 }
 
 .league_logo {
-  height: 20px;
+  height: 35px;
 }
 .league_logo:hover {
-  margin-top: -5px;
-  height: 30px;
+  margin-top: -8px;
+  height: 50px;
 }
 
 /***********************************************/

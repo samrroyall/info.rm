@@ -160,13 +160,13 @@
                 <!-- Custom Stat Player Link -->
                 {% if custom_season %}
                   <a class="text-dark"
-                    href="{{ url_for('player', id=row.get('id'), season=custom_season) }}">
+                    href="{{ url_for('player', id=row.get('id')) }}">
                     {{row.get("name")}}
                   </a>
                 <!-- Regular Player Link -->
                 {% else %}
                   <a class="text-dark"
-                    href="{{ url_for('player', id=row.get('id'), season=current_season) }}">
+                    href="{{ url_for('player', id=row.get('id')) }}">
                     {{row.get("name")}}
                   </a>
                 {% endif %}
