@@ -10,7 +10,7 @@ from src.query import get_current_season, get_seasons, get_leagues, get_top_five
 info_rm = Flask(__name__)
 
 CURRENT_SEASON = str(get_current_season())
-SEASONS = [str(season) for season in get_seasons()]
+SEASONS = get_seasons()
 LEAGUES = get_leagues()
 TOP_5 = get_top_five()
 

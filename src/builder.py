@@ -135,7 +135,7 @@ def default_stats():
         "stats.goals",
         "stats.assists"
     ]
-    max_minutes_played = get_max("stats.minutes_played")
+    max_minutes_played = get_max("stats.minutes_played", CURRENT_SEASON)
     filter_fields = [
         ([("stats.minutes_played",">",str(max_minutes_played/3)), ("stats.season", "=", CURRENT_SEASON)],"AND")
     ]
@@ -182,15 +182,18 @@ def custom_stats(form_data):
 
     # get club, league, nationality, position values
     for key in ["club", "league", "nationality", "position"]:
-        if key != "club":
-            value = form_data_dict.get(f"{key}_select")
+        value = form_data_dict.get(f"{key}_select")
         if key == "position" and value and value in positions:
             key_string = "stats.position"
         elif key == "league" and value and value in leagues:
             key_string = "stats.league_name"
-        elif (key == "club" and form_data_dict.get("club_league_select") and
-            value in clubs_dict.get(season).get(form_data_dict.get("club_league_select"))):
-            key_string = "stats.team_name"
+        elif key == "club":
+            club_league = form_data_dict.get("club_league_select")
+            value = form_data_dict.get(f"club_{club_league.replace(' ','_')}_{season}_select")
+            if club_league and value in clubs_dict.get(season).get(club_league):
+                key_string = "stats.team_name"
+            else:
+                continue
         elif key == "nationality" and value and value in nations.get(season):
               key_string = "players.nationality"
         else:

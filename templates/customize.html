@@ -153,10 +153,10 @@
           {% for season in seasons %}
             {% for league in leagues %}
               <div class="col-4 hidden" id="club_{{league.replace(' ', '_')}}_{{season}}_select_div">
-                <select class="custom-select custom-select-sm select_input" id="club_select" name="club_select">
+                <select class="custom-select custom-select-sm select_input" id="club_select" name="club_{{league.replace(' ', '_')}}_{{season}}_select">
                   <option value="">None</option>
                   {% for club in clubs.get(season).get(league) %}
-                    <option>{{club}}</option>
+                  <option>{{club}}</option>
                   {% endfor %}
                 </select>
               </div>

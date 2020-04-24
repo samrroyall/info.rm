@@ -133,6 +133,11 @@ body, html {
   height: 35px;
 }
 
+#EuropaCrop {
+  height: 35px;
+  overflow: hidden;
+}
+
 .league_logo {
   height: 35px;
 }

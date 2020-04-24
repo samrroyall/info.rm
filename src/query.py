@@ -356,10 +356,7 @@ def result_to_dict(
     ) -> Dict[str,str]:
     result = dict()
     for index, colname in index_dict.items():
-        try:
-            result[colname] = query_result[index]
-        except:
-            print(query_result, index)
+        result[colname] = query_result[index]
     return result
 
 def stats_to_per90( 
@@ -468,10 +465,12 @@ def get_select_data() -> Dict[str, Any]:
     connection.commit()
     leagues_result.sort()
     result["leagues"] = leagues_result
+    
+    seasons = get_seasons()
 
     # clubs
     result["clubs"] = dict()
-    for season in SEASONS:
+    for season in seasons:
         result["clubs"][season] = dict()
         for league in result.get("leagues"):
             # leagues stay static
@@ -519,14 +518,14 @@ def get_seasons() -> List[str]:
 
     # get seasons
     cursor.execute("SELECT DISTINCT season FROM stats;")
-    season_result = [tup[0] for tup in cursor.fetchall()]
+    season_result = [str(tup[0]) for tup in cursor.fetchall()]
     connection.commit()
     return season_result 
 
 def get_current_season() -> str:
     seasons = get_seasons()
     int_seasons = [int(season) for season in seasons]
-    return max(int_seasons)
+    return str(max(int_seasons))
 
 #################################
 ### Global Variable Functions ###
