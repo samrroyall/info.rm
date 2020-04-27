@@ -41,6 +41,11 @@ function changePage(stat, substat, page) {
      }
   }
 }
+
+function searchPlayers(preSearch, val) {
+  window.location.href = preSearch + "/search/" + val;
+}
+
 // Per 90 Toggler and Season Dropdown JS
 $(document).ready( function() {
   $(function() {
@@ -68,4 +73,13 @@ $(document).ready( function() {
       }
     });
   });
+  // Search Bar JS
+  $(function() {
+    $("#navSearch").bind("keyup", function () { 
+      var val = $(this).val().toString();
+      var preSearch = window.location.href.split("/search/")[0];
+      searchPlayers(preSearch, val);
+    });
+  });
 });
+

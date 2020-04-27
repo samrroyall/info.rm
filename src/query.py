@@ -1,6 +1,8 @@
 import os
 import pathlib
 import sqlite3
+#import unicodedata
+import unidecode
 from typing import List, Tuple, Optional, Dict, Any
 
 from .config import get_config_arg
@@ -526,6 +528,29 @@ def get_current_season() -> str:
     seasons = get_seasons()
     int_seasons = [int(season) for season in seasons]
     return str(max(int_seasons))
+
+def get_players() -> Dict[str, int]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get players names and IDs
+    cursor.execute("SELECT players.firstname, players.lastname, players.id FROM players ORDER BY players.firstname;")
+    player_result = cursor.fetchall()
+    connection.commit()
+
+    player_dict = dict()
+    for tup in player_result:
+        name = f"{tup[0]} {tup[1]}"
+        decoded_name = unidecode.unidecode(name.lower())
+        id = tup[2]
+
+        if decoded_name in player_dict:
+            player_dict[decoded_name].append( (id, name) )
+        else:
+            player_dict[decoded_name] = [ (id, name) ]
+
+    return player_dict
 
 #################################
 ### Global Variable Functions ###

@@ -10,6 +10,10 @@
 <script>
   $(document).ready( function() {
     $(function() {
+
+      $("#player-season-select").val("{{current_season}}");
+      $("#player-" + "{{current_season}}" + "-select").removeClass("hidden");
+
       $("#player-season-select").change(function () {
         {% for season in seasons %}
           $("#{{season}}-wrapper").addClass("hidden");
@@ -17,7 +21,7 @@
         {% endfor %}
         var season = $(this).val();
         $("#" + season + "-wrapper").toggleClass("hidden");
-          $("#player-" + season + "-select").removeClass("hidden");
+        $("#player-" + season + "-select").removeClass("hidden");
       });
     });
   });

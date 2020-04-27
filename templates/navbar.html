@@ -1,3 +1,14 @@
+{% if search_query %}
+  <script>
+    $(document).ready( function() {
+      $("#navSearch").focus();
+      $("#navSearch").val("{{search_query}}");
+      var val_len = "{{search_query}}";
+      $("#navSearch").setSelectionRange(val_len, val_len);
+    });
+  </script>
+{% endif %}
+
 <nav class="navbar navbar-light navbar-fixed-top bg-light border-bottom navbar-expand-lg align-items-center"
   id="mainNav">
     <!-- Logo -->
@@ -5,18 +16,47 @@
       href="{{ url_for('home') }}">
         <strong>info.rm</strong>
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main_nav_collapse" aria-controls="main_nav_collapse" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+      data-target="#main_nav_collapse" aria-controls="main_nav_collapse"
+      aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
     </button>
     <!-- Collapse Div Start -->
-    <div class="collapse navbar-collapse text-left" id="main_nav_collapse">
-      <div class="navbar-nav" id="builder-nav-item">
-        <!-- Builder -->
-        <a class="nav-item nav-link text-secondary" href="{{ url_for('builder') }}">
-          StatBuilder
-          {% include "builder_icon.html" %} 
-        </a>
-      </div>
+    <div class="collapse navbar-collapse text-left border-left mr-0" id="main_nav_collapse">
+	  <!-- Builder -->
+          <a class="nav-item nav-link text-secondary px-0"
+	    id="builder-link"
+	    href="{{ url_for('builder') }}">
+            StatBuilder
+            {% include "builder_icon.html" %} 
+          </a>
+	<div id="searchForm">
+  	  {% if search_query %}
+	    {% if search_result|length > 0 %}
+	      <form class="form-inline dropdown show"
+                action="{{ url_for('player', id=search_result[0][0]) }}">
+	    {% else %}
+	      <form class="form-inline dropdown show">
+	    {% endif %}
+	      <input class="form-control form-control-sm" type="search"
+	        placeholder="Player Search" aria-label="Search" id="navSearch">
+	      <div class="dropdown-menu show" id="searchDropdown">
+ 	        {% for item in search_result %}
+                  <a class="dropdown-item text-dark searchName"
+		    href="{{ url_for('player', id=item[0]) }}">
+		      <strong>{{ item[1] }}</strong>
+	          </a>
+	        {% endfor %}
+	      </div>
+	  {% elif search %}
+	    <form class="form-inline dropdown show">
+	      <input class="form-control form-control-sm" type="search"
+	      placeholder="Player Search" aria-label="Search" id="navSearch">
+	  {% else %}
+	    <form class="form-inline dropdown show">
+	  {% endif %}
+	    </form>
+        </div>
       <!-- Leagues -->
       {% include "league_nav.html" %} 
     </div>

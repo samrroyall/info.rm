@@ -3,3 +3,4 @@ flask
 requests
 sqlalchemy
 sqlalchemy_utils
+unidecode
