@@ -4,13 +4,13 @@ from .query import get_players
 #### TREE ####
 ##############
 
-class Node:
-    def __init__(self, name, data):
-      self.name = name
-      self.data = data
-    
-    def __repr__(self):
-        return f"{self.data[0][0]} ({self.data[0][1]})"
+#class Node:
+#    def __init__(self, name, data):
+#      self.name = name
+#      self.data = data
+#    
+#    def __repr__(self):
+#        return f"{self.data[0][0]} ({self.data[0][1]})"
 
 
 class Tree:
@@ -32,42 +32,6 @@ class Tree:
     def has_data(self):
         return self.data is not None
 
-    #####################
-    ### INSERT METHOD ###
-    #####################
-
-    def insert(self, name, data):
-        key_string = name[:len(self.label)+1]
-        if self.has_children():
-            if self.has_child(key_string):
-                self.children.get(key_string).insert(name, data)
-            else:
-                self.children[key_string] = self.__class__(
-                                                    label=key_string, 
-                                                    data=Node(name=name, data=data)
-                                                )
-        else:
-            # create pointer to new subtree
-            self.children = dict()
-
-            # move current tree data to subtree
-            if self.has_data():
-                current_value = self.data
-                self.data = None
-                current_key_string = current_value.name[:len(self.label)+1]
-                self.children[current_key_string] = self.__class__(
-                                                            label=current_key_string, 
-                                                            data=current_value
-                                                        )
-
-            # insert new data to subtree
-            if self.has_child(key_string):
-                self.children.get(key_string).insert(name, data)
-            else:
-                self.children[key_string] = self.__class__(
-                                                label=key_string, 
-                                                data=Node(name=name, data=data)
-                                            )
     ######################
     ### SEARCH METHODS ###
     ######################
@@ -98,6 +62,7 @@ class Tree:
                 return [self.data.data]
         else:
             return []
+        
 
 ########################
 ### PUBLIC FUNCTIONS ###
@@ -114,6 +79,10 @@ class Stack:
         value = self.data[0]
         self.data = self.data[1:]
         return value
+    
+    def clear(self):
+        self.data = []
+
 
 TREE = Tree("", None)
 
@@ -129,6 +98,7 @@ def print_tree(tree, level):
         print(f"{padding}children:")
     else:
         print(f"{padding}children: NULL")
+        print(f"{padding}--------------")
 
 def print_children(STACK, tree):
     level = 0
@@ -161,21 +131,99 @@ def display(search_key):
 ### INSERT  ###
 ###############
 
+def create_child(label, prefix, name):
+    tree = Tree(
+             label=label, 
+             data=(prefix, name)
+           )
+    return tree
+
+def insert(prefix, name):
+    # insert to root
+    if not TREE.has_children() or not TREE.has_child(prefix[0]):
+        if not TREE.has_children():
+            TREE.children = dict()
+        TREE.children[prefix[0]] = create_child(
+                                            prefix[0], 
+                                            prefix,
+                                            [name]
+                                        )
+    # insert below root 
+    else:
+        next_label = prefix[0]
+        current_tree = TREE
+        while True:
+            # get new tree
+            current_tree = current_tree.children.get(next_label)
+
+            # ensure that each additional player with the same prefix
+            # does not create a new tree
+            if next_label == prefix:
+                if current_tree.has_children():
+                    if current_tree.has_child(prefix):
+                        current_data = current_tree.children.get(prefix).data
+                        current_data[1].append(name)
+                        current_tree.children.get(prefix).data = current_data
+                    else:
+                        current_tree.children[prefix] = create_child(
+                                                                prefix, 
+                                                                prefix,
+                                                                [name]
+                                                            )
+                else:
+                    current_data = current_tree.data
+                    current_data[1].append(name)
+                    current_tree.data = current_data
+                return
+
+            # insert regularly
+            child_label = prefix[:len(current_tree.label) + 1]
+            if current_tree.has_children():
+                if current_tree.has_child(child_label):
+                    # move insertion to new child
+                    next_label = child_label
+                    continue
+            else:
+                current_tree.children = dict()
+                if current_tree.has_data():
+                    # move current value to new child 
+                    current_prefix = current_tree.data[0]
+                    current_name = current_tree.data[1]
+                    current_child_label = current_prefix[:len(current_tree.label) + 1]
+                    current_tree.children[current_child_label] = create_child(
+                                                                     current_child_label, 
+                                                                     current_prefix,
+                                                                     current_name
+                                                                 )
+                    # remove current data
+                    current_tree.data = None
+                    # deal with new value
+                    if current_child_label == child_label:
+                        # move insertion to new child
+                        next_label = child_label
+                        continue
+            # insert new child
+            current_tree.children[child_label] = create_child(
+                                                    child_label, 
+                                                    prefix,
+                                                    [name]
+                                                )
+            return
+
 def get_prefixes(name):
     split_name = name.split(" ")
     prefix_list = []
     for idx in range(len(split_name)):
         chunk = split_name[idx:]
-        prefix_list.append("".join(chunk))
+        prefix_list.append(" ".join(chunk))
     return prefix_list
 
 def generate_tree():
     player_dict = get_players()
-    for name, data in player_dict.items():
+    for name in player_dict.keys():
         prefixes = get_prefixes(name)
-        TREE.insert(prefixes[0], data)
-        #for prefix in prefixes:
-        #   TREE.insert(prefix, data)
+        for prefix in prefixes:
+            insert(prefix, name)
 
 ###############
 ### SEARCH  ###
