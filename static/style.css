@@ -342,6 +342,10 @@ select, .orderlabel, .arrowlink, .page-link, .filtericon {
   cursor: pointer;
 }
 
+#player_per90Label {
+  margin-top: 2px;
+}
+
 .per90Label, .orderLabel {
   cursor: pointer;
   font-size: .7em;
