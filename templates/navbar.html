@@ -3,8 +3,8 @@
     $(document).ready( function() {
       $("#navSearch").focus();
       $("#navSearch").val("{{search_query}}");
-      var val_len = "{{search_query}}";
-      $("#navSearch").setSelectionRange(val_len, val_len);
+      var val_len = $("#navSearch").val().length;
+      $("#navSearch").get(0).setSelectionRange(val_len, val_len);
     });
   </script>
 {% endif %}
@@ -36,7 +36,7 @@
 	      <form class="form-inline dropdown show"
                 action="{{ url_for('player', id=search_result[0][0]) }}">
 	    {% else %}
-	      <form class="form-inline dropdown show">
+	      <form class="form-inline dropdown show" autocomplete="off">
 	    {% endif %}
 	      <input class="form-control form-control-sm" type="search"
 	        placeholder="Player Search" aria-label="Search" id="navSearch">
@@ -49,11 +49,11 @@
 	        {% endfor %}
 	      </div>
 	  {% elif search %}
-	    <form class="form-inline dropdown show">
+	    <form class="form-inline dropdown show" autocomplete="off">
 	      <input class="form-control form-control-sm" type="search"
 	      placeholder="Player Search" aria-label="Search" id="navSearch">
 	  {% else %}
-	    <form class="form-inline dropdown show">
+	    <form class="form-inline dropdown show" autocomplete="off">
 	  {% endif %}
 	    </form>
         </div>

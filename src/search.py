@@ -4,24 +4,11 @@ from .query import get_players
 #### TREE ####
 ##############
 
-#class Node:
-#    def __init__(self, name, data):
-#      self.name = name
-#      self.data = data
-#    
-#    def __repr__(self):
-#        return f"{self.data[0][0]} ({self.data[0][1]})"
-
-
 class Tree:
     def __init__(self, label, data):
         self.label = label
         self.data = data
         self.children = None
-
-    ######################
-    ### HELPER METHODS ###
-    ######################
 
     def has_children(self):
         return self.children is not None
@@ -32,41 +19,9 @@ class Tree:
     def has_data(self):
         return self.data is not None
 
-    ######################
-    ### SEARCH METHODS ###
-    ######################
-
-    def get_child_data(self):
-        if self.has_children():
-            result = []
-            for child in self.children.values():
-                result += child.get_child_data()
-            return result
-        else:
-            return [self.data.data]
-
-    def search(self, key_string):
-        if key_string == self.label:
-            if self.has_children():
-                return self.get_child_data()
-            else:
-                return [self.data.data]
-        elif key_string.startswith(self.label):
-            sub_key_string = key_string[:len(self.label)+1]
-            if self.has_children():
-                if self.has_child(sub_key_string):
-                    return self.children.get(sub_key_string).search(key_string)
-                else:
-                    return []
-            else:
-                return [self.data.data]
-        else:
-            return []
-        
-
-########################
-### PUBLIC FUNCTIONS ###
-########################
+###############
+#### STACK ####
+###############
 
 class Stack:
     def __init__(self):
@@ -83,49 +38,12 @@ class Stack:
     def clear(self):
         self.data = []
 
+#################
+#### GLOBALS ####
+#################
 
 TREE = Tree("", None)
-
-###############
-### DISPLAY ###
-###############
-
-def print_tree(tree, level):
-    padding = ".."*level
-    print(f"{padding}label: {tree.label}")
-    print(f"{padding}data: {tree.data}")
-    if tree.has_children():
-        print(f"{padding}children:")
-    else:
-        print(f"{padding}children: NULL")
-        print(f"{padding}--------------")
-
-def print_children(STACK, tree):
-    level = 0
-    print_tree(tree, level)
-    if tree.has_children():
-        level = 1
-        STACK.data = [(child, level) for child in tree.children.values()]
-    else:
-        return
-    while len(STACK.data) > 0:
-        current_tree, level = STACK.pop()
-        print_tree(current_tree, level)
-        if current_tree.has_children():
-            for child in current_tree.children.values():
-                STACK.push( (child, level + 1) )
-
-def display(search_key):
-    STACK = Stack()
-    STACK.push(TREE)
-    while len(STACK.data) > 0:
-        current_tree = STACK.pop()
-        if current_tree.has_children():
-            for child in current_tree.children.values():
-                if child.label == search_key:
-                    print_children(STACK, child)
-                elif search_key.startswith(child.label):
-                    STACK.push(child)
+PLAYER_DICT = None
 
 ###############
 ### INSERT  ###
@@ -219,21 +137,112 @@ def get_prefixes(name):
     return prefix_list
 
 def generate_tree():
-    player_dict = get_players()
-    for name in player_dict.keys():
+    global PLAYER_DICT
+    PLAYER_DICT = get_players()
+    for name in PLAYER_DICT.keys():
         prefixes = get_prefixes(name)
         for prefix in prefixes:
             insert(prefix, name)
 
 ###############
+### DISPLAY ###
+###############
+
+#def print_tree(tree, level):
+#    padding = ".."*level
+#    print(f"{padding}label: {tree.label}")
+#    print(f"{padding}data: {tree.data}")
+#    if tree.has_children():
+#        print(f"{padding}children:")
+#    else:
+#        print(f"{padding}children: NULL")
+#        print(f"{padding}..............")
+#
+#def print_children(tree):
+#    level = 0
+#    print_tree(tree, level)
+#    if tree.has_children():
+#        STACK = Stack()
+#        level = 1
+#        for child in tree.children.values():
+#            STACK.push( (child, level) )
+#    else:
+#        return
+#    while len(STACK.data) > 0:
+#        current_tree, level = STACK.pop()
+#        print_tree(current_tree, level)
+#        if current_tree.has_children():
+#            for child in current_tree.children.values():
+#                STACK.push( (child, level + 1) )
+#
+#def display(search_key):
+#    next_label = search_key[0]
+#    current_tree = TREE
+#    while True:
+#        current_tree = current_tree.children.get(next_label)
+#        if current_tree.has_children():
+#            for child in current_tree.children.values():
+#                if child.label == search_key:
+#                    return print_children(child)
+#                elif search_key.startswith(child.label):
+#                    next_label = child.label
+
+###############
 ### SEARCH  ###
 ###############
 
-def search_tree(query):
-    search_result = TREE.search(query)
+def get_child_data(tree):
+    if tree.has_children():
+        STACK = Stack()
+        for child in tree.children.values(): 
+            STACK.push(child)
+        data = []
+        while len(STACK.data) > 0:
+            current_child = STACK.pop()
+            if current_child.has_children():
+                for child in current_child.children.values():
+                    STACK.push(child)
+            else:
+                data += current_child.data[1]
+        return data
+    else:
+        return tree.data[1]
+
+def search(search_key):
+    current_tree = TREE
+    next_label = search_key[0]
+    # handle one character searches
+    if len(search_key) == 1:
+        return get_child_data(current_tree.children.get(next_label))
+    while True:
+        current_tree = current_tree.children.get(next_label)
+        if current_tree is None:
+            return []
+        if current_tree.has_children():
+            for child in current_tree.children.values():
+                if child.label == search_key:
+                    return get_child_data(child)
+                elif search_key.startswith(child.label):
+                    next_label = child.label
+        else:
+            return current_tree.data[1]
+
+def search_tree(search_key):
     result = []
-    for values in search_result:
-        result += values
-    result = list(set(result))
-    return sorted(result, key=lambda elem: elem[1])
+    split_key = search_key.split(" ")
+    for idx in range(len(split_key)):
+        key = split_key[idx]
+        if len(key) == 0:
+            break
+        search_result = search(key)
+        if idx == 0:
+            result += search_result
+        else:
+            result = set(result) & set(search_result)
+    result_with_ids = []
+    for name in result:
+        id_list = PLAYER_DICT.get(name)
+        for id in id_list: 
+            result_with_ids.append( (id, name) )
+    return sorted(result_with_ids, key=lambda elem: elem[1])
 

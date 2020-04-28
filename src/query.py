@@ -546,9 +546,9 @@ def get_players() -> Dict[str, int]:
         id = tup[2]
 
         if decoded_name in player_dict:
-            player_dict[decoded_name].append( (id, name) )
+            player_dict[decoded_name].append( id )
         else:
-            player_dict[decoded_name] = [ (id, name) ]
+            player_dict[decoded_name] = [ id ]
 
     return player_dict
 

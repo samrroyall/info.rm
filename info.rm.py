@@ -63,9 +63,16 @@ def dashboard(league="Top-5", season=CURRENT_SEASON):
 
 @info_rm.route("/league/<league>/season/<season>/search/<search_query>")
 def dashboard_search(league="Top-5", search_query=None, season = CURRENT_SEASON):
-    if ((league.replace("-", " ") in LEAGUES or league == "Top-5") and 
-        season in SEASONS and search_query):
-        search_result = search_tree(search_query.strip().lower().replace(" ",""))[:10]
+    if search_query == "''":
+        return redirect(url_for(
+                "no_search",
+                league="Top-5",
+                season=CURRENT_SEASON
+            ))
+    elif ((league.replace("-", " ") in LEAGUES or league == "Top-5") and
+      season in SEASONS):
+        search_query = search_query[1:-1]
+        search_result = search_tree(search_query.lower())[:20]
         return render_template(
                     "dashboard.html",
                     query_result = dashboard_stats(
@@ -83,7 +90,7 @@ def dashboard_search(league="Top-5", search_query=None, season = CURRENT_SEASON)
                     seasons = SEASONS,
                     search_result = search_result,
                     search_query = search_query,
-                    search=True
+                    search = True
                 )
     else:
         return redirect(url_for(
