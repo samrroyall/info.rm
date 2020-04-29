@@ -1,4 +1,5 @@
-from .query import Query, get_max, get_top_five
+from .query import Query
+from .query_utils import get_max, get_top_five
 from .web_query import rank_response
 
 DEFAULT_FILTER = None

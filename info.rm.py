@@ -5,8 +5,8 @@ from flask import Flask, render_template, request, redirect, url_for
 from src.builder import default_stats, custom_stats
 from src.dashboard import dashboard_stats
 from src.player import player_team_data
-from src.query import get_current_season, get_seasons, get_leagues, get_top_five
-from src.search import generate_tree, search_tree
+from src.query_utils import get_current_season, get_seasons, get_leagues, get_top_five
+from src.search_players import generate_tree, search_tree
 
 info_rm = Flask(__name__)
 

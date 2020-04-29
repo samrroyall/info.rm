@@ -1,4 +1,4 @@
-from .query import get_max, get_select_data, get_current_season, get_positions
+from .query_utils import get_max, get_select_data, get_current_season, get_positions
 from .web_query import rank_response
 
 ########################
