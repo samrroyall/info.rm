@@ -171,9 +171,9 @@ def dashboard_stats(league, season, per_90):
     DEFAULT_FILTER = [("stats.season", "=", season)]
 
     if league == "Top-5":
-        DEFAULT_FILTER.append( ("stats.league_name", "IN", TOP_5) )
+        DEFAULT_FILTER.append( ("stats.league_id", "IN", TOP_5) )
     else:
-        DEFAULT_FILTER.append( ("stats.league_name", "=", league.replace("-", " ")) )
+        DEFAULT_FILTER.append( ("stats.league_id", "=", league) )
 
     global DRIBBLE_FILTER
     DRIBBLE_FILTER = str(get_max("stats.dribbles_attempted", season)/3)

@@ -14,6 +14,7 @@ db_path = os.path.join(str(file_path), f"../db/info.rm.db")
 FLOAT_STATS = [
     "stats.rating",
 ]
+
 PCT_STATS = [
     "stats.shots_on_pct",
     "stats.passes_accuracy",
@@ -21,7 +22,13 @@ PCT_STATS = [
     "stats.dribbles_succeeded_pct",
     "stats.penalties_scored_pct",
 ]
-TOP_5 = ["Bundesliga 1", "Ligue 1", "Premier League", "Primera Division", "Serie A"]
+
+# Bundesliga 1 (78),
+# Ligue 1 (61), 
+# Premier League (39), 
+# Primera Division (140),
+# Serie A (135)
+TOP_5 = ["78", "61", "39", "140", "135"]
 
 stats_keys = {
         0: "id", 
@@ -273,10 +280,14 @@ def get_leagues() -> List[str]:
     cursor = connection.cursor()
 
     # get leagues
-    cursor.execute("SELECT DISTINCT name FROM leagues;")
-    leagues_result = [tup[0] for tup in cursor.fetchall()]
+    cursor.execute("SELECT DISTINCT name, id FROM leagues;")
+    leagues_result = cursor.fetchall()
     connection.commit()
-    return leagues_result 
+
+    result = dict()
+    for tup in leagues_result:
+        result[str(tup[1])] = tup[0]
+    return result 
 
 def get_positions() -> List[str]:
     # open DB connection

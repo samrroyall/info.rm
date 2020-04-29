@@ -33,6 +33,8 @@ def update_table(engine, data, table):
         except:
             print("ERROR: Update Unsuccessful.")
             sys.exit(1)
+    else:
+        print("NOT INSERTED")
     return session
 
 def insert_into_table(engine, data, table):

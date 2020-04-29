@@ -53,6 +53,7 @@ def get_data(action, engine, season):
 
             if endpoint == "players":
                 processed_players, processed_stats = request_type(id, processed_players, processed_stats, season).update()
+                print(processed_players, processed_stats)
                 print("INFO: Response for {0} Obtained Successfully.".\
                     format(ids.get(id).get("team_name")))
 

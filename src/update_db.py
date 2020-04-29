@@ -38,6 +38,7 @@ LEAGUES = [
 
 def update_db(engine, endpoint, action_type, processed_data):
     for processed_vals in processed_data:
+       print(processed_data)
        if action_type == "insert":
            session = insert_into_table(engine, processed_vals, eval(endpoint.capitalize()))
        elif action_type == "update":

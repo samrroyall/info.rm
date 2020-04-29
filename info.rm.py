@@ -12,7 +12,7 @@ info_rm = Flask(__name__)
 
 CURRENT_SEASON = str(get_current_season())
 SEASONS = get_seasons()
-LEAGUES = get_leagues()
+LEAGUES_DICT = get_leagues()
 TOP_5 = get_top_five()
 generate_tree()
 
@@ -35,7 +35,7 @@ def no_search(league="Top-5", season=CURRENT_SEASON):
 
 @info_rm.route("/league/<league>/season/<season>")
 def dashboard(league="Top-5", season=CURRENT_SEASON):
-    if ((league.replace("-", " ") in LEAGUES or league == "Top-5") and 
+    if ((league in LEAGUES_DICT.keys() or league == "Top-5") and 
         season in SEASONS):
         return render_template(
                     "dashboard.html",
@@ -66,10 +66,10 @@ def dashboard_search(league="Top-5", search_query=None, season = CURRENT_SEASON)
     if search_query == "''":
         return redirect(url_for(
                 "no_search",
-                league="Top-5",
+                league=league,
                 season=CURRENT_SEASON
             ))
-    elif ((league.replace("-", " ") in LEAGUES or league == "Top-5") and
+    elif ((league in LEAGUES_DICT.keys() or league == "Top-5") and
       season in SEASONS):
         search_query = search_query[1:-1]
         search_result = search_tree(search_query.lower())[:20]

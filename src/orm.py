@@ -58,21 +58,17 @@ class Teams(Base):
     _TYPES = {
         "id": int,
         "name": str,
-        "league_id": int,
-        "league_name": str,
         "logo": str
     }
 
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    league_id = Column(Integer, ForeignKey("leagues.id"), nullable=False)
-    league_name = Column(String)
     logo = Column(String)
 
     def __repr__(self):
         """ Instance to print class objects """
-        return f"<Teams(team_id={self.id}, league_id={self.league_id}, name={self.name} ...)>"
+        return f"<Teams(team_id={self.id}, name={self.name} ...)>"
 
 class Players(Base):
     """ ORM Class defining attributes for players table. """

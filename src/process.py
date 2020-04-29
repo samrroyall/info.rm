@@ -262,10 +262,10 @@ flags_dict = {
 ###########################
 
 def get_alternative_league(league_name):
-    if league_name == "Bundesliga 1":
-        return "Bundesliga"
-    elif league_name == "Primera Division":
-        return "La Liga"
+    if league_name == "Bundesliga":
+        return "Bundesliga 1"
+    elif league_name == "La Liga":
+        return "Primera Division"
     else:
         return None
 
@@ -348,8 +348,8 @@ def not_null(value):
     """ Function to turn quantitative stats to 0 if currently null. """
     return 0 if value is None else value
 
-def generate_uid(id, season, team_id):
-    text = f"{id}{season}{team_id}"
+def generate_uid(id, season, team_id, league_id):
+    text = f"{id}{season}{team_id}{league_id}"
     ciphertext = md5(text.encode()).hexdigest()
     return ciphertext
 
@@ -493,7 +493,8 @@ def process_leagues(leagues, _, season):
 
             # country
             temp_league["country"] = league_country
-            temp_league["flag"] = league.get("country").get("flag")
+            league_flag = league.get("country").get("flag")
+            temp_league["flag"] = "#" if league_flag is None else league_flag
 
             # generate output dict
             league_ids[temp_league.get("id")] = temp_league.get("name")
@@ -511,8 +512,6 @@ def process_teams(teams, league_id, season):
     for idx in range(len(teams)):
         team = teams[idx]
         temp_team = dict()
-        temp_team["league_id"] = league_id
-        temp_team["league_name"] = league_name
 
         # team
         temp_team["id"] = team.get("team").get("id")
@@ -523,16 +522,12 @@ def process_teams(teams, league_id, season):
         teams[idx] = check_keys(temp_team, attributes)
         team_ids[temp_team.get("id")] = {
             "team_name":temp_team.get("name"),
-            "league_name":league_name,
-            "league_id":league_id
         }
     return {"ids":team_ids,"processed_data":teams}
 
 def process_players(players, team_id, season, filtered_players, filtered_stats, request_instance):
     """ Function to process the API response regarding player data. """
-    config_values = eval(get_config_arg("team_ids", season)).get(team_id)
-    league_name = config_values.get("league_name", season)
-    alt_league_name = get_alternative_league(league_name)
+    leagues = eval(get_config_arg("league_ids", season)).values()
     orm_class = Stats
     attributes = getattr(orm_class, "_TYPES")
 
@@ -549,8 +544,9 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
 
             # ensure only player stats for current leagues are being processed
             temp_league_name = stats.get("league").get("name")
-            if temp_league_name != league_name and (alt_league_name is None or
-                temp_league_name != alt_league_name):
+            alt_league_name = get_alternative_league(temp_league_name)
+            if temp_league_name not in leagues and (alt_league_name is None or
+                alt_league_name not in leagues):
                 continue
 
             # only store statistics on players that have played
@@ -607,7 +603,8 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
             temp_player["id"] = generate_uid(
                                     temp_player.get("player_id"),
                                     temp_player.get("season"),
-                                    temp_player.get("team_id")
+                                    temp_player.get("team_id"),
+                                    temp_player.get("league_id")
                                 )
 
             if temp_player.get("id") in filtered_stats.keys():
