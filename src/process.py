@@ -299,7 +299,7 @@ def process_height_weight(height, weight):
             weight = "NULL"
     return height, weight
 
-def process_birthdate(birthdate_str) -> date:
+def process_birthdate(birthdate_str):
     if birthdate_str:
         split_date = birthdate_str.split("/")
         split_date[0] = split_date[0].rjust(2,"0")
@@ -325,6 +325,35 @@ def process_birthdate(birthdate_str) -> date:
                                         "%Y/%m/%d"
                                     ).date()
                 return birthdate_date    
+
+def get_most_recent_team(player_id, request_instance):
+    # get player transfer information
+    api_response = request_instance.make_call(
+                                    endpoint = "transfers",
+                                    params = {
+                                        "player": player_id
+                                    }
+                                )
+    transfers = api_response.get("response")[0].get("transfers" 
+
+    # pull most recent team out of transfer response
+    most_recent_transfer_date = None
+    most_recent_team_id = None
+
+    for transfer_idx in range(len(transfers)):
+        transfer_dict = transfers[transfer_idx]
+        new_team_id = transfer_dict.get("teams").get("in").get("id")
+        transfer_date = datetime.strptime(
+                                transfer_dict.get("date"),
+                                "%Y-%m-%d"
+                            ).date( 
+                                
+        # update most recent team
+        if (most_recent_transfer_date is None or 
+            most_recent_transfer_date < transfer_date) 
+            most_recent_transfer_date = transfer_date
+            most_recent_team_id = new_team_id
+    return most_recent_team_id
 
 # no type checking on functions dealing with JSON data
 def check_keys(response_data, attributes):
@@ -527,7 +556,7 @@ def process_teams(teams, league_id, season):
 
 def process_players(players, team_id, season, filtered_players, filtered_stats, request_instance):
     """ Function to process the API response regarding player data. """
-    leagues = eval(get_config_arg("league_ids", season)).values()
+    league_dict = eval(get_config_arg("league_ids", season))
     orm_class = Stats
     attributes = getattr(orm_class, "_TYPES")
 
@@ -543,10 +572,8 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
             temp_player = dict()
 
             # ensure only player stats for current leagues are being processed
-            temp_league_name = stats.get("league").get("name")
-            alt_league_name = get_alternative_league(temp_league_name)
-            if temp_league_name not in leagues and (alt_league_name is None or
-                alt_league_name not in leagues):
+            temp_league_id = stats.get("league").get("id")
+            if temp_league_id not in leagues_dict.keys():
                 continue
 
             # only store statistics on players that have played
@@ -556,13 +583,15 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
 
             # player info needed for players table
             player_info = player.get("player")
-            temp_player["player_id"] = player.get("player").get("id")
+            temp_player["player_id"] = player.get("player").get("id")  
             temp_player["name"] = player_info.get("name").replace("&apos;","'")
             temp_player["firstname"] = player_info.get("firstname")
             temp_player["lastname"] = player_info.get("lastname")
 
             # only store one record in players table
             if temp_player.get("player_id") not in filtered_players.keys() :
+
+                current_team_id = get_most_recent_team(temp_player.get("player_id"), request_instance):               
 
                 # get player flag
                 country_abbrev = flags_dict.get(player_info.get("nationality"))
@@ -591,12 +620,13 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
                         "nationality": player_info.get("nationality"),
                         "flag": flag,
                         "height": height,
-                        "weight": weight
+                        "weight": weight,
+                        "current_team_id": current_team_id
                     }
 
             # player info
-            temp_player["league_id"] = stats.get("league").get("id")
-            temp_player["league_name"] = league_name
+            temp_player["league_id"] = temp_league_id 
+            temp_player["league_name"] = league_dict.get(temp_league_id)
             temp_player["team_id"] = stats.get("team").get("id")
             temp_player["team_name"] = stats.get("team").get("name")
             temp_player["season"] = int(season)

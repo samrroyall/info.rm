@@ -83,7 +83,8 @@ class Players(Base):
         "nationality": str,
         "flag": str,
         "height": str,
-        "weight": str
+        "weight": str,
+        "current_team_id": int
     }
 
     id = Column(Integer, primary_key=True)
@@ -96,6 +97,7 @@ class Players(Base):
     flag = Column(String)
     height = Column(String)  
     weight = Column(String) 
+    current_team_id = Column(Integer, ForeignKey("teams.id"), nullable=False)
  
     def __repr__(self):
         """ Instance to print class objects """
