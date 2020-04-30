@@ -10,6 +10,14 @@ from tasks import setup, get_data
 ### GLOBAL VARIABLES ###
 ########################
 
+# Desired Leagues that do not carry player stats 
+# FUTURE_LEAGUES = [
+#   "Jupiler Pro League,Belgium",
+#   "Premier League,Ukraine",
+#   "Premiership,Scotland",
+#   "Czech Liga,Czech-Republic"
+# ]
+
 LEAGUES = [
     # TOP 5
     "Bundesliga 1,Germany",
@@ -22,14 +30,10 @@ LEAGUES = [
     "UEFA Europa League,World",
     "Primeira Liga,Portugal",
     "Premier League,Russia",
-    "Jupiler Pro League,Belgium",
     "Eredivisie,Netherlands",
-    "Premier League,Ukraine",
     "Super Lig,Turkey",
     "Tipp3 Bundesliga,Austria",
-    "Superligaen,Denmark",
-    "Premiership,Scotland",
-    "Czech Liga,Czech-Republic"
+    "Superligaen,Denmark"
 ]
 
 #######################
