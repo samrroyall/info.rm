@@ -5,11 +5,14 @@ from hashlib import md5
 
 from config import get_config_arg
 from orm import Leagues, Teams, Players, Stats
+from query_utils import get_world_leagues
 import sys
 
 ###########################
 ####### FLAGS DICT ########
 ###########################
+
+WORLD_LEAGUES = get_world_leagues()
 
 flags_dict = {
     "Afghanistan": "AF",
@@ -261,14 +264,6 @@ flags_dict = {
 ##### PROCESS HELPERS #####
 ###########################
 
-def get_alternative_league(league_name):
-    if league_name == "Bundesliga":
-        return "Bundesliga 1"
-    elif league_name == "La Liga":
-        return "Primera Division"
-    else:
-        return None
-
 def process_height_weight(height, weight):
     if height and height != "":
         split_height = height.split(" ")
@@ -327,6 +322,10 @@ def process_birthdate(birthdate_str):
                 return birthdate_date    
 
 def get_most_recent_team(player_id, request_instance):
+    # DEBUG: Change later
+    return {}
+
+
     # get player transfer information
     api_response = request_instance.make_call(
                                     endpoint = "transfers",
@@ -334,26 +333,34 @@ def get_most_recent_team(player_id, request_instance):
                                         "player": player_id
                                     }
                                 )
-    transfers = api_response.get("response")[0].get("transfers" 
+    if len(api_response.get("response")) > 0: 
+        transfers = api_response.get("response")[0].get("transfers")
 
-    # pull most recent team out of transfer response
-    most_recent_transfer_date = None
-    most_recent_team_id = None
+        # pull most recent team, per season, out of transfer response
+        season_transfer_dict = dict()
 
-    for transfer_idx in range(len(transfers)):
-        transfer_dict = transfers[transfer_idx]
-        new_team_id = transfer_dict.get("teams").get("in").get("id")
-        transfer_date = datetime.strptime(
-                                transfer_dict.get("date"),
-                                "%Y-%m-%d"
-                            ).date( 
+        for transfer_idx in range(len(transfers)):
+            transfer_dict = transfers[transfer_idx]
+            date_str = transfer_dict.get("date")
+
+            transfer_team_id = transfer_dict.get("teams").get("in").get("id")
+            transfer_season = int(date_str.split("-")[0])
+            transfer_date = datetime.strptime(
+                                    date_str,
+                                    "%Y-%m-%d"
+                                ).date()
                                 
-        # update most recent team
-        if (most_recent_transfer_date is None or 
-            most_recent_transfer_date < transfer_date) 
-            most_recent_transfer_date = transfer_date
-            most_recent_team_id = new_team_id
-    return most_recent_team_id
+            # update most recent team by season
+            if transfer_season not in season_transfer_dict.keys():
+                season_transfer_dict[transfer_season] = (transfer_date, transfer_team_id)
+            else:
+                season_transfer_current = season_transfer_dict.get(transfer_season)
+                season_transfer_current_date = season_transfer_current[0]
+                if season_transfer_current_date < transfer_date:
+                    season_transfer_dict[transfer_season] = (transfer_date, transfer_team_id)
+        return season_transfer_dict
+    else:
+        return {}
 
 # no type checking on functions dealing with JSON data
 def check_keys(response_data, attributes):
@@ -383,7 +390,41 @@ def generate_uid(id, season, team_id, league_id):
     return ciphertext
 
 # no type checking on functions dealing with JSON data
-def process_stats(stats, temp_player, previous_data):
+def process_stats(stats, temp_player, previous_data, transfer_dict):
+    """
+    """
+
+    # DEBUG: TEST AFTER staggered approach is created
+    # get the player's most recent team based on the season
+    #if transfer_dict is not None:
+    if False:
+        is_world_league = temp_player.get("league_id") in WORLD_LEAGUES
+
+        # if no transfers are listed, assume current team is current 
+        # (unless stat is from a world league)
+        if len(transfer_dict.keys()) == 0 and not is_world_league:
+            temp_player["is_current"] = True
+        elif is_world_league:
+            temp_player["is_current"] = False
+        else:
+            stat_season = int(temp_player.get("season"))
+            # if there was a transfer this season, pick new team
+            if stat_season in transfer_dict.keys():
+                current_team_id = transfer_dict.get(stat_season)[1]
+            # if not find most recent transfer and pick new team
+            else:
+                earlier_seasons = [season for season in transfer_dict.keys() if season < stat_season]
+                most_recent_season = max(earlier_seasons)
+                current_team_id = transfer_dict.get(most_recent_season)[1]
+
+            # set values unless current stat is for a world league
+            if current_team_id == temp_player.get("team_id") and not is_world_league:
+                temp_player["is_current"] = True
+            else:
+                temp_player["is_current"] = False
+    # Change later
+    temp_player["is_current"] = True
+
     # games
     player_game_info = stats.get("games")
     temp_player["position"] = player_game_info.get("position")
@@ -446,11 +487,13 @@ def process_stats(stats, temp_player, previous_data):
     temp_player["penalties_committed"] = not_null(player_pen_info.get("commited")) #sic
 
 
-    if previous_data:
+    # if there is another stat for the player with the same team, league, and season
+    # aggregate values that are different
+    if previous_data is not None:
         static_keys = ([
             "id", "player_id", "name", "firstname", "lastname", 
             "league_name", "team_id", "team_name", "season",
-            "rating", "position"
+            "rating", "position", "is_current"
         ])
         for key, value in previous_data.items():   
             if key not in static_keys and key in temp_player.keys():
@@ -458,6 +501,7 @@ def process_stats(stats, temp_player, previous_data):
                     current_value = temp_player.get(key)
                     if current_value is None:
                         current_value = 0
+                    # if current and previous values differ, aggregate
                     if value != float(current_value):
                         temp_player[key] = current_value + value
 
@@ -554,9 +598,9 @@ def process_teams(teams, league_id, season):
         }
     return {"ids":team_ids,"processed_data":teams}
 
-def process_players(players, team_id, season, filtered_players, filtered_stats, request_instance):
+def process_players(players, team_id, season, filtered_players, filtered_stats, player_transfers, request_instance):
     """ Function to process the API response regarding player data. """
-    league_dict = eval(get_config_arg("league_ids", season))
+    leagues_dict = eval(get_config_arg("league_ids", season))
     orm_class = Stats
     attributes = getattr(orm_class, "_TYPES")
 
@@ -590,8 +634,10 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
 
             # only store one record in players table
             if temp_player.get("player_id") not in filtered_players.keys() :
-
-                current_team_id = get_most_recent_team(temp_player.get("player_id"), request_instance):               
+                # create transfer dict
+                transfer_dict = get_most_recent_team(temp_player.get("player_id"), request_instance)
+                if temp_player.get("player_id") not in player_transfers.keys():
+                    player_transfers[temp_player.get("player_id")] = transfer_dict
 
                 # get player flag
                 country_abbrev = flags_dict.get(player_info.get("nationality"))
@@ -620,13 +666,12 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
                         "nationality": player_info.get("nationality"),
                         "flag": flag,
                         "height": height,
-                        "weight": weight,
-                        "current_team_id": current_team_id
+                        "weight": weight
                     }
 
             # player info
             temp_player["league_id"] = temp_league_id 
-            temp_player["league_name"] = league_dict.get(temp_league_id)
+            temp_player["league_name"] = leagues_dict.get(temp_league_id)
             temp_player["team_id"] = stats.get("team").get("id")
             temp_player["team_name"] = stats.get("team").get("name")
             temp_player["season"] = int(season)
@@ -638,9 +683,9 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
                                 )
 
             if temp_player.get("id") in filtered_stats.keys():
-                temp_player = process_stats(stats, temp_player, filtered_stats.get(temp_player.get("id")))
+                temp_player = process_stats(stats, temp_player, filtered_stats.get(temp_player.get("id")), None)
             else:
-                temp_player = process_stats(stats, temp_player, None)
+                temp_player = process_stats(stats, temp_player, None, player_transfers.get(temp_player.get("id")))
             processed_player = check_keys(temp_player, attributes)
             filtered_stats[processed_player.get("id")] = processed_player
-    return filtered_players, filtered_stats
+    return filtered_players, filtered_stats, player_transfers

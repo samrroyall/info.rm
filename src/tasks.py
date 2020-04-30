@@ -22,6 +22,7 @@ def get_data(action, engine, season):
     # for players endpoint
     processed_players = dict()
     processed_stats = dict()
+    player_transfers = dict()
 
     # league requests do not require ids from prior calls
     if endpoint == "leagues":
@@ -52,8 +53,13 @@ def get_data(action, engine, season):
                 pass
 
             if endpoint == "players":
-                processed_players, processed_stats = request_type(id, processed_players, processed_stats, season).update()
-                print(processed_players, processed_stats)
+                processed_players, processed_stats, player_transfers = request_type(
+                                                                           id, 
+                                                                           processed_players, 
+                                                                           processed_stats, 
+                                                                           player_transfers,
+                                                                           season
+                                                                       ).update()
                 print("INFO: Response for {0} Obtained Successfully.".\
                     format(ids.get(id).get("team_name")))
 

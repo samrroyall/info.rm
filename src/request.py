@@ -142,13 +142,14 @@ class Request(metaclass=Registry):
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
         response_type = self.__class__.__name__.lower().split("request")[0]
         process_func = eval(f"process_{response_type}")
-        if hasattr(self, "processed_players") and hasattr(self, "processed_stats"):
+        if hasattr(self, "processed_players") and hasattr(self, "processed_stats") and hasattr(self, "player_transfers"):
             return process_func(
                             response_data.get("response"),
                             self.foreign_key,
                             self.current_season_short,
                             self.processed_players,
                             self.processed_stats,
+                            self.player_transfers,
                             self
                         )
         else:
@@ -200,6 +201,7 @@ class PlayersRequest(Request):
             team_id: int, 
             processed_players: Dict[str, Any], 
             processed_stats: Dict[str, Any], 
+            player_transfers: Dict[int, Any], 
             season: str
         ) -> None:
         super().__init__(season)
@@ -211,3 +213,4 @@ class PlayersRequest(Request):
         }
         self.processed_players = processed_players
         self.processed_stats = processed_stats
+        self.player_transfers = player_transfers

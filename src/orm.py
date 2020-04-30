@@ -83,8 +83,7 @@ class Players(Base):
         "nationality": str,
         "flag": str,
         "height": str,
-        "weight": str,
-        "current_team_id": int
+        "weight": str
     }
 
     id = Column(Integer, primary_key=True)
@@ -97,7 +96,6 @@ class Players(Base):
     flag = Column(String)
     height = Column(String)  
     weight = Column(String) 
-    current_team_id = Column(Integer, ForeignKey("teams.id"), nullable=False)
  
     def __repr__(self):
         """ Instance to print class objects """
@@ -115,6 +113,7 @@ class Stats(Base):
         "firstname": str,
         "lastname": str,
         "season": int,
+        "is_current": bool,
         "league_id": int,
         "league_name": str,
         "team_id": int,
@@ -164,6 +163,7 @@ class Stats(Base):
     firstname = Column(String)
     lastname = Column(String)
     season = Column(Integer)
+    is_current = Column(Boolean)
     league_id = Column(Integer, ForeignKey("leagues.id"), nullable=False) 
     league_name = Column(String)
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=False) 

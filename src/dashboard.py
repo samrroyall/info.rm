@@ -176,16 +176,16 @@ def dashboard_stats(league, season, per_90):
         DEFAULT_FILTER.append( ("stats.league_id", "=", league) )
 
     global DRIBBLE_FILTER
-    DRIBBLE_FILTER = str(get_max("stats.dribbles_attempted", season)/3)
+    DRIBBLE_FILTER = str(get_max("stats.dribbles_attempted", league, season)/5)
 
     global MP_FILTER
-    MP_FILTER = str(get_max("stats.minutes_played", season)/3)
+    MP_FILTER = str(get_max("stats.minutes_played", league, season)/5)
 
     global PASS_FILTER
-    PASS_FILTER = str(get_max("stats.passes", season)/3)
+    PASS_FILTER = str(get_max("stats.passes", league, season)/5)
 
     global SHOT_FILTER
-    SHOT_FILTER = str(get_max("stats.shots", season)/3)
+    SHOT_FILTER = str(get_max("stats.shots", league, season)/5)
 
     query_result = dict()
     query_result["scoring"] = scoring_stats()

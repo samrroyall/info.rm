@@ -29,6 +29,7 @@ PCT_STATS = [
 # Primera Division (140),
 # Serie A (135)
 TOP_5 = ["78", "61", "39", "140", "135"]
+TOP_5_STR = "(78, 61, 39, 140, 135)"
 
 stats_keys = {
         0: "id", 
@@ -37,47 +38,48 @@ stats_keys = {
         3: "firstname", 
         4: "lastname", 
         5: "season", 
-        6: "league_id", 
-        7: "league_name", 
-        8: "team_id", 
-        9: "team_name", 
-        10: "position", 
-        11: "rating", 
-        12: "shots", 
-        13: "shots_on", 
-        14: "shots_on_pct",
-        15: "goals",
-        16: "goals_conceded",
-        17: "assists",
-        18: "passes",
-        19: "passes_key",
-        20: "passes_accuracy",
-        21: "tackles",
-        22: "blocks",
-        23: "interceptions",
-        24: "duels",
-        25: "duels_won",
-        26: "duels_won_pct",
-        27: "dribbles_past",
-        28: "dribbles_attempted",
-        29: "dribbles_succeeded",
-        30: "dribbles_succeeded_pct",
-        31: "fouls_drawn",
-        32: "fouls_committed",
-        33: "cards_yellow",
-        34: "cards_red",
-        35: "penalties_won",
-        36: "penalties_committed",
-        37: "penalties_scored",
-        38: "penalties_missed",
-        39: "penalties_scored_pct",
-        40: "penalties_saved",
-        41: "games_appearances",
-        42: "minutes_played",
-        43: "games_started",
-        44: "substitutions_in",
-        45: "substitutions_out",
-        46: "games_bench"
+        6: "is_current",
+        7: "league_id", 
+        8: "league_name", 
+        9: "team_id", 
+        10: "team_name", 
+        11: "position", 
+        12: "rating", 
+        13: "shots", 
+        14: "shots_on", 
+        15: "shots_on_pct",
+        16: "goals",
+        17: "goals_conceded",
+        18: "assists",
+        19: "passes",
+        20: "passes_key",
+        21: "passes_accuracy",
+        22: "tackles",
+        23: "blocks",
+        24: "interceptions",
+        25: "duels",
+        26: "duels_won",
+        27: "duels_won_pct",
+        28: "dribbles_past",
+        29: "dribbles_attempted",
+        30: "dribbles_succeeded",
+        31: "dribbles_succeeded_pct",
+        32: "fouls_drawn",
+        33: "fouls_committed",
+        34: "cards_yellow",
+        35: "cards_red",
+        36: "penalties_won",
+        37: "penalties_committed",
+        38: "penalties_scored",
+        39: "penalties_missed",
+        40: "penalties_scored_pct",
+        41: "penalties_saved",
+        42: "games_appearances",
+        43: "minutes_played",
+        44: "games_started",
+        45: "substitutions_in",
+        46: "substitutions_out",
+        47: "games_bench"
     }
 
 players_keys = {
@@ -96,9 +98,7 @@ players_keys = {
 teams_keys = {
         0: "id",
         1: "name",
-        2: "league_id",
-        3: "league_name",
-        4: "logo"
+        2: "logo"
     }
 
 leagues_keys = {
@@ -162,11 +162,17 @@ def stats_to_per90(
 # used for default queries 
 def get_max(
         stat: str,
+        league: str,
         season: str
     ) -> float:
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
-    cursor.execute(f"SELECT max({stat}) FROM stats WHERE season = {season};")
+    if league == "Top-5":
+        league_string = f"IN {TOP_5_STR}"
+    else:
+        league_string = f"= {league}"
+
+    cursor.execute(f"SELECT max({stat}) FROM stats WHERE season = {season} AND league_id {league_string};")
     query_result = list(cursor.fetchall()[0])[0]
     connection.commit()
     connection.close()
@@ -219,7 +225,10 @@ def get_player_data(
 
         # get team logo
         team_id = formatted_row.get("team_id")
-        cursor.execute(f"SELECT logo FROM teams WHERE id = {team_id};")
+        try:
+            cursor.execute(f"SELECT logo FROM teams WHERE id = {team_id};")
+        except:
+            print(f"SELECT logo FROM teams WHERE id = {team_id};")
         team_logo = cursor.fetchall()[0][0]
         connection.commit()
 
@@ -274,13 +283,13 @@ def get_select_data() -> Dict[str, Any]:
 
     return result
 
-def get_leagues() -> List[str]:
+def get_leagues() -> List[Tuple[str, int]]:
     # open DB connection
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
 
     # get leagues
-    cursor.execute("SELECT DISTINCT name, id FROM leagues;")
+    cursor.execute("SELECT name, id FROM leagues;")
     leagues_result = cursor.fetchall()
     connection.commit()
 
@@ -288,6 +297,17 @@ def get_leagues() -> List[str]:
     for tup in leagues_result:
         result[str(tup[1])] = tup[0]
     return result 
+
+def get_world_leagues() -> List[int]:
+# open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get leagues
+    cursor.execute("SELECT id FROM leagues WHERE country = \"World\";")
+    leagues_result = [int(tup[0]) for tup in cursor.fetchall()]
+    connection.commit()
+    return leagues_result 
 
 def get_positions() -> List[str]:
     # open DB connection
