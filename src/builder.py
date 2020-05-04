@@ -135,9 +135,9 @@ def default_stats():
         "stats.goals",
         "stats.assists"
     ]
-    max_minutes_played = get_max("stats.minutes_played", CURRENT_SEASON)
+    max_minutes_played = get_max("stats.minutes_played", None, CURRENT_SEASON)
     filter_fields = [
-        ([("stats.minutes_played",">",str(max_minutes_played/3)), ("stats.season", "=", CURRENT_SEASON)],"AND")
+        ([("stats.minutes_played",">",str(max_minutes_played/5)), ("stats.season", "=", CURRENT_SEASON)],"AND")
     ]
     order_field = (["stats.rating"], True)
 
