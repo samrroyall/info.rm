@@ -19,10 +19,10 @@
   <div class="col-4 col-xs-3 col-md-2 ml-auto">
       <select class="custom-select custom-select-sm seasonselect" 
         id="season-select" value="">
-          <option>{{current_season}}</option>
+	  <option value="{{current_season}}">{{current_season}}/{{current_season|int+1}}</option>
           {% for season in seasons %}
             {% if season != current_season %}
-              <option>{{season}}</option>
+	      <option value="{{season}}">{{season}}/{{season|int+1}}</option>
             {% endif %}
           {% endfor %}
       </select>

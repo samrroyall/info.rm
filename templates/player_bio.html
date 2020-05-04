@@ -36,8 +36,18 @@
         <strong>League</strong>
       </div>
       <div class="col-8 text-right playerStatBio">
-        <strong>{{player_stat.get("league_name")}}</strong>&nbsp
-        <img src="{{league_data.get('flag')}}" height="15px" width="auto">
+	<!-- Edit Europa League Logo -->
+	{% if league_data.get("flag").split("/")[-1][0] == "3" %}
+	  <div>
+            <strong>{{player_stat.get("league_name")}}</strong>&nbsp
+	    <div class="float-right" id="EuropaCropPlayer">
+              <img src="{{league_data.get('flag')}}" height="40px">
+	    </div>
+	  </div>
+	{% else %}
+          <strong>{{player_stat.get("league_name")}}</strong>&nbsp
+          <img src="{{league_data.get('flag')}}" height="15px" width="auto">
+	{% endif %}
       </div>
     </div>
   </li>

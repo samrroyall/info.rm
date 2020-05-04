@@ -564,8 +564,11 @@ def process_leagues(leagues, _):
 
             # country
             temp_league["country"] = league_country
-            league_flag = league.get("country").get("flag")
-            temp_league["flag"] = "#" if league_flag is None else league_flag
+            if temp_league.get("country") == "World":
+                temp_league["flag"] = temp_league.get("logo")
+            else:
+                league_flag = league.get("country").get("flag")
+                temp_league["flag"] = "#" if league_flag is None else league_flag
 
             # generate output dict
             league_ids[temp_league.get("id")] = temp_league.get("name")

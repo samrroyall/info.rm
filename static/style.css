@@ -149,6 +149,12 @@ body, html {
   overflow: hidden;
 }
 
+#EuropaCropPlayer {
+  height: 20px;
+  width: 25px;
+  overflow: hidden;
+}
+
 .league_logo {
   height: 35px;
 }

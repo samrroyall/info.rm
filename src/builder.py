@@ -28,6 +28,8 @@ stats = {
     "Blocks": "stats.blocks",
     "Interceptions": "stats.interceptions",
     "Tackles": "stats.tackles",
+    "Fouls Drawn": "stats.fouls_drawn",
+    "Fouls Committed": "stats.fouls_committed",
     "Penalties_Committed": "stats.penalties_committed",
     "Goals_Conceded": "stats.goals_conceded",
     "Player_Rating": "stats.rating",

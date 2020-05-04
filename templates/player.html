@@ -53,7 +53,7 @@
       id="player-season-select" value="">
         {% for season in seasons %}
           {% if season != current_season %}
-            <option>{{season}}</option>
+	    <option value="{{season}}">{{season}}/{{season|int+1}}</option>
           {% endif %}
         {% endfor %}
     </select>
@@ -69,7 +69,7 @@
             id="player-{{season}}-select" value="" onChange="changeTeam({{season}}, {{num_teams}});">
         {% endif %}
               {% for stat in player_stats.get(season) %}
-                <option value="{{stat}}">{{player_stats.get(season).get(stat).get("stats").get("team_name")}}</option>
+                <option value="{{stat}}">{{player_stats.get(season).get(stat).get("stats").get("team_name")}} - {{player_stats.get(season).get(stat).get("stats").get("league_name")}}</option>
               {% endfor %}
           </select>
       {% endif %}
