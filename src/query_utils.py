@@ -167,12 +167,15 @@ def get_max(
     ) -> float:
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
-    if league == "Top-5":
-        league_string = f"IN {TOP_5_STR}"
+    if league is None:
+        league_string = ""
+    elif league == "Top-5":
+        league_string = f" AND league_id IN {TOP_5_STR}"
     else:
-        league_string = f"= {league}"
+        league_string = f" AND league_id = {league}"
 
-    cursor.execute(f"SELECT max({stat}) FROM stats WHERE season = {season} AND league_id {league_string};")
+    query_string = f"SELECT max({stat}) FROM stats WHERE season = {season}{league_string};"
+    cursor.execute(query_string)
     query_result = list(cursor.fetchall()[0])[0]
     connection.commit()
     connection.close()
