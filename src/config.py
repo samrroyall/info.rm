@@ -2,16 +2,16 @@
 import pathlib
 
 current_path = pathlib.Path(__file__).parent.parent.absolute()
+CONFIG_PATH = pathlib.PurePath.joinpath(current_path, f"config.ini")
 
-def config_exists(season):
-    config_path = pathlib.PurePath.joinpath(current_path, f"config/config-{season}.ini")
-    return pathlib.Path.exists(config_path)
+def config_exists():
+    return pathlib.Path.exists(CONFIG_PATH)
 
-def read_config(season):
+def read_config():
     """ Function for reading configuration information from config.ini """
-    config_path = pathlib.PurePath.joinpath(current_path, f"config/config-{season}.ini")
+    assert config_exists(), "config.ini does not exist"
     config_args = {}
-    with open(config_path, "r") as f:
+    with open(CONFIG_PATH, "r") as f:
         for line in f.readlines():
             key_value_list = line.strip().split("=")
             config_args[key_value_list[0]] = key_value_list[1]
@@ -19,24 +19,16 @@ def read_config(season):
 
 def write_config(args):
     """ Function for writing configuration information from config.ini """
-    season = args.get("current_season").split("-")[0]
-    config_path = pathlib.PurePath.joinpath(current_path, f"config/config-{season}.ini")
-    with open(config_path, "w") as f:
+    with open(CONFIG_PATH, "w") as f:
         for key,value in args.items():
             f.write(f"{key}={value}\n")
 
-def get_config_arg(config_arg, season):
-    """ Function for reading IDs from config-XXXX.ini """
-    config_args = read_config(season)
-    if config_args.get(config_arg):
-        return config_args.get(config_arg)
+def get_arg(arg):
+    """ Function for reading IDs from manifest """
+    assert config_exists(), "config.ini does not exist."
+    config_args = read_config()
+    if arg in config_args:
+        return config_args.get(arg)
     else:
         return None
-
-def set_config_arg(config_arg, value, season):
-    """ Function for writing IDs to config.ini """
-    config_args = read_config(season)
-    config_args[config_arg] = value
-    write_config(config_args)
-
 

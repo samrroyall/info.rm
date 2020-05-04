@@ -3,7 +3,6 @@ import pathlib
 import sqlite3
 from typing import List, Tuple, Optional, Dict, Any
 
-from .config import get_config_arg
 from .orm import Leagues, Teams, Players, Stats
 
 file_path = pathlib.Path(__file__).parent.absolute()

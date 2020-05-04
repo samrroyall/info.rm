@@ -3,16 +3,15 @@
 from datetime import datetime, date
 from hashlib import md5
 
-from config import get_config_arg
+from manifest import get_arg
 from orm import Leagues, Teams, Players, Stats
 from query_utils import get_world_leagues
-import sys
 
 ###########################
 ####### FLAGS DICT ########
 ###########################
 
-WORLD_LEAGUES = get_world_leagues()
+WORLD_LEAGUES = None
 
 flags_dict = {
     "Afghanistan": "AF",
@@ -322,10 +321,6 @@ def process_birthdate(birthdate_str):
                 return birthdate_date    
 
 def get_most_recent_team(player_id, request_instance):
-    # DEBUG: Change later
-    return {}
-
-
     # get player transfer information
     api_response = request_instance.make_call(
                                     endpoint = "transfers",
@@ -390,38 +385,38 @@ def generate_uid(id, season, team_id, league_id):
     return ciphertext
 
 # no type checking on functions dealing with JSON data
-def process_stats(stats, temp_player, previous_data, transfer_dict):
+def process_stats(stats, temp_player, previous_data):
     """
     """
 
     # DEBUG: TEST AFTER staggered approach is created
     # get the player's most recent team based on the season
     #if transfer_dict is not None:
-    if False:
-        is_world_league = temp_player.get("league_id") in WORLD_LEAGUES
+    #   is_world_league = temp_player.get("league_id") in WORLD_LEAGUES
+    #
+    #   # if no transfers are listed, assume current team is current 
+    #   # (unless stat is from a world league)
+    #   if len(transfer_dict.keys()) == 0 and not is_world_league:
+    #       temp_player["is_current"] = True
+    #   elif is_world_league:
+    #       temp_player["is_current"] = False
+    #   else:
+    #       stat_season = int(temp_player.get("season"))
+    #       # if there was a transfer this season, pick new team
+    #       if stat_season in transfer_dict.keys():
+    #           current_team_id = transfer_dict.get(stat_season)[1]
+    #       # if not find most recent transfer and pick new team
+    #       else:
+    #           earlier_seasons = [season for season in transfer_dict.keys() if season < stat_season]
+    #           most_recent_season = max(earlier_seasons)
+    #           current_team_id = transfer_dict.get(most_recent_season)[1]
+    #
+    #       # set values unless current stat is for a world league
+    #       if current_team_id == temp_player.get("team_id") and not is_world_league:
+    #           temp_player["is_current"] = True
+    #       else:
+    #           temp_player["is_current"] = False
 
-        # if no transfers are listed, assume current team is current 
-        # (unless stat is from a world league)
-        if len(transfer_dict.keys()) == 0 and not is_world_league:
-            temp_player["is_current"] = True
-        elif is_world_league:
-            temp_player["is_current"] = False
-        else:
-            stat_season = int(temp_player.get("season"))
-            # if there was a transfer this season, pick new team
-            if stat_season in transfer_dict.keys():
-                current_team_id = transfer_dict.get(stat_season)[1]
-            # if not find most recent transfer and pick new team
-            else:
-                earlier_seasons = [season for season in transfer_dict.keys() if season < stat_season]
-                most_recent_season = max(earlier_seasons)
-                current_team_id = transfer_dict.get(most_recent_season)[1]
-
-            # set values unless current stat is for a world league
-            if current_team_id == temp_player.get("team_id") and not is_world_league:
-                temp_player["is_current"] = True
-            else:
-                temp_player["is_current"] = False
     # Change later
     temp_player["is_current"] = True
 
@@ -543,11 +538,12 @@ def process_stats(stats, temp_player, previous_data, transfer_dict):
 #############################
 
 # no type checking on functions dealing with JSON data
-def process_leagues(leagues, _, season):
+def process_leagues(leagues, _):
     """ Function to process the API response regarding league data. """
     orm_class = Leagues
     attributes = getattr(orm_class, "_TYPES")
-    current_leagues = eval(get_config_arg("leagues", season))
+    covered_leagues = get_arg("leagues")
+    current_leagues = get_arg("league_ids")
 
     league_ids = dict()
     filtered_leagues = []
@@ -555,7 +551,9 @@ def process_leagues(leagues, _, season):
         league = leagues[idx]
         league_name = league.get("league").get("name")
         league_country = league.get("country").get("name")
-        if f"{league_name},{league_country}" in current_leagues:
+        if f"{league_name},{league_country}" in covered_leagues:
+            if current_leagues is not None and league.get("league").get("id") in current_leagues:
+                continue
             temp_league = dict()
 
             # league
@@ -575,14 +573,16 @@ def process_leagues(leagues, _, season):
     return {"ids":league_ids,"processed_data":filtered_leagues}
 
 # no type checking on functions dealing with JSON data
-def process_teams(teams, league_id, season):
+def process_teams(teams, season):
     """ Function to process the API response regarding team data. """
-    league_name = eval(get_config_arg("league_ids", season)).get(league_id)
     orm_class = Teams
     attributes = getattr(orm_class, "_TYPES")
+    current_teams = get_arg("team_ids").get(season)
 
     team_ids = dict()
     for idx in range(len(teams)):
+        if current_teams is not None and team.get("team").get("id") in current_teams:
+            continue
         team = teams[idx]
         temp_team = dict()
 
@@ -598,15 +598,20 @@ def process_teams(teams, league_id, season):
         }
     return {"ids":team_ids,"processed_data":teams}
 
-def process_players(players, team_id, season, filtered_players, filtered_stats, player_transfers, request_instance):
+def process_players(players, filtered_players, filtered_stats):
     """ Function to process the API response regarding player data. """
-    leagues_dict = eval(get_config_arg("league_ids", season))
+    global WORLD_LEAGUES
+    if WORLD_LEAGUES is None:
+        WORLD_LEAGUES = get_world_leagues()
+    leagues_dict = get_arg("league_ids")
+    current_players = get_arg("player_ids")
     orm_class = Stats
     attributes = getattr(orm_class, "_TYPES")
 
     for idx in range(len(players)):
         player = players[idx]
 
+        #grab player stats from response
         if isinstance(player.get("statistics"), list):
             player_stats = player.get("statistics")
         else:
@@ -614,6 +619,7 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
 
         for stats in player_stats:
             temp_player = dict()
+
 
             # ensure only player stats for current leagues are being processed
             temp_league_id = stats.get("league").get("id")
@@ -633,48 +639,50 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
             temp_player["lastname"] = player_info.get("lastname")
 
             # only store one record in players table
-            if temp_player.get("player_id") not in filtered_players.keys() :
-                # create transfer dict
-                transfer_dict = get_most_recent_team(temp_player.get("player_id"), request_instance)
-                if temp_player.get("player_id") not in player_transfers.keys():
-                    player_transfers[temp_player.get("player_id")] = transfer_dict
+            # ensure player is not in DB
+            if (current_players is None or (current_players is not None and temp_player.get("player_id") not in current_players)):
+                if temp_player.get("player_id") not in filtered_players.keys() :
+                    # create transfer dict
+                    #transfer_dict = get_most_recent_team(temp_player.get("player_id"), request_instance)
+                    #if temp_player.get("player_id") not in player_transfers.keys():
+                    #    player_transfers[temp_player.get("player_id")] = transfer_dict
 
-                # get player flag
-                country_abbrev = flags_dict.get(player_info.get("nationality"))
-                if country_abbrev is None:
-                    print(f"INFO: No Flag Found For {player_info.get('nationality')}.")
-                    flag = "#"
-                else:
-                    flag = f"https://media.api-sports.io/flags/{country_abbrev.lower()}.svg"
+                    # get player flag
+                    country_abbrev = flags_dict.get(player_info.get("nationality"))
+                    if country_abbrev is None:
+                        print(f"INFO: No Flag Found For {player_info.get('nationality')}.")
+                        flag = "#"
+                    else:
+                        flag = f"https://media.api-sports.io/flags/{country_abbrev.lower()}.svg"
 
-                # get player height and weight
-                height, weight = process_height_weight(
-                                            player_info.get("height"),
-                                            player_info.get("weight")
-                                        )
+                    # get player height and weight
+                    height, weight = process_height_weight(
+                                         player_info.get("height"),
+                                         player_info.get("weight")
+                                     )
 
-                # update filtered_players
-                filtered_players[temp_player.get("player_id")] = {
-                        "id": temp_player.get("player_id"),
-                        "name": temp_player.get("name"),
-                        "firstname": temp_player.get("firstname"),
-                        "lastname": temp_player.get("lastname"),
-                        "age": player_info.get("age"),
-                        "birth_date": process_birthdate(
-                                            player_info.get("birth").get("date")
-                                        ),
-                        "nationality": player_info.get("nationality"),
-                        "flag": flag,
-                        "height": height,
-                        "weight": weight
+                    # update filtered_players
+                    filtered_players[temp_player.get("player_id")] = {
+                            "id": temp_player.get("player_id"),
+                            "name": temp_player.get("name"),
+                            "firstname": temp_player.get("firstname"),
+                            "lastname": temp_player.get("lastname"),
+                            "age": player_info.get("age"),
+                            "birth_date": process_birthdate(
+                                              player_info.get("birth").get("date")
+                                          ),
+                            "nationality": player_info.get("nationality"),
+                            "flag": flag,
+                            "height": height,
+                            "weight": weight
                     }
 
-            # player info
+            # player stat info
             temp_player["league_id"] = temp_league_id 
             temp_player["league_name"] = leagues_dict.get(temp_league_id)
             temp_player["team_id"] = stats.get("team").get("id")
             temp_player["team_name"] = stats.get("team").get("name")
-            temp_player["season"] = int(season)
+            temp_player["season"] = stats.get("league").get("season")
             temp_player["id"] = generate_uid(
                                     temp_player.get("player_id"),
                                     temp_player.get("season"),
@@ -683,9 +691,9 @@ def process_players(players, team_id, season, filtered_players, filtered_stats, 
                                 )
 
             if temp_player.get("id") in filtered_stats.keys():
-                temp_player = process_stats(stats, temp_player, filtered_stats.get(temp_player.get("id")), None)
+                temp_player = process_stats(stats, temp_player, filtered_stats.get(temp_player.get("id")))
             else:
-                temp_player = process_stats(stats, temp_player, None, player_transfers.get(temp_player.get("id")))
+                temp_player = process_stats(stats, temp_player, None)
             processed_player = check_keys(temp_player, attributes)
             filtered_stats[processed_player.get("id")] = processed_player
-    return filtered_players, filtered_stats, player_transfers
+    return filtered_players, filtered_stats

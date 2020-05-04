@@ -47,17 +47,16 @@ def initialize_parser():
     args = parser.parse_args()
     
     if args.action == "setup":
-        assert len(args.current_season.split("-")) == 2, \
-            "info.rm.py: error: -s/--season must be in form YYYY-YYYY."
-        assert args.token and args.current_season and args.subscription_time, \
-            "info.rm.py: error: setup procedure requires the following arguments: -t/--token, -s/--season, and -st/--subscription-time"
+        assert args.token and args.subscription_time, \
+            "info.rm.py: error: setup procedure requires the following arguments: -t/--token, -st/--subscription-time"
         assert len(args.subscription_time.split(":")) == 3, \
             "info.rm.py: error: -st/--subscription-time must be in form HH:MM:SS."
     else: 
+        
         assert not args.token and not args.subscription_time, \
-            f"info.rm.py: error: {args.action} procedure only takes -s/--season as an argument"
+            f"info.rm.py: error: {args.action} procedure requires the following arguments: -s/--season"
         assert args.current_season, \
-            f"info.rm.py: error: {args.action} procedure requires -s/--season as an argument"
+            f"info.rm.py: error: {args.action} procedure requires the following arguments: -s/--season"
         assert len(args.current_season.split("-")) == 2, \
             "info.rm.py: error: -s/--season must be in form YYYY-YYYY."
     return args

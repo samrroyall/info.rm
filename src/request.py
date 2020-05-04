@@ -5,7 +5,7 @@ from requests import get
 from time import sleep
 from typing import Type, Dict, Set, Any, Optional, List, Tuple
 
-from config import get_config_arg
+from config import get_arg
 from process import process_leagues, process_teams, process_players
 
 class Registry(type):
@@ -42,14 +42,12 @@ class Request(metaclass=Registry):
 
     def __init__(self, season: str) -> None:
         cls = self.__class__
-        subscription_time = get_config_arg("subscription_time", season)
-        current_season = get_config_arg("current_season", season)
-        token = get_config_arg("token", season)
+        subscription_time = get_arg("subscription_time")
+        token = get_arg("token")
         self.reset_hour: int = int(subscription_time.split(':')[0])
         self.reset_minute: int = int(subscription_time.split(':')[1])
         self.reset_second: int = int(subscription_time.split(':')[2])
-        self.current_season_long: str = current_season
-        self.current_season_short: int = current_season.split('-')[0]
+        self.season: str = season
         self.headers: Dict[str,str] = {
             "x-rapidapi-key": token,
             "x-rapidapi-host": cls._API_HOST
@@ -110,8 +108,10 @@ class Request(metaclass=Registry):
     def make_call(self, endpoint = None, params = None) -> Dict[str, Dict[str, Any]]:
         """ Method to make API call. """
         cls = self.__class__
+
         # View ratelimit before proceeding, sleep if needed
         self.get_ratelimit()
+
         # Make API request
         if endpoint:
           url = f"{cls._API_URL}{endpoint}"
@@ -122,41 +122,40 @@ class Request(metaclass=Registry):
         else:
           url = f"{cls._API_URL}{self.endpoint}"
           api_response = get(url, headers=self.headers, params=self.params)
+
         # Update ratelimit
         headers_lower = dict([(k.lower(),v) for k,v in dict(api_response.headers).items()])
         self.set_ratelimit(headers_lower)
+
         # Deal with API response status code
         request_code = api_response.status_code
         if request_code == 429:
             print("INFO: Minute Ratelimit Reached. Sleeping Now...")
             sleep(61)
             return self.make_call()
-        # Format API request content as JSON
-        request_content = api_response.json()
         # Ensure that HTTP request is successful
         assert request_code == 200, \
             f"""ERROR: HTTP Request '{url}' Failed. Status: {request_code}.
             \tDescription: {request_content.get('message')}"""
+        # Format API request content as JSON
+
+        request_content = api_response.json()
         return request_content
 
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
         response_type = self.__class__.__name__.lower().split("request")[0]
         process_func = eval(f"process_{response_type}")
-        if hasattr(self, "processed_players") and hasattr(self, "processed_stats") and hasattr(self, "player_transfers"):
+
+        if hasattr(self, "processed_players") and hasattr(self, "processed_stats"):
             return process_func(
                             response_data.get("response"),
-                            self.foreign_key,
-                            self.current_season_short,
                             self.processed_players,
-                            self.processed_stats,
-                            self.player_transfers,
-                            self
+                            self.processed_stats
                         )
         else:
             return process_func(
                             response_data.get("response"),
-                            self.foreign_key,
-                            self.current_season_short
+                            self.season
                         )
 
     def update(self) -> Dict[str, Any]:
@@ -173,7 +172,9 @@ class LeaguesRequest(Request):
         super().__init__(season)
         self.endpoint: str = "leagues"
         self.foreign_key: Optional[int] = None
-        self.params: Dict[str, int] = {"season": self.current_season_short}
+        self.params: Dict[str, int] = {
+            "season": self.season
+        }
 
 
 class TeamsRequest(Request):
@@ -187,7 +188,7 @@ class TeamsRequest(Request):
         self.foreign_key: int = league_id
         self.params: Dict[str, int] = {
             "league": league_id,
-            "season": self.current_season_short
+            "season": self.season
         }
 
 
@@ -200,8 +201,7 @@ class PlayersRequest(Request):
             self, 
             team_id: int, 
             processed_players: Dict[str, Any], 
-            processed_stats: Dict[str, Any], 
-            player_transfers: Dict[int, Any], 
+            processed_stats: Dict[str, Any],
             season: str
         ) -> None:
         super().__init__(season)
@@ -209,8 +209,7 @@ class PlayersRequest(Request):
         self.foreign_key: int = team_id
         self.params: Dict[str, int] = {
             "team": team_id,
-            "season": self.current_season_short
+            "season": self.season
         }
         self.processed_players = processed_players
         self.processed_stats = processed_stats
-        self.player_transfers = player_transfers
