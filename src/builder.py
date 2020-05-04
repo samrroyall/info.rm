@@ -28,8 +28,8 @@ stats = {
     "Blocks": "stats.blocks",
     "Interceptions": "stats.interceptions",
     "Tackles": "stats.tackles",
-    "Fouls Drawn": "stats.fouls_drawn",
-    "Fouls Committed": "stats.fouls_committed",
+    "Fouls_Drawn": "stats.fouls_drawn",
+    "Fouls_Committed": "stats.fouls_committed",
     "Penalties_Committed": "stats.penalties_committed",
     "Goals_Conceded": "stats.goals_conceded",
     "Player_Rating": "stats.rating",
@@ -138,9 +138,11 @@ def default_stats():
         "stats.assists"
     ]
     max_minutes_played = get_max("stats.minutes_played", None, CURRENT_SEASON)
-    filter_fields = [
-        ([("stats.minutes_played",">",str(max_minutes_played/5)), ("stats.season", "=", CURRENT_SEASON)],"AND")
-    ]
+    filter_fields = [([
+        ("stats.minutes_played",">",str(max_minutes_played/5)), 
+        ("stats.season", "=", CURRENT_SEASON),
+        ("leagues.country", "!=", "World")
+    ],"AND")]
     order_field = (["stats.rating"], True)
 
     # ******include season in filter*****

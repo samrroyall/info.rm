@@ -13,7 +13,7 @@ db_path = os.path.join(str(file_path), f"../db/info.rm.db")
 ###########################
 
 class Filter:
-    _OPS = ["=", "<", "<=", ">", ">=", "IN"]
+    _OPS = ["=", "!=", "<", "<=", ">", ">=", "IN"]
 
     def __init__(self, properties: Tuple[str, str, str]) -> None:
         cls = self.__class__
