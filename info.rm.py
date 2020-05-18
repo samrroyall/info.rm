@@ -25,14 +25,6 @@ def home():
                 season=CURRENT_SEASON
             ))
 
-@info_rm.route("/league/<league>/season/<season>/search/")
-def no_search(league="Top-5", season=CURRENT_SEASON):
-    return redirect(url_for(
-                "dashboard",
-                league=league,
-                season=season
-            ))
-
 @info_rm.route("/league/<league>/season/<season>")
 def dashboard(league="Top-5", season=CURRENT_SEASON):
     if ((league in LEAGUES_DICT.keys() or league == "Top-5") and 
@@ -65,7 +57,7 @@ def dashboard(league="Top-5", season=CURRENT_SEASON):
 def dashboard_search(league="Top-5", search_query=None, season = CURRENT_SEASON):
     if search_query == "''":
         return redirect(url_for(
-                "no_search",
+                "dashboard",
                 league=league,
                 season=CURRENT_SEASON
             ))
@@ -90,7 +82,6 @@ def dashboard_search(league="Top-5", search_query=None, season = CURRENT_SEASON)
                     seasons = SEASONS,
                     search_result = search_result,
                     search_query = search_query,
-                    search = True
                 )
     else:
         return redirect(url_for(
@@ -102,17 +93,43 @@ def dashboard_search(league="Top-5", search_query=None, season = CURRENT_SEASON)
 @info_rm.route("/player/<id>")
 def player(id):
     data = player_team_data(id, False)
-    temp_season = str(max([int(season) for season in data.get("stats").keys()]))
     per90_data = player_team_data(id, True)
     if data and per90_data:
+        temp_season = str(max([int(season) for season in data.get("stats").keys()]))
         return render_template(
                     "player.html",
                     data=data,
                     per90_data=per90_data,
                     current_season=temp_season,
+                    search = True
                 )
     else:
         return redirect(url_for("home"))
+
+@info_rm.route("/player/<id>/search/<search_query>")
+def player_search(id, search_query = None):
+    if search_query == "''":
+        return redirect(url_for(
+                   "player",
+                   id=id,
+               ))
+    else:
+        data = player_team_data(id, False)
+        per90_data = player_team_data(id, True)
+        if data and per90_data:
+            temp_season = str(max([int(season) for season in data.get("stats").keys()]))
+            search_query = search_query[1:-1]
+            search_result = search_tree(search_query.lower())[:20]
+            return render_template(
+                       "player.html",
+                       data=data,
+                       per90_data=per90_data,
+                       current_season=temp_season,
+                       search_result = search_result,
+                       search_query = search_query
+                   )
+        else:
+            return redirect(url_for("home"))
 
 @info_rm.route("/builder")
 def builder():

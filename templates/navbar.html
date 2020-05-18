@@ -22,7 +22,11 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <!-- Collapse Div Start -->
-    <div class="collapse navbar-collapse text-left border-left mr-0" id="main_nav_collapse">
+    {% if search_query %}
+      <div class="collapse navbar-collapse show text-left border-left mr-0" id="main_nav_collapse">
+    {% else %}
+      <div class="collapse navbar-collapse text-left border-left mr-0" id="main_nav_collapse">
+    {% endif %}
 	  <!-- Builder -->
           <a class="nav-item nav-link text-secondary px-0"
 	    id="builder-link"
@@ -31,13 +35,8 @@
             {% include "builder_icon.html" %} 
           </a>
 	<div id="searchForm">
-  	  {% if search_query %}
-	    {% if search_result|length > 0 %}
-	      <form class="form-inline dropdown show"
-                action="{{ url_for('player', id=search_result[0][0]) }}">
-	    {% else %}
-	      <form class="form-inline dropdown show" autocomplete="off">
-	    {% endif %}
+	  <form class="form-inline dropdown show" autocomplete="off">
+  	    {% if search_query %}
 	      <input class="form-control form-control-sm" type="search"
 	        placeholder="Player Search" aria-label="Search" id="navSearch">
 	      <div class="dropdown-menu show" id="searchDropdown">
@@ -48,14 +47,11 @@
 	          </a>
 	        {% endfor %}
 	      </div>
-	  {% elif search %}
-	    <form class="form-inline dropdown show" autocomplete="off">
-	      <input class="form-control form-control-sm" type="search"
-	      placeholder="Player Search" aria-label="Search" id="navSearch">
-	  {% else %}
-	    <form class="form-inline dropdown show" autocomplete="off">
-	  {% endif %}
-	    </form>
+	    {% elif search %}
+	       <input class="form-control form-control-sm" type="search"
+	       placeholder="Player Search" aria-label="Search" id="navSearch">
+	    {% endif %}
+	  </form>
         </div>
       <!-- Leagues -->
       {% include "league_nav.html" %} 
