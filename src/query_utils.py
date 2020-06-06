@@ -5,7 +5,7 @@ import unidecode
 from typing import List, Tuple, Optional, Dict, Any
 
 file_path = pathlib.Path(__file__).parent.absolute()
-db_path = os.path.join(str(file_path), f"../db/info.rm.db")
+db_path = os.path.join(str(file_path), "info.rm.db")
 
 #################################
 #### Public Function Helpers ####

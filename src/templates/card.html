@@ -62,11 +62,11 @@
 
             <!-- Prev Button -->
             {% if card_num == 0 %}
-              <div class="col prevarrow text-right {{stat}}_prev_{{card_num}}"
+              <div class="col text-right {{stat}}_prev_{{card_num}}"
                 onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');">
             <!-- Prev Button Hidden -->
             {% else %}
-              <div class="col prevarrow text-right {{stat}}_prev_{{card_num}} hidden"
+              <div class="col text-right {{stat}}_prev_{{card_num}} hidden"
                 onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');">
             {% endif %}
                 <a class="text-secondary arrowlink" role="button">

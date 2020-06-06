@@ -1,5 +1,5 @@
-from .search import insert, search
-from .query_utils import get_players
+from search import insert, search
+from query_utils import get_players
 
 PLAYER_DICT = None
 

@@ -2,11 +2,10 @@
 
 from flask import Flask, render_template, request, redirect, url_for
 
-from src.builder import default_stats, custom_stats
-from src.dashboard import dashboard_stats
-from src.player import player_team_data
-from src.query_utils import get_current_season, get_seasons, get_leagues, get_top_five
-from src.search_players import generate_tree, search_tree
+from builder import default_stats, custom_stats
+from dashboard import dashboard_stats
+from query_utils import get_player_data, get_current_season, get_seasons, get_leagues, get_top_five
+from search_players import generate_tree, search_tree
 
 info_rm = Flask(__name__)
 
@@ -92,8 +91,8 @@ def dashboard_search(league="Top-5", search_query=None, season = CURRENT_SEASON)
 
 @info_rm.route("/player/<id>")
 def player(id):
-    data = player_team_data(id, False)
-    per90_data = player_team_data(id, True)
+    data = get_player_data(id, False)
+    per90_data = get_player_data(id, True)
     if data and per90_data:
         temp_season = str(max([int(season) for season in data.get("stats").keys()]))
         return render_template(
@@ -114,8 +113,8 @@ def player_search(id, search_query = None):
                    id=id,
                ))
     else:
-        data = player_team_data(id, False)
-        per90_data = player_team_data(id, True)
+        data = get_player_data(id, False)
+        per90_data = get_player_data(id, True)
         if data and per90_data:
             temp_season = str(max([int(season) for season in data.get("stats").keys()]))
             search_query = search_query[1:-1]

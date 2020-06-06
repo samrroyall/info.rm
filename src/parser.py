@@ -10,16 +10,16 @@ def initialize_parser():
           / / __ \/ /_/ __ \  / ___/ __ `__ \ 
          / / / / / __/ /_/ / / /  / / / / / /
         /_/_/ /_/_/  \____(_)_/  /_/ /_/ /_/ 
-        """, formatter_class=argparse.RawTextHelpFormatter)
+
+""", formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         "action",
         type = str,
         choices = [
             "setup",
-            "insert_leagues",
-            "insert_teams",
-            "insert_players",
-            "update_players",
+            "leagues",
+            "teams",
+            "players",
         ],
         help = "procedure to be run by info.rm"
     )

@@ -3,10 +3,10 @@ import pathlib
 import sqlite3
 from typing import List, Tuple, Optional, Dict, Any
 
-from .orm import Leagues, Teams, Players, Stats
+from orm import Leagues, Teams, Players, Stats
 
 file_path = pathlib.Path(__file__).parent.absolute()
-db_path = os.path.join(str(file_path), f"../db/info.rm.db")
+db_path = os.path.join(str(file_path), "info.rm.db")
 
 ###########################
 ###### Query Classes ######

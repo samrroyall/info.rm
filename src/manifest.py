@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pathlib
 
-current_path = pathlib.Path(__file__).parent.parent.absolute()
+current_path = pathlib.Path(__file__).parent.absolute()
 MANIFEST_PATH = pathlib.PurePath.joinpath(current_path, f"MANIFEST")
 
 def manifest_exists():
@@ -23,7 +23,7 @@ def write_manifest(args):
         for key,value in args.items():
             f.write(f"{key}={value}\n")
 
-def get_arg(arg, season=None):
+def get_manifest_arg(arg, season=None):
     """ Function for reading IDs from manifest """
     assert manifest_exists(), "MANIFEST does not exist."
     manifest_args = read_manifest()
@@ -40,7 +40,7 @@ def get_arg(arg, season=None):
     else:
         return None
 
-def set_arg(arg, value, season=None):
+def set_manifest_arg(arg, value, season=None):
     """ Function for writing IDs to  manifest """
     if manifest_exists():
         manifest_args = read_manifest()

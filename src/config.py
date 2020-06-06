@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pathlib
 
-current_path = pathlib.Path(__file__).parent.parent.absolute()
+current_path = pathlib.Path(__file__).parent.absolute()
 CONFIG_PATH = pathlib.PurePath.joinpath(current_path, f"config.ini")
 
 def config_exists():
@@ -23,7 +23,7 @@ def write_config(args):
         for key,value in args.items():
             f.write(f"{key}={value}\n")
 
-def get_arg(arg):
+def get_config_arg(arg):
     """ Function for reading IDs from manifest """
     assert config_exists(), "config.ini does not exist."
     config_args = read_config()
