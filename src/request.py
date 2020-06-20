@@ -11,259 +11,6 @@ from manifest import get_manifest_arg
 from orm import Leagues, Teams, Players, Stats
 from query_utils import get_world_leagues
 
-####################################################
-########### GLOBAL PROCESSING VARIABLES ############
-####################################################
-
-WORLD_LEAGUES = None
-
-flags_dict = {
-    "Afghanistan": "AF",
-    "Albania": "AL",
-    "Algeria": "DZ",
-    "American Samoa": "AS",
-    "Andorra": "AD",
-    "Angola": "AO",
-    "Anguilla": "AI",
-    "Antigua and Barbuda": "AG",
-    "Argentina": "AR",
-    "Armenia": "AM",
-    "Aruba": "AW",
-    "Australia": "AU",
-    "Austria": "AT",
-    "Azerbaijan": "AZ",
-    "Bahamas": "BS",
-    "Bahrain": "BH",
-    "Bangladesh": "BD",
-    "Barbados": "BB",
-    "Belarus": "BY",
-    "Belgium": "BE",
-    "Belize": "BZ",
-    "Benin": "BJ",
-    "Bermuda": "BM",
-    "Bhutan": "BT",
-    "Bolivia": "BO",
-    "Bonaire": "BQ",
-    "Bosnia and Herzegovina": "BA",
-    "Botswana": "BW",
-    "Bouvet Island": "BV",
-    "Brazil": "BR",
-    "Brunei": "BN",
-    "Bulgaria": "BG",
-    "Burkina Faso": "BF",
-    "Burundi": "BI",
-    "Cambodia": "KH",
-    "Cameroon": "CM",
-    "Canada": "CA",
-    "Cape Verde Islands": "CV",
-    "Cayman Islands": "KY",
-    "Central African Republic": "CF",
-    "Chad": "TD",
-    "Chile": "CL",
-    "China PR": "CN",
-    "Colombia": "CO",
-    "Comoros": "KM",
-    "Congo": "CG",
-    "Congo DR": "CD",
-    "Cook Islands": "CK",
-    "Costa Rica": "CR",
-    "Croatia": "HR",
-    "Cuba": "CU",
-    "Curaçao": "CW",
-    "Cyprus": "CY",
-    "Czech Republic": "CZ",
-    "Côte d'Ivoire": "CI",
-    "Denmark": "DK",
-    "Djibouti": "DJ",
-    "Dominica": "DM",
-    "Dominican Republic": "DO",
-    "Ecuador": "EC",
-    "Egypt": "EG",
-    "El Salvador": "SV",
-    "Equatorial Guinea": "GQ",
-    "England": "GB",
-    "Eritrea": "ER",
-    "Estonia": "EE",
-    "Ethiopia": "ET",
-    "Falkland Islands": "FK",
-    "Faroe Islands": "FK",
-    "Fiji": "FJ",
-    "Finland": "FI",
-    "France": "FR",
-    "French Guiana": "GF",
-    "French Polynesia": "PF",
-    "FYR Macedonia": "MK",
-    "Gabon": "GA",
-    "Gambia": "GM",
-    "Georgia": "GE",
-    "Germany": "DE",
-    "Ghana": "GH",
-    "Gibraltar": "GI",
-    "Greece": "GR",
-    "Greenland": "GL",
-    "Grenada": "GD",
-    "Guadeloupe": "GP",
-    "Guam": "GU",
-    "Guinea": "GN",
-    "Guinea-Bissau": "GW",
-    "Guyana": "GY",
-    "Haiti": "HT",
-    "Honduras": "HN",
-    "Hong Kong": "HK",
-    "Hungary": "HU",
-    "Iceland": "IS",
-    "India": "IN",
-    "Indonesia": "ID",
-    "Iran": "IR",
-    "Iraq": "IQ",
-    "Ireland": "IE",
-    "Ireland Republic": "IE",
-    "Isle of Man": "IM",
-    "Israel": "IL",
-    "Italy": "IT",
-    "Jamaica": "JM",
-    "Japan": "JP",
-    "Jordan": "JO",
-    "Kazakhstan": "KZ",
-    "Kenya": "KE",
-    "Kiribati": "KI",
-    "Korea Republic": "KR",
-    "Korea DPR": "KP",
-    "Kuwait": "KW",
-    "Kyrgyzstan": "KG",
-    "Laos": "LA",
-    "Latvia": "LV",
-    "Lebanon": "LB",
-    "Lesotho": "LS",
-    "Liberia": "LR",
-    "Libya": "LY",
-    "Liechtenstein": "LI",
-    "Lithuania": "LT",
-    "Luxembourg": "LU",
-    "Macao": "MO",
-    "Macedonia": "MK",
-    "Madagascar": "MG",
-    "Malawi": "MW",
-    "Malaysia": "MW",
-    "Maldives": "MV",
-    "Mali": "ML",
-    "Malta": "MT",
-    "Marshall Islands": "MH",
-    "Martinique": "MQ",
-    "Mauritania": "MR",
-    "Mauritius": "MU",
-    "Mayotte": "YT",
-    "Mexico": "MX",
-    "Micronesia": "FM",
-    "Moldova": "MD",
-    "Monaco": "MC",
-    "Mongolia": "MN",
-    "Montenegro": "ME",
-    "Montserrat": "MS",
-    "Morocco": "MA",
-    "Mozambique": "MZ",
-    "Myanmar": "MM",
-    "Namibia": "NA",
-    "Nauru": "NR",
-    "Nepal": "NP",
-    "Netherlands": "NL",
-    "New Caledonia": "NC",
-    "New Zealand": "NZ",
-    "Nicaragua": "NI",
-    "Niger": "NE",
-    "Nigeria": "NG",
-    "Niue": "NU",
-    "Norfolk Island": "NF",
-    "Northern Mariana Islands": "MP",
-    "North Macedonia": "MK",
-    "Northern Ireland": "GB",
-    "Norway": "NO",
-    "Oman": "OM",
-    "Pakistan": "PK",
-    "Palau": "PW",
-    "Palestine": "PS",
-    "Panama": "PA",
-    "Papau New Guinea": "PA",
-    "Paraguay": "PY",
-    "Peru": "PE",
-    "Philippines": "PH",
-    "Pitcairn": "PN",
-    "Poland": "PL",
-    "Portugal": "PT",
-    "Puerto Rico": "PR",
-    "Qatar": "QA",
-    "Republic of Ireland": "IE",
-    "Romania": "RO",
-    "Russia": "RU",
-    "Rwanda": "RW",
-    "Réunion": "RE",
-    "Saint Barthelemy": "BL",
-    "Saint Helena": "SH",
-    "Saint Kitts and Nevis": "KN",
-    "Saint Lucia": "LC",
-    "Saint Martin": "MF",
-    "Saint Pierre and Miquelon": "PM",
-    "Saint Vincent and the Grenadines": "VC",
-    "Samoa": "WS",
-    "San Marino": "SM",
-    "Sao Tome and Principe": "ST",
-    "Saudi Arabia": "SA",
-    "Scotland": "GB",
-    "Senegal": "SN",
-    "Serbia": "RS",
-    "Seychelles": "SC",
-    "Sierra Leone": "SL",
-    "Singapore": "SG",
-    "Sint Maarten": "SX",
-    "Slovakia": "SK",
-    "Slovenia": "SI",
-    "Solomon Islands": "ZA",
-    "Somalia": "SO",
-    "South Africa": "ZA",
-    "South Georgia and the South Sandwich Islands": "GS",
-    "South Sudan": "SS",
-    "Spain": "ES",
-    "Sri Lanka": "LK",
-    "Sudan": "SD",
-    "Suriname": "SR",
-    "Svalbard and Jan Mayen": "SJ",
-    "Swaziland": "SE",
-    "Sweden": "SE",
-    "Switzerland": "CH",
-    "Syria": "SY",
-    "Taiwan": "TW",
-    "Tajikistan": "TJ",
-    "Tanzania": "TZ",
-    "Thailand": "TH",
-    "Timor-Leste": "TL",
-    "Togo": "TG",
-    "Tokelau": "TK",
-    "Tonga": "TO",
-    "Trinidad and Tobago": "TT",
-    "Tunisia": "TN",
-    "Turkey": "TR",
-    "Turkmenistan": "TM",
-    "Turks and Caicos Islands": "TC",
-    "Tuvalu": "TV",
-    "Uganda": "UG",
-    "Ukraine": "UA",
-    "United Arab Emirates": "AE",
-    "Uruguay": "UY",
-    "USA": "US",
-    "United States": "US",
-    "Uzbekistan": "UZ",
-    "Vanuatu": "VU",
-    "Venezuela": "VE",
-    "Vietnam": "VN",
-    "British Virgin Islands": "VG",
-    "US Virgin Islands": "VI",
-    "Wallis and Futuna": "WF",
-    "Wales": "GB",
-    "Yemen": "YE",
-    "Zambia": "ZM",
-    "Zimbabwe": "ZW",
-}
-
 ####################################
 ########## CLASS REGISTRY ##########
 ####################################
@@ -368,42 +115,53 @@ class Request(metaclass=Registry):
             print("INFO: Ratelimit Reached. Sleeping...")
             sleep(cls._RATELIMIT_RESET - datetime.today().timestamp() + 1)
 
-    def make_call(self, endpoint = None, params = None) -> Dict[str, Dict[str, Any]]:
+    def make_call(self, endpoint = None, params = None) -> Tuple[Dict[str, Dict[str, Any]], Optional[int]]:
         """ Method to make API call. """
         cls = self.__class__
 
         # View ratelimit before proceeding, sleep if needed
-        self.get_ratelimit()
+        # self.get_ratelimit()
 
         # Make API request
         if endpoint:
-          url = f"{cls._API_URL}{endpoint}"
-          if params:
-            api_response = get(url, headers=self.headers, params=params)
-          else:
-            api_response = get(url, headers=self.headers)
+            url = f"{cls._API_URL}{endpoint}"
         else:
-          url = f"{cls._API_URL}{self.endpoint}"
-          api_response = get(url, headers=self.headers, params=self.params)
+            url = f"{cls._API_URL}{self.endpoint}"
+        if params:
+            params.update(self.params)
+            api_response = get(url, headers=self.headers, params=params)
+        else:
+            api_response = get(url, headers=self.headers, params=self.params)
 
         # Update ratelimit
-        headers_lower = dict([(k.lower(),v) for k,v in dict(api_response.headers).items()])
-        self.set_ratelimit(headers_lower)
+        # headers_lower = dict([(k.lower(),v) for k,v in dict(api_response.headers).items()])
+        # self.set_ratelimit(headers_lower)
 
-        # Deal with API response status code
+        # Ensure that Minute ratelimit is not reached 
         request_code = api_response.status_code
         if request_code == 429:
             print("INFO: Minute Ratelimit Reached. Sleeping Now...")
             sleep(61)
+            print("INFO: Retrying Call...")
             return self.make_call()
+        
         # Ensure that HTTP request is successful
         assert request_code == 200, \
             f"""ERROR: HTTP Request '{url}' Failed. Status: {request_code}.
     Description: {request_content.get('message')}"""
-        # Format API request content as JSON
 
+        # Format API request content as JSON
         request_content = api_response.json()
-        return request_content
+
+        # Check pagination
+        current_page = request_content.get("paging").get("current")
+        num_pages = request_content.get("paging").get("total")
+        if current_page < num_pages: 
+            next_page = current_page + 1
+        else:
+            next_page = None
+
+        return request_content, next_page
     
     def check_types(self, response_data, attributes):
         """ Function to fix response data types and remove unnecessary keys. """
@@ -420,6 +178,7 @@ class Request(metaclass=Registry):
         # remove unneeded keys
         for key in unneeded_keys:
             del response_data[key]
+
         return response_data
 
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -428,7 +187,14 @@ class Request(metaclass=Registry):
         
     def update(self) -> Dict[str, Any]:
         """ Method to gather, process, and store API data. """
-        api_response = self.make_call()
+        api_response, next_page = self.make_call()
+
+        # check pagination
+        while next_page:
+            print(f"INFO: Calling Next Response Page ({next_page})...")
+            new_response, next_page = self.make_call(params = {"page": next_page})
+            api_response["response"] += new_response.get("response")
+
         return self.process_response(api_response)
 
 #######################################
@@ -542,6 +308,291 @@ class PlayersRequest(Request):
     data through API requests regarding Teams data. """
     _REGISTER: bool = True
 
+    _STAT_KEYS = {
+        "position": "position",
+        "rating": "rating",
+        "shots": "total",
+        "shots_on": "on",
+        "goals": "total",
+        "goals_conceded": "conceded",
+        "assists": "assists",
+        "passes": "total",
+        "passes_key": "key",
+        "passes_accuracy": "accuracy",
+        "tackles": "total",
+        "blocks": "blocks",
+        "interceptions": "interceptions",
+        "duels": "total",
+        "duels_won": "won",
+        "dribbles_past": "past",
+        "dribbles_attempted": "attempts",
+        "dribbles_succeeded": "success",
+        "fouls_drawn": "drawn",
+        "fouls_committed": "committed",
+        "cards_yellow": "yellow",
+        "cards_red": "red",
+        "penalties_won": "won", 
+        "penalties_committed": "commited", #sic
+        "penalties_scored": "scored", 
+        "penalties_missed": "missed", 
+        "penalties_saved": "saved", 
+        "minutes_played": "minutes",
+        "games_appearances": "appearences", #sic
+        "games_started": "lineups",
+        "games_bench": "bench",
+        "substitutions_in": "in",
+        "substitutions_out": "out"
+    }
+
+    _FLAGS_DICT = {
+        "Afghanistan": "AF",
+        "Albania": "AL",
+        "Algeria": "DZ",
+        "American Samoa": "AS",
+        "Andorra": "AD",
+        "Angola": "AO",
+        "Anguilla": "AI",
+        "Antigua and Barbuda": "AG",
+        "Argentina": "AR",
+        "Armenia": "AM",
+        "Aruba": "AW",
+        "Australia": "AU",
+        "Austria": "AT",
+        "Azerbaijan": "AZ",
+        "Bahamas": "BS",
+        "Bahrain": "BH",
+        "Bangladesh": "BD",
+        "Barbados": "BB",
+        "Belarus": "BY",
+        "Belgium": "BE",
+        "Belize": "BZ",
+        "Benin": "BJ",
+        "Bermuda": "BM",
+        "Bhutan": "BT",
+        "Bolivia": "BO",
+        "Bonaire": "BQ",
+        "Bosnia and Herzegovina": "BA",
+        "Botswana": "BW",
+        "Bouvet Island": "BV",
+        "Brazil": "BR",
+        "Brunei": "BN",
+        "Bulgaria": "BG",
+        "Burkina Faso": "BF",
+        "Burundi": "BI",
+        "Cambodia": "KH",
+        "Cameroon": "CM",
+        "Canada": "CA",
+        "Cape Verde Islands": "CV",
+        "Cayman Islands": "KY",
+        "Central African Republic": "CF",
+        "Chad": "TD",
+        "Chile": "CL",
+        "China PR": "CN",
+        "Colombia": "CO",
+        "Comoros": "KM",
+        "Congo": "CG",
+        "Congo DR": "CD",
+        "Cook Islands": "CK",
+        "Costa Rica": "CR",
+        "Croatia": "HR",
+        "Cuba": "CU",
+        "Curaçao": "CW",
+        "Cyprus": "CY",
+        "Czech Republic": "CZ",
+        "Côte d'Ivoire": "CI",
+        "Denmark": "DK",
+        "Djibouti": "DJ",
+        "Dominica": "DM",
+        "Dominican Republic": "DO",
+        "Ecuador": "EC",
+        "Egypt": "EG",
+        "El Salvador": "SV",
+        "Equatorial Guinea": "GQ",
+        "England": "GB",
+        "Eritrea": "ER",
+        "Estonia": "EE",
+        "Ethiopia": "ET",
+        "Falkland Islands": "FK",
+        "Faroe Islands": "FK",
+        "Fiji": "FJ",
+        "Finland": "FI",
+        "France": "FR",
+        "French Guiana": "GF",
+        "French Polynesia": "PF",
+        "FYR Macedonia": "MK",
+        "Gabon": "GA",
+        "Gambia": "GM",
+        "Georgia": "GE",
+        "Germany": "DE",
+        "Ghana": "GH",
+        "Gibraltar": "GI",
+        "Greece": "GR",
+        "Greenland": "GL",
+        "Grenada": "GD",
+        "Guadeloupe": "GP",
+        "Guam": "GU",
+        "Guinea": "GN",
+        "Guinea-Bissau": "GW",
+        "Guyana": "GY",
+        "Haiti": "HT",
+        "Honduras": "HN",
+        "Hong Kong": "HK",
+        "Hungary": "HU",
+        "Iceland": "IS",
+        "India": "IN",
+        "Indonesia": "ID",
+        "Iran": "IR",
+        "Iraq": "IQ",
+        "Ireland": "IE",
+        "Ireland Republic": "IE",
+        "Isle of Man": "IM",
+        "Israel": "IL",
+        "Italy": "IT",
+        "Jamaica": "JM",
+        "Japan": "JP",
+        "Jordan": "JO",
+        "Kazakhstan": "KZ",
+        "Kenya": "KE",
+        "Kiribati": "KI",
+        "Korea Republic": "KR",
+        "Korea DPR": "KP",
+        "Kuwait": "KW",
+        "Kyrgyzstan": "KG",
+        "Laos": "LA",
+        "Latvia": "LV",
+        "Lebanon": "LB",
+        "Lesotho": "LS",
+        "Liberia": "LR",
+        "Libya": "LY",
+        "Liechtenstein": "LI",
+        "Lithuania": "LT",
+        "Luxembourg": "LU",
+        "Macao": "MO",
+        "Macedonia": "MK",
+        "Madagascar": "MG",
+        "Malawi": "MW",
+        "Malaysia": "MW",
+        "Maldives": "MV",
+        "Mali": "ML",
+        "Malta": "MT",
+        "Marshall Islands": "MH",
+        "Martinique": "MQ",
+        "Mauritania": "MR",
+        "Mauritius": "MU",
+        "Mayotte": "YT",
+        "Mexico": "MX",
+        "Micronesia": "FM",
+        "Moldova": "MD",
+        "Monaco": "MC",
+        "Mongolia": "MN",
+        "Montenegro": "ME",
+        "Montserrat": "MS",
+        "Morocco": "MA",
+        "Mozambique": "MZ",
+        "Myanmar": "MM",
+        "Namibia": "NA",
+        "Nauru": "NR",
+        "Nepal": "NP",
+        "Netherlands": "NL",
+        "New Caledonia": "NC",
+        "New Zealand": "NZ",
+        "Nicaragua": "NI",
+        "Niger": "NE",
+        "Nigeria": "NG",
+        "Niue": "NU",
+        "Norfolk Island": "NF",
+        "Northern Mariana Islands": "MP",
+        "North Macedonia": "MK",
+        "Northern Ireland": "GB",
+        "Norway": "NO",
+        "Oman": "OM",
+        "Pakistan": "PK",
+        "Palau": "PW",
+        "Palestine": "PS",
+        "Panama": "PA",
+        "Papau New Guinea": "PA",
+        "Paraguay": "PY",
+        "Peru": "PE",
+        "Philippines": "PH",
+        "Pitcairn": "PN",
+        "Poland": "PL",
+        "Portugal": "PT",
+        "Puerto Rico": "PR",
+        "Qatar": "QA",
+        "Republic of Ireland": "IE",
+        "Romania": "RO",
+        "Russia": "RU",
+        "Rwanda": "RW",
+        "Réunion": "RE",
+        "Saint Barthelemy": "BL",
+        "Saint Helena": "SH",
+        "Saint Kitts and Nevis": "KN",
+        "Saint Lucia": "LC",
+        "Saint Martin": "MF",
+        "Saint Pierre and Miquelon": "PM",
+        "Saint Vincent and the Grenadines": "VC",
+        "Samoa": "WS",
+        "San Marino": "SM",
+        "Sao Tome and Principe": "ST",
+        "Saudi Arabia": "SA",
+        "Scotland": "GB",
+        "Senegal": "SN",
+        "Serbia": "RS",
+        "Seychelles": "SC",
+        "Sierra Leone": "SL",
+        "Singapore": "SG",
+        "Sint Maarten": "SX",
+        "Slovakia": "SK",
+        "Slovenia": "SI",
+        "Solomon Islands": "ZA",
+        "Somalia": "SO",
+        "South Africa": "ZA",
+        "South Georgia and the South Sandwich Islands": "GS",
+        "South Sudan": "SS",
+        "Spain": "ES",
+        "Sri Lanka": "LK",
+        "Sudan": "SD",
+        "Suriname": "SR",
+        "Svalbard and Jan Mayen": "SJ",
+        "Swaziland": "SE",
+        "Sweden": "SE",
+        "Switzerland": "CH",
+        "Syria": "SY",
+        "Taiwan": "TW",
+        "Tajikistan": "TJ",
+        "Tanzania": "TZ",
+        "Thailand": "TH",
+        "Timor-Leste": "TL",
+        "Togo": "TG",
+        "Tokelau": "TK",
+        "Tonga": "TO",
+        "Trinidad and Tobago": "TT",
+        "Tunisia": "TN",
+        "Turkey": "TR",
+        "Turkmenistan": "TM",
+        "Turks and Caicos Islands": "TC",
+        "Tuvalu": "TV",
+        "Uganda": "UG",
+        "Ukraine": "UA",
+        "United Arab Emirates": "AE",
+        "Uruguay": "UY",
+        "USA": "US",
+        "United States": "US",
+        "Uzbekistan": "UZ",
+        "Vanuatu": "VU",
+        "Venezuela": "VE",
+        "Vietnam": "VN",
+        "British Virgin Islands": "VG",
+        "US Virgin Islands": "VI",
+        "Wallis and Futuna": "WF",
+        "Wales": "GB",
+        "Yemen": "YE",
+        "Zambia": "ZM",
+        "Zimbabwe": "ZW",
+    }
+
+    _WORLD_LEAGUES = None
+
     def __init__(
             self, 
             team_id: int, 
@@ -561,10 +612,8 @@ class PlayersRequest(Request):
 
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
         """ Function to process the API response regarding player data. """
-        global WORLD_LEAGUES
-    
-        if WORLD_LEAGUES is None:
-            WORLD_LEAGUES = get_world_leagues()
+        if self.__class__._WORLD_LEAGUES is None:
+            self.__class__._WORLD_LEAGUES = get_world_leagues()
     
         players = response_data.get("response")
         leagues_dict = get_manifest_arg("league_ids")
@@ -583,14 +632,14 @@ class PlayersRequest(Request):
     
             for stats in player_stats:
                 temp_player = dict()
+
                 # ensure only player stats for current leagues are being processed
                 temp_league_id = stats.get("league").get("id")
                 if temp_league_id not in leagues_dict.keys():
                     continue
     
                 # only store statistics on players that have played
-                if (not stats.get("games").get("minutes") or
-                    float(stats.get("games").get("minutes")) == 0.0):
+                if (not stats.get("games").get("minutes") or float(stats.get("games").get("minutes")) == 0.0):
                     continue
     
                 # player info needed for players table
@@ -600,24 +649,21 @@ class PlayersRequest(Request):
                 temp_player["firstname"] = player_info.get("firstname")
                 temp_player["lastname"] = player_info.get("lastname")
     
-                # only store one record in players table
-                # ensure player is not in DB
-                if ((current_players is None or current_players is not None) 
+                # only store one record in players table... ensure player is not in DB
+                if (current_players is None or (current_players is not None 
                     and temp_player.get("player_id") not in current_players
-                    and temp_player.get("player_id") not in self.processed_players.keys()):
+                    and temp_player.get("player_id") not in self.processed_players.keys())):
+
                     # get player flag
-                    country_abbrev = flags_dict.get(player_info.get("nationality"))
+                    country_abbrev = self.__class__._FLAGS_DICT.get(player_info.get("nationality"))
                     if country_abbrev is None:
-                        print(f"INFO: No Flag Found For {player_info.get('nationality')}.")
+                        print(f"INFO: No Flag Found For {player_info.get('nationality')}...")
                         flag = "#"
                     else:
                         flag = f"https://media.api-sports.io/flags/{country_abbrev.lower()}.svg"
     
                     # get player height and weight
-                    height, weight = self.process_height_weight(
-                                         player_info.get("height"),
-                                         player_info.get("weight")
-                                     )
+                    height, weight = self.process_height_weight(player_info.get("height"), player_info.get("weight"))
     
                     # update processed_players
                     self.processed_players[temp_player.get("player_id")] = {
@@ -654,11 +700,7 @@ class PlayersRequest(Request):
                                             self.processed_stats.get(temp_player.get("id"))
                                         )
                 else:
-                    temp_player = self.process_stats(
-                                            stats,
-                                            temp_player, 
-                                            None
-                                        )
+                    temp_player = self.process_stats(stats, temp_player, None)
                 processed_player = self.check_types(temp_player, attributes)
                 self.processed_stats[processed_player.get("id")] = processed_player
         return self.processed_players, self.processed_stats
@@ -666,76 +708,28 @@ class PlayersRequest(Request):
     def process_stats(self, stats, temp_player, previous_data):
         # Change later
         temp_player["is_current"] = True
-    
-        # games
-        player_game_info = stats.get("games")
-        temp_player["position"] = player_game_info.get("position")
-        temp_player["rating"] = player_game_info.get("rating")
-        temp_player["minutes_played"] = self.not_null(player_game_info.get("minutes"))
-        temp_player["games_appearances"] = self.not_null(player_game_info.get("appearences")) #sic
-        temp_player["games_started"] = self.not_null(player_game_info.get("lineups"))
-        # substitutes
-        player_sub_info = stats.get("substitutes")
-        temp_player["games_bench"] = self.not_null(player_sub_info.get("bench"))
-        temp_player["substitutions_in"] = self.not_null(player_sub_info.get("in"))
-        temp_player["substitutions_out"] = self.not_null(player_sub_info.get("out"))
-        # shots
-        player_shot_info = stats.get("shots")
-        temp_player["shots"] = self.not_null(player_shot_info.get("total"))
-        temp_player["shots_on"] = self.not_null(player_shot_info.get("on"))
-        temp_player["shots_on_pct"] = None
-        
-        # goals
-        player_goal_info = stats.get("goals")
-        temp_player["goals"] = self.not_null(player_goal_info.get("total"))
-        temp_player["goals_conceded"] = self.not_null(player_goal_info.get("conceded"))
-        temp_player["assists"] = self.not_null(player_goal_info.get("assists"))
-        # passes
-        player_pass_info = stats.get("passes")
-        temp_player["passes"] = self.not_null(player_pass_info.get("total"))
-        temp_player["passes_key"] = self.not_null(player_pass_info.get("key"))
-        temp_player["passes_accuracy"] = player_pass_info.get("accuracy")
-        # tackles
-        player_tackle_info = stats.get("tackles")
-        temp_player["tackles"] = self.not_null(player_tackle_info.get("total"))
-        temp_player["blocks"] = self.not_null(player_tackle_info.get("blocks"))
-        temp_player["interceptions"] = self.not_null(player_tackle_info.get("interceptions"))
-        # duels
-        player_duel_info = stats.get("duels")
-        temp_player["duels"] = self.not_null(player_duel_info.get("total"))
-        temp_player["duels_won"] = self.not_null(player_duel_info.get("won"))
-        
-        # dribbles
-        player_dribble_info = stats.get("dribbles")
-        temp_player["dribbles_past"] = self.not_null(player_dribble_info.get("past"))
-        temp_player["dribbles_attempted"] = self.not_null(player_dribble_info.get("attempts"))
-        temp_player["dribbles_succeeded"] = self.not_null(player_dribble_info.get("success"))
-        
-        # fouls
-        player_foul_info = stats.get("fouls")
-        temp_player["fouls_drawn"] = self.not_null(player_foul_info.get("drawn"))
-        temp_player["fouls_committed"] = self.not_null(player_foul_info.get("committed"))
-        # cards
-        player_card_info = stats.get("cards")
-        temp_player["cards_yellow"] = self.not_null(player_card_info.get("yellow"))
-        temp_player["cards_red"] = self.not_null(player_card_info.get("red"))
-        
-        # penalty
-        player_pen_info = stats.get("penalty")
-        temp_player["penalties_won"] = self.not_null(player_pen_info.get("won"))
-        temp_player["penalties_scored"] = self.not_null(player_pen_info.get("scored"))
-        temp_player["penalties_missed"] = self.not_null(player_pen_info.get("missed"))
-        temp_player["penalties_saved"] = self.not_null(player_pen_info.get("saved"))
-        temp_player["penalties_committed"] = self.not_null(player_pen_info.get("commited")) #sic
-    
-    
-        # if there is another stat for the player with the same team, league, and season
-        # aggregate values that are different
+
+        stat_sections = [
+            ("games", ["position", "rating", "minutes_played", "games_appearances", "games_started"]),
+            ("substitutes", ["games_bench", "substitutions_in", "substitutions_out"]), 
+            ("shots", ["shots", "shots_on"]), 
+            ("goals", ["goals", "goals_conceded", "assists"]), 
+            ("passes", ["passes", "passes_key", "passes_accuracy"]), 
+            ("tackles", ["tackles", "blocks", "interceptions"]),
+            ("dribbles", ["dribbles_past", "dribbles_attempted", "dribbles_succeeded"]),
+            ("duels", ["duels", "duels_won"]),
+            ("penalty", ["penalties_won", "penalties_scored", "penalties_missed", "penalties_saved", "penalties_committed"])
+        ]
+
+        # get values
+        for values_key, keys in stat_sections:
+            temp_player = self.grab_stat_values(keys,stats.get(values_key),temp_player)
+
+        # if there is another stat for the player with the same uid aggregate values that are different
         if previous_data is not None:
             static_keys = ([
-                "id", "player_id", "name", "firstname", "lastname", 
-                "league_name", "team_id", "team_name", "season",
-                "rating", "position", "is_current"
+                "id", "player_id", "name", "firstname", "lastname", "league_name",
+                "team_id", "team_name", "season", "rating", "position", "is_current"
             ])
             for key, value in previous_data.items():   
                 if key not in static_keys and key in temp_player.keys():
@@ -746,98 +740,81 @@ class PlayersRequest(Request):
                         # if current and previous values differ, aggregate
                         if value != float(current_value):
                             temp_player[key] = current_value + value
-    
-        # Calculate values
-    
-        # ensure >= 0 shots
+
+        # ensure >= 0 shots taken
         if temp_player.get("shots") > 0:
-            temp_player["shots_on_pct"] = round(temp_player.get("shots_on") * 100
-                                                / temp_player.get("shots"))
-        temp_player["duels_won_pct"] = None
+            temp_player["shots_on_pct"] = round(
+                temp_player.get("shots_on") * 100
+                / temp_player.get("shots")
+            )
         # ensure >= 0 duels
-        if temp_player.get("duels") > 0:
-            temp_player["duels_won_pct"] = round(temp_player.get("duels_won") * 100
-                                                 / temp_player.get("duels"))
-    
-        temp_player["dribbles_succeeded_pct"] = None
+        if temp_player.get("duels") and temp_player.get("duels") > 0:
+            temp_player["duels_won_pct"] = round(
+                temp_player.get("duels_won") * 100
+                / temp_player.get("duels")
+            )
         # ensure >= 0 dribbles_attempted
         if temp_player.get("dribbles_attempted") > 0:
-            temp_player["dribbles_succeeded_pct"] = round(temp_player.get("dribbles_succeeded") * 100
-                                                          / temp_player.get("dribbles_attempted"))
-    
-        temp_player["penalties_scored_pct"] = None
-        if (temp_player.get("penalties_scored") > 0 or
-            temp_player.get("penalties_missed") > 0):
-            temp_player["penalties_scored_pct"] = round(temp_player.get("penalties_scored") * 100
-                                                        / (temp_player.get("penalties_scored")
-                                                           + temp_player.get("penalties_missed")))
-    
+            temp_player["dribbles_succeeded_pct"] = round(
+                temp_player.get("dribbles_succeeded") * 100
+                / temp_player.get("dribbles_attempted")
+            )
+        # ensure >= 0 penalties taken 
+        if (temp_player.get("penalties_scored") > 0 or temp_player.get("penalties_missed") > 0):
+            temp_player["penalties_scored_pct"] = round(
+                temp_player.get("penalties_scored") * 100
+                / (temp_player.get("penalties_scored") + temp_player.get("penalties_missed"))
+            )
         return temp_player
 
-    def process_height_weight(self, height, weight):
-        if height and height != "":
-            split_height = height.split(" ")
-            if len(split_height) == 1:
-                height_in = float(height) * 0.393701
-                feet = int(height_in // 12)
-                inches = round(height_in % 12)
-                height = f"{feet}'{inches}\""
-            elif len(split_height) == 2:
-                height_in = float(split_height[0]) * 0.393701
-                feet = int(height_in // 12)
-                inches = round(height_in % 12)
-                height = f"{feet}'{inches}\""
-            else:
-                print(height)
-                height = "NULL"
+    ##########################################
+    ######## PROCESS HELPER FUNCTIONS ########
+    ##########################################
 
-        if weight and weight != "":
-            split_weight = weight.split(" ")
-            if len(split_weight) == 1:
-                weight_lb = round(float(weight) * 2.20462)
-                weight = f"{weight_lb} lbs"
-            if len(split_weight) == 2:
-                weight_lb = round(float(split_weight[0]) * 2.20462)
-                weight = f"{weight_lb} lbs"
-            else:
-                print(weight)
-                weight = "NULL"
+    def process_height_weight(self, height, weight):
+        if height and len(height) > 0:
+            height = height[:height.find(" ")] 
+            height_in = float(height) * 0.393701
+            height = f"{int(height_in // 12)}'{round(height_in % 12)}\""
+        else:
+            height = "N/A"
+        if weight and len(weight) > 0:
+            weight = weight[:weight.find(" ")]
+            weight = f"{round(float(weight) * 2.20462)} lbs"
+        else:
+            weight = "N/A"
         return height, weight
 
     def process_birthdate(self, birthdate_str):
-        if birthdate_str:
-            split_date = birthdate_str.split("/")
+        if birthdate_str and len(birthdate_str) > 0:
+            char = "/" if "/" in birthdate_str else "-"
+            split_date = birthdate_str.split(char)
             split_date[0] = split_date[0].rjust(2,"0")
             split_date[1] = split_date[1].rjust(2,"0")
-            split_date[2] = split_date[2]
             birthdate_str = "/".join(split_date)
             try:
-                birthdate_date = datetime.strptime(
-                                        birthdate_str,
-                                        "%d/%m/%Y"
-                                    ).date()
-                return birthdate_date
+               return datetime.strptime(birthdate_str, "%d/%m/%Y").date()
             except:
                 try:
-                    birthdate_date = datetime.strptime(
-                                            birthdate_str,
-                                            "%m/%d/%Y"
-                                        ).date()
-                    return birthdate_date
+                    return datetime.strptime(birthdate_str, "%m/%d/%Y").date()
                 except:
-                    birthdate_date = datetime.strptime(
-                                            birthdate_str,
-                                            "%Y/%m/%d"
-                                        ).date()
-                    return birthdate_date    
+                    try: 
+                        return datetime.strptime(birthdate_str,"%Y/%m/%d").date()
+                    except:
+                        return "N/A"
+        else:
+            return "N/A"
+                    
+    def grab_stat_values(self, keys, values, temp_player) -> Dict[str, Any]:
+        for key in keys:
+            temp_player[key] = self.not_null(values.get(self.__class__._STAT_KEYS.get(key)))
+        return temp_player
 
-    
     def not_null(self, value):
         """ Function to turn quantitative stats to 0 if currently null. """
         return 0 if value is None else value
     
-    def generate_uid(self, id, season, team_id, league_id):
-        text = f"{id}{season}{team_id}{league_id}"
-        ciphertext = md5(text.encode()).hexdigest()
-        return ciphertext
+    def generate_uid(self, id: int, season: int, team_id: int, league_id: int) -> str:
+        """ Function to calculate and return a player's UID. """
+        return md5(f"{id}{season}{team_id}{league_id}".encode()).hexdigest()
     

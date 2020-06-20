@@ -228,10 +228,7 @@ def get_player_data(
 
         # get team logo
         team_id = formatted_row.get("team_id")
-        try:
-            cursor.execute(f"SELECT logo FROM teams WHERE id = {team_id};")
-        except:
-            print(f"SELECT logo FROM teams WHERE id = {team_id};")
+        cursor.execute(f"SELECT logo FROM teams WHERE id = {team_id};")
         team_logo = cursor.fetchall()[0][0]
         connection.commit()
 

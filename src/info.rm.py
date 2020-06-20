@@ -17,7 +17,6 @@ generate_tree()
 
 @info_rm.route("/")
 def home():
-    print("season:", CURRENT_SEASON)
     return redirect(url_for(
                 "dashboard",
                 league="Top-5",

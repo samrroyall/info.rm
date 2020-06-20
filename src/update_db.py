@@ -78,7 +78,7 @@ def get_data(action, engine, season):
                                                             processed_stats,
                                                             season
                                                         ).update()
-                print("INFO: Response for {0} Obtained Successfully.".\
+                print("INFO: Response for {0} Obtained Successfully...".\
                     format(ids.get(id).get("team_name")))
 
                
