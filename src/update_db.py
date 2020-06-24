@@ -4,7 +4,7 @@ from config import write_config
 from db import initialize_engine, modify_db_row 
 from manifest import set_manifest_arg, get_manifest_arg
 from orm import Leagues, Teams, Players, Stats
-from parser import initialize_parser
+from cli_parser import initialize_parser
 from request import Request
 
 ########################

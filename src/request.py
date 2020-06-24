@@ -786,24 +786,30 @@ class PlayersRequest(Request):
         return height, weight
 
     def process_birthdate(self, birthdate_str):
-        if birthdate_str and len(birthdate_str) > 0:
-            char = "/" if "/" in birthdate_str else "-"
-            split_date = birthdate_str.split(char)
+        assert birthdate_str and len(birthdate_str) > 0,\
+            f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+        split_char = [char for char in ["/", "-"] if char in birthdate_str]
+        assert len(split_char) == 1, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+        split_date = birthdate_str.split(split_char[0])
+        year_idx = [idx for idx in list(range(len(split_date))) if len(split_date[idx]) == 4]
+        assert len(year_idx) == 1, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+        assert year_idx[0] == 0 or year_idx[0] == 2, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+        if year_idx[0] == 0:
+            split_date[1] = split_date[1].rjust(2,"0")
+            split_date[2] = split_date[2].rjust(2,"0")
+            birthdate_str = "/".join(split_date)
+            try:
+                return datetime.strptime(birthdate_str, "%Y/%m/%d").date()
+            except:
+                return datetime.strptime(birthdate_str, "%Y/%d/%m").date()
+        else:
             split_date[0] = split_date[0].rjust(2,"0")
             split_date[1] = split_date[1].rjust(2,"0")
             birthdate_str = "/".join(split_date)
             try:
-               return datetime.strptime(birthdate_str, "%d/%m/%Y").date()
+                return datetime.strptime(birthdate_str, "%m/%d/%Y").date()
             except:
-                try:
-                    return datetime.strptime(birthdate_str, "%m/%d/%Y").date()
-                except:
-                    try: 
-                        return datetime.strptime(birthdate_str,"%Y/%m/%d").date()
-                    except:
-                        return "N/A"
-        else:
-            return "N/A"
+                return datetime.strptime(birthdate_str, "%d/%m/%Y").date()
                     
     def grab_stat_values(self, keys, values, temp_player) -> Dict[str, Any]:
         for key in keys:
