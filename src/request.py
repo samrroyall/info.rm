@@ -786,8 +786,8 @@ class PlayersRequest(Request):
         return height, weight
 
     def process_birthdate(self, birthdate_str):
-        assert birthdate_str and len(birthdate_str) > 0,\
-            f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+        if birthdate_str is None or len(birthdate_str) == 0:
+            return date(1900, 1, 1)
         split_char = [char for char in ["/", "-"] if char in birthdate_str]
         assert len(split_char) == 1, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
         split_date = birthdate_str.split(split_char[0])
