@@ -39,24 +39,22 @@ class Request(metaclass=Registry):
     """ Class defining methods used during the collection and processing of
     data through API requests. """
 
-    # CLASS VARIABLES - change some of these to CLI arguments
     _REGISTER: bool = False
-    #_API_URL: str = "https://api-football-v1.p.rapidapi.com/v2/"
     _API_URL: str = "https://api-football-beta.p.rapidapi.com/"
     _API_HOST: str = "api-football-beta.p.rapidapi.com"
-    _API_RATELIMIT_HEADER: str = "x-ratelimit-requests-limit"
-    _API_RATELIMIT_REMAINING_HEADER: str = "x-ratelimit-requests-remaining"
-    _RATELIMIT: Optional[int] = None
-    _RATELIMIT_REMAINING: Optional[int] = None
-    _RATELIMIT_RESET: Optional[float] = None
+    #_API_RATELIMIT_HEADER: str = "x-ratelimit-requests-limit"
+    #_API_RATELIMIT_REMAINING_HEADER: str = "x-ratelimit-requests-remaining"
+    #_RATELIMIT: Optional[int] = None
+    #_RATELIMIT_REMAINING: Optional[int] = None
+    #_RATELIMIT_RESET: Optional[float] = None
 
     def __init__(self, season: str) -> None:
         cls = self.__class__
         subscription_time = get_config_arg("subscription_time")
         token = get_config_arg("token")
-        self.reset_hour: int = int(subscription_time.split(':')[0])
-        self.reset_minute: int = int(subscription_time.split(':')[1])
-        self.reset_second: int = int(subscription_time.split(':')[2])
+        #self.reset_hour: int = int(subscription_time.split(':')[0])
+        #self.reset_minute: int = int(subscription_time.split(':')[1])
+        #self.reset_second: int = int(subscription_time.split(':')[2])
         self.season: str = season
         self.headers: Dict[str,str] = {
             "x-rapidapi-key": token,
@@ -66,76 +64,18 @@ class Request(metaclass=Registry):
         self.foreign_key: Optional[int]
         self.params: Dict[str, int]
 
-    def set_reset_time_day(self) -> None:
-        """ Method to calculate reset time for daily ratelimit. """
-        cls = self.__class__
-        today = datetime.today()
-        # If past reset time on current date, set reset time to tomorrow
-        if (today.hour > self.reset_hour or (today.hour == self.reset_hour and
-                today.minute >= self.reset_minute) or (today.hour == self.reset_hour
-                and today.minute == self.reset_minute and today.second >= self.reset_second)):
-            reset_datetime = today.replace(
-                hour = self.reset_hour,
-                minute = self.reset_minute,
-                second = self.reset_second,
-                microsecond = 0
-            )
-        # Set reset time to <reset_hour> <reset_minute> on current date
-        else:
-            reset_datetime = today.replace(
-                day = today.day + 1,
-                hour = self.reset_hour,
-                minute = self.reset_minute,
-                second = self.reset_second,
-                microsecond = 0
-            )
-        cls._RATELIMIT_RESET = reset_datetime.timestamp()
-
-    def set_ratelimit(self, headers: Dict[str, str]) -> None:
-        """ Method to update API rate limit status. """
-        cls = self.__class__
-        # If daily ratelimit has not been set, set it
-        if not cls._RATELIMIT:
-            cls._RATELIMIT = int(headers.get(cls._API_RATELIMIT_HEADER))
-        # Always update requests remaining for daily ratelimit
-        cls._RATELIMIT_REMAINING = int(headers.get(cls._API_RATELIMIT_REMAINING_HEADER))
-        # Set daily ratelimit reset time on first request
-        if not cls._RATELIMIT_RESET:
-            self.set_reset_time_day()
-
-    def get_ratelimit(self) -> None:
-        """ Method to check and respond to API rate limit status. """
-        cls = self.__class__
-        # update daily ratelimit reset time if passed
-        if (cls._RATELIMIT_RESET and cls._RATELIMIT_RESET <=
-                datetime.today().timestamp()):
-            self.set_reset_time_day()
-        # If requests remaining hits 0, sleep until reset time + one second
-        if cls._RATELIMIT_REMAINING and cls._RATELIMIT_REMAINING == 0:
-            print("INFO: Ratelimit Reached. Sleeping...")
-            sleep(cls._RATELIMIT_RESET - datetime.today().timestamp() + 1)
-
     def make_call(self, endpoint = None, params = None) -> Tuple[Dict[str, Dict[str, Any]], Optional[int]]:
         """ Method to make API call. """
-        cls = self.__class__
-
-        # View ratelimit before proceeding, sleep if needed
-        # self.get_ratelimit()
+        # Set API request parameters
+        url = f"{self.__class__._API_URL}{endpoint}" if endpoint else f"{self.__class__._API_URL}{self.endpoint}"
+        if params is not None:
+            params.update(self.params)
+            call_params = params
+        else:
+            call_params = self.params
 
         # Make API request
-        if endpoint:
-            url = f"{cls._API_URL}{endpoint}"
-        else:
-            url = f"{cls._API_URL}{self.endpoint}"
-        if params:
-            params.update(self.params)
-            api_response = get(url, headers=self.headers, params=params)
-        else:
-            api_response = get(url, headers=self.headers, params=self.params)
-
-        # Update ratelimit
-        # headers_lower = dict([(k.lower(),v) for k,v in dict(api_response.headers).items()])
-        # self.set_ratelimit(headers_lower)
+        api_response = get(url, headers=self.headers, params=call_params)
 
         # Ensure that Minute ratelimit is not reached 
         request_code = api_response.status_code
@@ -143,13 +83,12 @@ class Request(metaclass=Registry):
             print("INFO: Minute Ratelimit Reached. Sleeping Now...")
             sleep(61)
             print("INFO: Retrying Call...")
-            return self.make_call()
+            return self.make_call(endpoint, params)
         
         # Ensure that HTTP request is successful
         assert request_code == 200, \
             f"""ERROR: HTTP Request '{url}' Failed. Status: {request_code}.
     Description: {request_content.get('message')}"""
-
         # Format API request content as JSON
         request_content = api_response.json()
 
@@ -182,14 +121,15 @@ class Request(metaclass=Registry):
         return response_data
 
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
-        """ Method to process API response. Implemented in subclasses. """
+        """ Method to process API response. Implemented in child classes. """
         pass
         
     def update(self) -> Dict[str, Any]:
         """ Method to gather, process, and store API data. """
+        # obtain API response
         api_response, next_page = self.make_call()
 
-        # check pagination
+        # handle pagination
         while next_page:
             print(f"INFO: Calling Next Response Page ({next_page})...")
             new_response, next_page = self.make_call(params = {"page": next_page})
@@ -215,8 +155,7 @@ class LeaguesRequest(Request):
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
         leagues = response_data.get("response")
         """ Function to process the API response regarding league data. """
-        orm_class = Leagues
-        attributes = getattr(orm_class, "_TYPES")
+        attributes = getattr(Leagues, "_TYPES")
         covered_leagues = get_manifest_arg("leagues")
         current_leagues = get_manifest_arg("league_ids")
     
@@ -272,8 +211,7 @@ class TeamsRequest(Request):
     def process_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
         """ Function to process the API response regarding team data. """
         teams = response_data.get("response")
-        orm_class = Teams
-        attributes = getattr(orm_class, "_TYPES")
+        attributes = getattr(Teams, "_TYPES")
 
         # get team IDs
         current_teams = get_manifest_arg("team_ids")
@@ -615,27 +553,22 @@ class PlayersRequest(Request):
         if self.__class__._WORLD_LEAGUES is None:
             self.__class__._WORLD_LEAGUES = get_world_leagues()
     
-        players = response_data.get("response")
-        leagues_dict = get_manifest_arg("league_ids")
-        current_players = get_manifest_arg("player_ids")
-        orm_class = Stats
-        attributes = getattr(orm_class, "_TYPES")
+        players = response_data.get("response") # api response
+        leagues_dict = get_manifest_arg("league_ids") # leagues processed
+        current_players = get_manifest_arg("player_ids") # players processed
+        attributes = getattr(Stats, "_TYPES") # variable types
     
         for idx in range(len(players)):
             player = players[idx]
     
-            #grab player stats from response
-            if isinstance(player.get("statistics"), list):
-                player_stats = player.get("statistics")
-            else:
-                player_stats = [player.get("statistics")]
+            # grab player stats from response
+            player_stats = player.get("statistics") if isinstance(player.get("statistics"), list) else [player.get("statistics")]
     
             for stats in player_stats:
                 temp_player = dict()
 
                 # ensure only player stats for current leagues are being processed
-                temp_league_id = stats.get("league").get("id")
-                if temp_league_id not in leagues_dict.keys():
+                if stats.get("league").get("id") not in leagues_dict.keys():
                     continue
     
                 # only store statistics on players that have played
@@ -680,8 +613,8 @@ class PlayersRequest(Request):
                     }
     
                 # player stat info
-                temp_player["league_id"] = temp_league_id 
-                temp_player["league_name"] = leagues_dict.get(temp_league_id)
+                temp_player["league_id"] = stats.get("league").get("id") 
+                temp_player["league_name"] = leagues_dict.get(stats.get("league").get("id"))
                 temp_player["team_id"] = stats.get("team").get("id")
                 temp_player["team_name"] = stats.get("team").get("name")
                 temp_player["season"] = stats.get("league").get("season")
@@ -695,10 +628,10 @@ class PlayersRequest(Request):
                 # process player stats information
                 if temp_player.get("id") in self.processed_stats.keys():
                     temp_player = self.process_stats(
-                                            stats, 
-                                            temp_player, 
-                                            self.processed_stats.get(temp_player.get("id"))
-                                        )
+                                           stats, 
+                                           temp_player, 
+                                           self.processed_stats.get(temp_player.get("id"))
+                                       )
                 else:
                     temp_player = self.process_stats(stats, temp_player, None)
                 processed_player = self.check_types(temp_player, attributes)
@@ -786,30 +719,45 @@ class PlayersRequest(Request):
         return height, weight
 
     def process_birthdate(self, birthdate_str):
-        assert birthdate_str and len(birthdate_str) > 0,\
-            f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
-        split_char = [char for char in ["/", "-"] if char in birthdate_str]
-        assert len(split_char) == 1, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
-        split_date = birthdate_str.split(split_char[0])
-        year_idx = [idx for idx in list(range(len(split_date))) if len(split_date[idx]) == 4]
-        assert len(year_idx) == 1, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
-        assert year_idx[0] == 0 or year_idx[0] == 2, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
-        if year_idx[0] == 0:
-            split_date[1] = split_date[1].rjust(2,"0")
-            split_date[2] = split_date[2].rjust(2,"0")
-            birthdate_str = "/".join(split_date)
-            try:
-                return datetime.strptime(birthdate_str, "%Y/%m/%d").date()
-            except:
-                return datetime.strptime(birthdate_str, "%Y/%d/%m").date()
-        else:
-            split_date[0] = split_date[0].rjust(2,"0")
-            split_date[1] = split_date[1].rjust(2,"0")
-            birthdate_str = "/".join(split_date)
-            try:
-                return datetime.strptime(birthdate_str, "%m/%d/%Y").date()
-            except:
-                return datetime.strptime(birthdate_str, "%d/%m/%Y").date()
+        try:
+            assert birthdate_str and len(birthdate_str) > 0,\
+                f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+
+            # determine date separator
+            split_char = [char for char in ["/", "-"] if char in birthdate_str]
+            assert len(split_char) == 1, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+            split_date = birthdate_str.split(split_char[0])
+
+            # determine year index
+            year_idx = [idx for idx in list(range(len(split_date))) if len(split_date[idx]) == 4]
+            assert len(year_idx) == 1, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+            assert year_idx[0] == 0 or year_idx[0] == 2, f"ERROR: Unrecognized Birthdate format: {birthdate_str}"
+
+            # parse date
+            if year_idx[0] == 0:
+                split_date[1] = split_date[1].rjust(2,"0")
+                split_date[2] = split_date[2].rjust(2,"0")
+                birthdate_str = "/".join(split_date)
+                try:
+                    return datetime.strptime(birthdate_str, "%Y/%m/%d").date()
+                except:
+                    try:
+                        return datetime.strptime(birthdate_str, "%Y/%d/%m").date()
+                    except:
+                        return date(1600, 1, 1)
+            else:
+                split_date[0] = split_date[0].rjust(2,"0")
+                split_date[1] = split_date[1].rjust(2,"0")
+                birthdate_str = "/".join(split_date)
+                try:
+                    return datetime.strptime(birthdate_str, "%m/%d/%Y").date()
+                except:
+                    try:
+                        return datetime.strptime(birthdate_str, "%d/%m/%Y").date()
+                    except:
+                        return date(1600, 1, 1)
+        except AssertionError:
+            return date(1600, 1, 1)
                     
     def grab_stat_values(self, keys, values, temp_player) -> Dict[str, Any]:
         for key in keys:
