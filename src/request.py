@@ -44,17 +44,11 @@ class Request(metaclass=Registry):
     _API_HOST: str = "api-football-beta.p.rapidapi.com"
     #_API_RATELIMIT_HEADER: str = "x-ratelimit-requests-limit"
     #_API_RATELIMIT_REMAINING_HEADER: str = "x-ratelimit-requests-remaining"
-    #_RATELIMIT: Optional[int] = None
-    #_RATELIMIT_REMAINING: Optional[int] = None
-    #_RATELIMIT_RESET: Optional[float] = None
-
+    
     def __init__(self, season: str) -> None:
         cls = self.__class__
         subscription_time = get_config_arg("subscription_time")
         token = get_config_arg("token")
-        #self.reset_hour: int = int(subscription_time.split(':')[0])
-        #self.reset_minute: int = int(subscription_time.split(':')[1])
-        #self.reset_second: int = int(subscription_time.split(':')[2])
         self.season: str = season
         self.headers: Dict[str,str] = {
             "x-rapidapi-key": token,
@@ -163,21 +157,17 @@ class LeaguesRequest(Request):
         filtered_leagues = []
         for idx in range(len(leagues)):
             league = leagues[idx]
-            league_name = league.get("league").get("name")
-            league_country = league.get("country").get("name")
-            if f"{league_name},{league_country}" in covered_leagues:
+            if f"{league.get('league').get('name')},{league.get('country').get('name')}" in covered_leagues:
                 if current_leagues is not None and league.get("league").get("id") in current_leagues:
                     continue
                 temp_league = dict()
 
                 # league data
-                temp_league["name"] = league_name
-                temp_league["id"] = league.get("league").get("id")
-                temp_league["logo"] = league.get("league").get("logo")
-                temp_league["type"] = league.get("league").get("type")
+                for key in ["name", "id", "logo", "type"]:
+                    temp_league[key] = league.get("league").get(key)
 
                 # country data
-                temp_league["country"] = league_country
+                temp_league["country"] = league.get("country").get("name")
                 if temp_league.get("country") == "World":
                     temp_league["flag"] = temp_league.get("logo")
                 else:
@@ -213,9 +203,9 @@ class TeamsRequest(Request):
         teams = response_data.get("response")
         attributes = getattr(Teams, "_TYPES")
 
-        # get team IDs
+        # get team IDs 
         current_teams = get_manifest_arg("team_ids")
-        if current_teams and current_teams.get(self.season):
+        if current_teams and self.season in current_teams:
             current_teams = current_teams.get(self.season)
 
         team_ids = dict()
@@ -226,9 +216,8 @@ class TeamsRequest(Request):
             temp_team = dict()
 
             # team
-            temp_team["id"] = team.get("team").get("id")
-            temp_team["name"] = team.get("team").get("name")
-            temp_team["logo"] = team.get("team").get("logo")
+            for key in ["id", "name", "logo"]:
+                temp_team[key] = team.get("team").get(key)
 
             # generate output dict
             teams[idx] = self.check_types(temp_team, attributes)
