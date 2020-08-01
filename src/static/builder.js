@@ -170,7 +170,7 @@ $(document).ready(function() {
 });
 
 function getColumnAbbrev(col1, lop, col2) {
-  var lookup = { shots: "S", shots_on: "SoT", shots_on_pct: "SoT%", goals: "G", goals_conceded: "GC", assists: "A", passes: "P", passes_key: "KP", passes_accuracy: "PA", tackles: "T", blocks: "B", interceptions: "I", duels: "DuT", duels_won: "DuW", duels_won_pct: "DuW%", dribbles_past: "DuP", dribbles_attempted: "DrA", dribbles_succeeded: "DrS",  dribbles_succeeded_pct: "DrS%", fouls_drawn: "FD", fouls_committed: "FC", cards_yellow: "YC", cards_red: "RC", penalties_won: "PW", penalties_committed: "PnC", penalties_success: "PnS", penalties_missed: "PnM", penalties_scored_pct: "PnS%", penalties_saved: "PnSa", minutes_played: "MP", games_appearances: "GA", games_started: "GS", games_bench: "GB", substitutions_in: "SbI", substitutions_out: "SbO", rating: "R"};
+  var lookup = { shots: "S", shots_on: "SoT", shots_on_pct: "SoT%", goals: "G", goals_conceded: "GC", assists: "A", passes: "P", passes_key: "KP", passes_accuracy: "PA", tackles: "T", blocks: "B", interceptions: "I", duels: "DuT", duels_won: "DuW", duels_won_pct: "DuW%", dribbles_past: "DuP", dribbles_attempted: "DrA", dribbles_succeeded: "DrS",  dribbles_succeeded_pct: "DrS%", fouls_drawn: "FD", fouls_committed: "FC", cards_yellow: "YC", cards_red: "RC", penalties_won: "PW", penalties_committed: "PnC", penalties_scored: "PnS", penalties_missed: "PnM", penalties_scored_pct: "PnS%", penalties_saved: "PnSa", minutes_played: "MP", games_appearances: "GA", games_started: "GS", games_bench: "GB", substitutions_in: "SbI", substitutions_out: "SbO", rating: "R"};
   var cols;
   if (lop) {
     cols = [col1, col2];

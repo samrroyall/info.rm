@@ -1,14 +1,13 @@
 from query import Query, Statement, grab_columns
 from query_utils import get_pct_stats, get_float_stats
 
-default_select_fields = ["teams.logo", "players.name", "players.id", "teams.name"]
+default_select_fields = ["teams.logo", "players.name", "players.id", "teams.name", "leagues.name"]
 floats = get_float_stats()
 pcts = get_pct_stats()
 
 
 def stmt(select_fields, filter_fields, order_field):
     select_fields = default_select_fields + select_fields
-
     # compile select fields and filter fields
     fields = []
     if filter_fields is not None:
@@ -16,7 +15,6 @@ def stmt(select_fields, filter_fields, order_field):
             filter_column = filter_field[0]
             fields.append(filter_column)
     fields += select_fields
-
     # grab table names (besides stats) from fields
     temp_table_names = []
     for sel_field in fields:
@@ -25,19 +23,16 @@ def stmt(select_fields, filter_fields, order_field):
             table = column.split(".")[0]
             if table != "stats":
                 temp_table_names.append(table)
-
     # dedup table names
     temp_table_names = list(set(temp_table_names))
-
     # create table_names list 
     table_names = ("stats", temp_table_names)
-
     stmt = Statement(
-        table_names = table_names,
-        select_fields = select_fields,
-        filter_fields = filter_fields,
-        order_field = order_field
-    )
+                table_names = table_names,
+                select_fields = select_fields, 
+                filter_fields = filter_fields, 
+                order_field = order_field
+           )
     return stmt
 
 # only needed if division is being done
@@ -59,7 +54,7 @@ def format_result(query_result, fields):
     for idx in range(len(query_result)):
         query_result[idx] = result_dict(query_result[idx], fields) 
         # NEED TO AGGREGATE STATS AND MAKE SURE THIS WORKS PER 90
-        # AAND GET CURRENT TEAM FOR TEAM NAME/LOGO 
+        # AAAND HOPEFULLY GET CURRENT TEAM FOR TEAM NAME/LOGO 
     return query_result
 
 def rank_response(select_fields, filter_fields, order_field):
@@ -131,6 +126,7 @@ def rank_response(select_fields, filter_fields, order_field):
             "rank": (str(rank) + ".").ljust(3," ") if rank != "N/A." else rank,
             "name": name,
             "id": player.get("players.id"),
+            "league_name": player.get("leagues.name"),
             "team_name": player.get("teams.name"),
             "team_logo": player.get("teams.logo"),
             "stats": stats

@@ -34,7 +34,7 @@
             <div class="col-6">
             </div>
             {% set num_stats = header|length %}
-            {% for i in range(num_stats) %}
+            {% for i in range(1,num_stats) %}
                 {% set column = header[i] %}
                 <script>
                   $(document).ready( function() {
@@ -177,7 +177,11 @@
 
               <!-- Player Team Row -->
               <div class="teamName">
-                <fine>{{row.get("team_name")}}</fine>
+                {% if "header" in query_result.keys() %}
+                  <fine>{{row.get("team_name")}}, {{row.get("league_name")}}</fine>
+                {% else %}
+                  <fine>{{row.get("team_name")}}</fine>
+                {% endif %}
               </div>
 
             </div>

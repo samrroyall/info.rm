@@ -105,9 +105,13 @@ def setup(args):
 def update_db(engine, action, processed_data):
     """ Function that calls the modify_db_row() function on each processed row.
     """
+    current_records = 0
     for processed_vals in processed_data:
-       session = modify_db_row(engine, processed_vals, eval(action.capitalize()))
-       session.close()
+        if current_records > 0 and current_records % 100 == 0:
+            print(f"INFO: {current_records}/{len(processed_data)} Records Added Successfully...")
+        session = modify_db_row(engine, processed_vals, eval(action.capitalize()))
+        session.close()
+        current_records += 1
 
 #######################
 #### MAIN FUNCTION ####
