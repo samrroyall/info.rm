@@ -107,7 +107,7 @@ def update_db(engine, action, processed_data):
     """
     current_records = 0
     for processed_vals in processed_data:
-        if current_records > 0 and current_records % 100 == 0:
+        if current_records > 0 and current_records % 500 == 0:
             print(f"INFO: {current_records}/{len(processed_data)} Records Added Successfully...")
         session = modify_db_row(engine, processed_vals, eval(action.capitalize()))
         session.close()
