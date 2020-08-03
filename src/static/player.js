@@ -1,8 +1,8 @@
 $(document).ready( function() {
   $(function() {
-    $("#player_per90_toggle").change(function () {
-      $(".playerStat").toggleClass("hidden");
-      $("player-stat-per90").toggleClass("hidden");
+    $("#player-per90-toggle").change(function () {
+      $(".player-stat").toggleClass("hidden");
+      $(".player-stat-per90").toggleClass("hidden");
     });
   });
 });

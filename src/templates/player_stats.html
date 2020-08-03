@@ -23,7 +23,7 @@
             <strong>{{ stat_field.title().replace("_"," ") }}</strong>
           {% endif %}
         </div>
-        <div class="col-5 text-success text-right playerStat">
+        <div class="col-5 text-success text-right player-stat">
           {% if stat_field == "goals" %}
             <strong>{{player_stat.get("goals")|int}}</strong>
             <strong>({{player_stat.get("penalties_scored")|int}})</strong>

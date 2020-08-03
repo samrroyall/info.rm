@@ -152,6 +152,7 @@ def stats_to_per90(
         if (key not in static_keys and
             key not in pct_keys and
             key != "minutes_played"):
+            value = value if value is not None else 0
             formatted_result[key] = float(value) / (minutes_played / 90.0)
     return formatted_result
 
