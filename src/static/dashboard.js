@@ -70,7 +70,7 @@ $(document).ready( function() {
     });
   });
   // Search Bar JS
-  $("#navSearch").bind("keyup", function (evt) { 
+  $("#nav-search").bind("keyup", function (evt) { 
     //if (window.event && event.type == "propertychange" && event.propertyName != "value")
     //  return;
     var val = $(this).val().toString();

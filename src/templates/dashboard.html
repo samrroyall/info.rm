@@ -4,12 +4,12 @@
 
 {% set section_names = {"goals": "Goals","assists": "Assists","goal_contributions": "Goal Contributions","shots_on": "Shots On Target","shots": "Shots","goals_per_shot":  "Goals Per Shot","passes_key": "Key Passes","passes": "Passes","passes_accuracy": "Pass Accuracy","dribbles_succeeded": "Successful Dribbles","dribbles_attempted": "Attempted Dribbles","dribbles_succeeded_pct": "Dribble Success Rate","tackles": "Tackles","interceptions": "Interceptions","blocks": "Blocks","rating": "Player Rating","goals_conceded": "Goals Conceded","penalties_saved": "Penalties Saved"} %}
 
-<div class="row align-items-center border-bottom" id="per90_season_wrapper">
+<div class="row align-items-center border-bottom" id="per90-season-wrapper">
   <!-- Dashboard Per 90 Toggle -->
   <div class="col-4 col-3-xs col-md-2 mr-auto custom-control custom-switch">
-      <input type="checkbox" class="custom-control-input" 
+      <input type="checkbox" class="custom-control-input"
         id="main_per90_toggle">
-      <label class="custom-control-label align-self-center per90Label"
+      <label class="custom-control-label align-self-center per90-label"
         for="main_per90_toggle">
           <strong class="text-secondary">Per 90</strong>
       </label>
@@ -17,12 +17,12 @@
 
   <!-- Dashboard Season Dropdown -->
   <div class="col-4 col-xs-3 col-md-2 ml-auto">
-      <select class="custom-select custom-select-sm seasonselect" 
+      <select class="custom-select custom-select-sm season-select"
         id="season-select" value="">
-	  <option value="{{current_season}}">{{current_season}}/{{current_season|int+1}}</option>
+	  <option value="{{current_season}}">{{current_season}}/{{((current_season|int+1)|string)[2:]}}</option>
           {% for season in seasons %}
             {% if season != current_season %}
-	      <option value="{{season}}">{{season}}/{{season|int+1}}</option>
+	      <option value="{{season}}">{{season}}/{{((season|int+1)|string)[2:]}}</option>
             {% endif %}
           {% endfor %}
       </select>
@@ -33,13 +33,12 @@
 <!-- Loop Through Stat Sections -->
 {% for stat in query_result.keys() %}
   <!-- Section Wrapper -->
-  <div id="dashboard_section_wrapper">
+  <div class="p-0 mx-5 my-4">
     <!-- Section Heading -->
-    <div class="ml-auto mr-auto text-left" id="dashboardSectionTitle">
+    <div class="ml-auto mr-auto text-left" id="dashboard-section-title">
       <strong>{{stat.upper()}}</strong>
     </div>
     <!-- Card Row -->
-    <!--<div class="row justify-content-center">-->
 
       <!-- Number of Cards in Given Section -->
       {% set num_cards = query_result.get(stat).keys()|length %}
@@ -52,9 +51,9 @@
 
         <!-- Card Content Beginning -->
         {% if card_num == 0 %}
-          <div class="card dashCard {{stat}}_card_{{card_num}} shadow-sm rounded">
+          <div class="card dash-card px-2 pt-3 {{stat}}_card_{{card_num}} shadow-sm rounded">
         {% else %}
-          <div class="card dashCard {{stat}}_card_{{card_num}} shadow-sm rounded hidden">
+          <div class="card dash-card px-2 pt-3 {{stat}}_card_{{card_num}} shadow-sm rounded hidden">
         {% endif %}
             {% include "card.html" %}
             {% include "per90_card.html" %}
@@ -63,10 +62,9 @@
 
       {% endfor %}
 
-      <!--</div>-->
     <!-- Card Row End -->
   </div>
-  <!-- Section Wrapper End --> 
+  <!-- Section Wrapper End -->
 
 {% endfor %}
 </div>

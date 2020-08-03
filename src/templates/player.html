@@ -37,19 +37,19 @@
   }
 </script>
 
-<div class="row border-bottom" id="per90_season_wrapper">
+<div class="row border-bottom" id="per90-season-wrapper">
   <!-- Per 90 Toggler -->
   <div class="col-4 col-xs-3 col-md-2 mr-auto custom-control custom-switch">
       <input type="checkbox" class="custom-control-input" id="player_per90_toggle">
-      <label class="custom-control-label per90Label" 
-        for="player_per90_toggle" id="player_per90Label">
+      <label class="custom-control-label per90-label"
+        for="player_per90_toggle" id="player-per90-label">
           <strong class="text-secondary">Per 90</strong>
       </label>
   </div>
 
   <!-- Seasons Dropdown -->
   <div class="col-8 col-xs-3 col-md-2 ml-auto">
-    <select class="custom-select custom-select-sm seasonselect" 
+    <select class="custom-select custom-select-sm season-select"
       id="player-season-select" value="">
         {% for season in seasons %}
           {% if season != current_season %}
@@ -62,10 +62,10 @@
       {% set num_teams = player_stats.get(season)|length %}
       {% if num_teams > 1 %}
         {% if season == current_season %}
-          <select class="custom-select custom-select-sm seasonselect" 
+          <select class="custom-select custom-select-sm season-select"
             id="player-{{season}}-select" value="" onChange="changeTeam({{season}}, {{num_teams}});">
         {% else %}
-          <select class="custom-select custom-select-sm seasonselect hidden" 
+          <select class="custom-select custom-select-sm season-select hidden"
             id="player-{{season}}-select" value="" onChange="changeTeam({{season}}, {{num_teams}});">
         {% endif %}
               {% for stat in player_stats.get(season) %}
@@ -77,7 +77,7 @@
   </div>
 </div>
 
-  <div class="text-center h4 text-secondary" id="playerPageName">
+  <div class="text-center h4 text-secondary" id="player-page-name">
     {{player_data.get("firstname")}}
     {{player_data.get("lastname")}}
   </div>
@@ -90,27 +90,27 @@
     {% else %}
       <div class="hidden" id="{{season}}-wrapper">
     {% endif %}
-    
+
     {% for stat in player_stats.get(season).keys() %}
       {% set player_stat = player_stats.get(season).get(stat).get("stats") %}
       {% set player_stat_per90 = player_stats_per90.get(season).get(stat).get("stats") %}
       {% set team_data = player_stats.get(season).get(stat).get("team") %}
       {% set league_data = player_stats.get(season).get(stat).get("league") %}
-      
+
       {% if stat == 0 %}
         <div id="{{season}}-{{stat}}-div">
       {% else %}
         <div class="hidden" id="{{season}}-{{stat}}-div">
       {% endif %}
-      
+
         <div class="row">
           <!-- Player First Col -->
-          <div class="col playerCol">
+          <div class="col player-col">
 
-            {% for card in ["player_bio.html", "player_gameplay.html"] %}
-              <div class="card ml-auto shadow-sm rounded" id="playercards_wrapper">
+            {% for card in ["player_bio.html", "player_fouling.html"] %}
+              <div class="card ml-auto shadow-sm rounded px-2 pt-3 pb-2" id="player-cards-wrapper">
                 <!-- Player Card Body -->
-                <div class="card-body">
+                <div class="py-0">
                   <!-- Player Cards Wrapper -->
                   <div class="row justify-content-center">
                     <!-- Player Card -->
@@ -129,12 +129,12 @@
           <!-- Player First Col End -->
 
           <!-- Player Second Col -->
-          <div class="col playerCol">
+          <div class="col player-col">
 
-            {% for card in ["player_stats.html", "player_fouling.html"] %}
-              <div class="card mr-auto shadow-sm rounded" id="playercards_wrapper">
+            {% for card in ["player_gameplay.html", "player_stats.html"] %}
+              <div class="card mr-auto shadow-sm rounded px-2 pt-3 pb-2" id="player-cards-wrapper">
                 <!-- Player Card Body -->
-                <div class="card-body">
+                <div class="py-0">
                   <!-- Player Cards Wrapper -->
                   <div class="row justify-content-center">
                     <!-- Player Card -->

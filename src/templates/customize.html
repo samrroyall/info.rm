@@ -17,12 +17,12 @@
 
     <!-- SELECT FIELDS -->
     <div class="form-group">
-      <label for="season_select" class="customLabel">
+      <label for="season_select" class="custom-label">
         Choose Season:
       </label>
       <div class="form-row justify-content-left">
         <div class="col-4">
-          <select class="custom-select custom-select-sm select_input" id="season_select" name="season_select" value="{{current_season}}">
+          <select class="custom-select custom-select-sm select-input" id="season_select" name="season_select" value="{{current_season}}">
             {% for season in seasons %}
               <option>{{season}}</option>
             {% endfor %}
@@ -32,7 +32,7 @@
     </div>
 
     <div class="form-group" style="margin-top: 15px">
-      <label for="select_field_1_1" class="customLabel">
+      <label for="select_field_1_1" class="custom-label">
         Select Stats to Show:
       </label>
       <p><fine>Tip: This is the only required field!</fine></p>
@@ -43,7 +43,7 @@
           <div class="form-row justify-content-left" id="select_div_{{select_row}}">
         {% endif %}
           <div class="col-4">
-            <select class="custom-select custom-select-sm select_input" name="select_field1_{{select_row}}" required>
+            <select class="custom-select custom-select-sm select-input" name="select_field1_{{select_row}}" required>
               <option value="">None</option>
               {% for stat in stats %}
                 <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
@@ -52,7 +52,7 @@
             <div class="invalid-feedback select-validation"></div>
           </div>
           <div class="col-2">
-            <select class="custom-select custom-select-sm select_input" name="select_op_{{select_row}}">
+            <select class="custom-select custom-select-sm select-input" name="select_op_{{select_row}}">
               <option value="">None</option>
               <option value="*">×</option>
               <option value="/">÷</option>
@@ -61,7 +61,7 @@
             </select>
           </div>
           <div class="col-4">
-            <select class="custom-select custom-select-sm select_input" name="select_field2_{{select_row}}">
+            <select class="custom-select custom-select-sm select-input" name="select_field2_{{select_row}}">
               <option value="">None</option>
               {% for stat in stats %}
                 <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
@@ -86,7 +86,7 @@
         {% endif %}
             <input type="checkbox" class="custom-control-input" id="select_per90_toggle_{{select_row}}"
               name="select_per90_toggle_{{select_row}}">
-            <label class="custom-control-label per90Label" for="select_per90_toggle_{{select_row}}">
+            <label class="custom-control-label per90-label" for="select_per90_toggle_{{select_row}}">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -95,13 +95,13 @@
 
     <!-- FILTER FIELDS -->
     <div class="form-group" style="margin-top: 15px">
-      <label for="select_field_1" class="customLabel">
+      <label for="select_field_1" class="custom-label">
         Choose Filters:
       </label>
       <p><fine>Tip: For desirable per 90 results, try filtering by minutes played!</fine></p>
       <div class="form-row">
         <div class="col-5 col-xs-3">
-          <select class="custom-select custom-select-sm select_input" id="filter_type">
+          <select class="custom-select custom-select-sm select-input" id="filter_type">
             <option value="">None</option>
             <option value="age">Age</option>
             <option value="club">Club</option>
@@ -119,7 +119,7 @@
         <strong>Age:</strong>
         <div class="form-row">
           <div class="col-2">
-            <select class="custom-select custom-select-sm select_input" id="age_op" name="age_op">
+            <select class="custom-select custom-select-sm select-input" id="age_op" name="age_op">
               <option value="">None</option>
               <option>=</option>
               <option><</option>
@@ -128,11 +128,11 @@
             </select>
           </div>
           <div class="col-2">
-            <input type="number" class="form-control text-center text_input" id="age_input1" name="age_input1" value="">
+            <input type="number" class="form-control text-center text-input" id="age_input1" name="age_input1" value="">
             <div class="invalid-feedback numeric-validation"></div>
           </div>
           <div class="col-2 hidden" id="age_input2_div">
-              <input type="number" class="form-control text-center text_input" id="age_input2" name="age_input2" value="">
+              <input type="number" class="form-control text-center text-input" id="age_input2" name="age_input2" value="">
               <div class="invalid-feedback numeric-validation"></div>
           </div>
         </div>
@@ -143,7 +143,7 @@
         <strong>Club:</strong>
         <div class="form-row">
           <div class="col-4" id="club_league_select_div">
-            <select class="custom-select custom-select-sm select_input" id="club_league_select"
+            <select class="custom-select custom-select-sm select-input" id="club_league_select"
               name="club_league_select" value="">
               <option value="">None</option>
               {% for league in leagues %}
@@ -154,7 +154,7 @@
           {% for season in seasons %}
             {% for league in leagues %}
               <div class="col-4 hidden" id="club_{{league.replace(' ', '_')}}_{{season}}_select_div">
-                <select class="custom-select custom-select-sm select_input" id="club_select" name="club_{{league.replace(' ', '_')}}_{{season}}_select">
+                <select class="custom-select custom-select-sm select-input" id="club_select" name="club_{{league.replace(' ', '_')}}_{{season}}_select">
                   <option value="">None</option>
                   {% for club in clubs.get(season).get(league) %}
                   <option>{{club}}</option>
@@ -171,7 +171,7 @@
         <strong>League:</strong>
         <div class="form-row">
           <div class="col-4" id="league_{{season}}_select_div">
-            <select class="custom-select custom-select-sm select_input"
+            <select class="custom-select custom-select-sm select-input"
               id="league_select" name="league_select">
               <option value="">None</option>
               {% for league in leagues %}
@@ -187,7 +187,7 @@
         <strong>Minutes Played:</strong>
         <div class="form-row">
           <div class="col-2">
-            <select class="custom-select custom-select-sm select_input" id="minutes_played_op"
+            <select class="custom-select custom-select-sm select-input" id="minutes_played_op"
               name="minutes_played_op">
               <option value="">None</option>
               <option>=</option>
@@ -197,14 +197,14 @@
             </select>
           </div>
           <div class="col-3">
-            <input type="number" class="form-control text-center text_input" id="minutes_played_input1"
+            <input type="number" class="form-control text-center text-input" id="minutes_played_input1"
               name="minutes_played_input1" value="">
             <div class="invalid-feedback numeric-validation"></div>
           </div>
 
           <div class="col-3">
             <div class="hidden" id="minutes_played_input2_div">
-              <input type="number" class="form-control text-center text_input" id="minutes_played_input2"
+              <input type="number" class="form-control text-center text-input" id="minutes_played_input2"
                 name="minutes_played_input2" value="">
               <div class="invalid-feedback numeric-validation"></div>
             </div>
@@ -222,7 +222,7 @@
             {% else %}
               <div class="col-4 hidden" id="nationality_{{season}}_select_div">
             {% endif %}
-              <select class="custom-select custom-select-sm select_input"
+              <select class="custom-select custom-select-sm select-input"
                 id="nationality_select" name="nationality_select">
                 <option value="">None</option>
                 {% for nation in nations %}
@@ -239,7 +239,7 @@
         <strong>Position:</strong>
         <div class="form-row">
           <div class="col-4">
-            <select class="custom-select custom-select-sm select_input" id="position_select" name="position_select">
+            <select class="custom-select custom-select-sm select-input" id="position_select" name="position_select">
               <option value="">None</option>
               <option>Attacker</option>
               <option>Midfielder</option>
@@ -263,7 +263,7 @@
           <div  class="form-row justify-content-left" id="stat_div_{{filter_row}}">
         {% endif %}
           <div class="col-4">
-            <select class="custom-select custom-select-sm select_input" name="stat_field1_{{filter_row}}" id="stat_field1_{{filter_row}}">
+            <select class="custom-select custom-select-sm select-input" name="stat_field1_{{filter_row}}" id="stat_field1_{{filter_row}}">
               <option value="">None</option>
               {% for stat in stats %}
                 <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
@@ -271,7 +271,7 @@
             </select>
           </div>
           <div class="col-2">
-            <select class="custom-select custom-select-sm select_input" name="stat_lop_{{filter_row}}" id="stat_lop_{{filter_row}}">
+            <select class="custom-select custom-select-sm select-input" name="stat_lop_{{filter_row}}" id="stat_lop_{{filter_row}}">
               <option value="">None</option>
               <option>×</option>
               <option>÷</option>
@@ -280,7 +280,7 @@
             </select>
           </div>
           <div class="col-4">
-            <select class="custom-select custom-select-sm select_input" name="stat_field2_{{filter_row}}" id="stat_field2_{{filter_row}}">
+            <select class="custom-select custom-select-sm select-input" name="stat_field2_{{filter_row}}" id="stat_field2_{{filter_row}}">
               <option value="">None</option>
               {% for stat in stats %}
                 <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
@@ -304,7 +304,7 @@
           <div  class="form-row" id="stat_expression_{{filter_row}}" style="margin-top: 5px">
         {% endif %}
             <div class="col-2">
-              <select class="custom-select custom-select-sm select_input" id="stat_cop_{{filter_row}}"
+              <select class="custom-select custom-select-sm select-input" id="stat_cop_{{filter_row}}"
                 name="stat_cop_{{filter_row}}">
                 <option value="">None</option>
                 <option>=</option>
@@ -314,13 +314,13 @@
               </select>
             </div>
             <div class="col-3">
-              <input type="number" class="form-control text-center text_input" name="stat_input1_{{filter_row}}"
+              <input type="number" class="form-control text-center text-input" name="stat_input1_{{filter_row}}"
                 id="stat_input1_{{filter_row}}" value="">
               <div class="invalid-feedback numeric-validation"></div>
             </div>
             <div class="col-3">
               <div class="hidden" id="stat_input2_div_{{filter_row}}">
-                <input type="number" class="form-control text-center text_input" name="stat_input2_{{filter_row}}"
+                <input type="number" class="form-control text-center text-input" name="stat_input2_{{filter_row}}"
                   id="stat_input2_{{filter_row}}" value="">
                 <div class="invalid-feedback numeric-validation"></div>
               </div>
@@ -335,7 +335,7 @@
         {% endif %}
             <input type="checkbox" class="custom-control-input" id="stat_per90_toggle_{{filter_row}}"
               name="stat_per90_toggle_{{filter_row}}">
-            <label class="custom-control-label per90Label" for="stat_per90_toggle_{{filter_row}}">
+            <label class="custom-control-label per90-label" for="stat_per90_toggle_{{filter_row}}">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -346,14 +346,14 @@
     <!-- ORDER BY FIELDS -->
     <div class="form-group" style="margin-top: 15px">
 
-      <label for="order_field1" class="customLabel">
+      <label for="order_field1" class="custom-label">
         Choose a Stat to Order By:
       </label>
       <p><fine>Tip: Must be one of your selected stats! (This is an optional parameter. The default is your first selected stat.)</fine></p>
 
       <div  class="form-row">
         <div class="col-5">
-          <select class="custom-select custom-select-sm select_input" id="order_field1" name="order_field1">
+          <select class="custom-select custom-select-sm select-input" id="order_field1" name="order_field1">
             <option value="">None</option>
             {% for stat in stats %}
               <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
@@ -361,7 +361,7 @@
           </select>
         </div>
         <div class="col-2">
-          <select class="custom-select custom-select-sm select_input" name="order_op">
+          <select class="custom-select custom-select-sm select-input" name="order_op">
             <option value="">None</option>
             <option value="*">×</option>
             <option value="/">÷</option>
@@ -370,7 +370,7 @@
           </select>
         </div>
         <div class="col-5">
-          <select class="custom-select custom-select-sm select_input" id="order_field2" name="order_field2">
+          <select class="custom-select custom-select-sm select-input" id="order_field2" name="order_field2">
             <option value="">None</option>
             {% for stat in stats %}
               <option value="{{stat.replace(' ','_')}}">{{stat}}</option>
@@ -384,7 +384,7 @@
           <div class="custom-control custom-switch toggle">
             <input type="checkbox" class="custom-control-input" name="order_per90_toggle"
               id="order_per90_toggle">
-            <label class="custom-control-label per90Label" for="order_per90_toggle">
+            <label class="custom-control-label per90-label" for="order_per90_toggle">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -393,7 +393,7 @@
           <div class="custom-control custom-switch toggle">
             <input type="checkbox" class="custom-control-input" name="asc_toggle"
               id="asc_toggle">
-            <label class="custom-control-label orderLabel" for="asc_toggle">
+            <label class="custom-control-label order-label" for="asc_toggle">
               <fine>Low to High</fine>
             </label>
           </div>

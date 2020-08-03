@@ -29,7 +29,7 @@
 
       <!-- Builder Title -->
       <li class="list-group-item border-0"
-        id="builderHeader">
+        id="builder-header">
           <div class="row justify-content-center">
             <div class="col-6">
             </div>
@@ -55,10 +55,10 @@
       {% set pagemod = query_result.get(stat).get(substat).get("data")|length % 10 %}
       {% set pagediv = query_result.get(stat).get(substat).get("data")|length // 10 %}
       <!-- Beginning Card Body -->
-      <div class="card-body">
+      <div class="py-0">
         <!-- Dashboard Title -->
         <h6 class="card-title row text-secondary"
-          id="dashCardTitle">
+          id="dash-card-title">
 
             <!-- Prev Button -->
             {% if card_num == 0 %}
@@ -69,7 +69,7 @@
               <div class="col text-right {{stat}}_prev_{{card_num}} hidden"
                 onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'prev');">
             {% endif %}
-                <a class="text-secondary arrowlink" role="button">
+                <a class="text-secondary arrow-link" role="button">
                   {% include "prev_arrow.html" %}
                 </a>
               </div>
@@ -90,7 +90,7 @@
               <div class="col nextarrow text-left {{stat}}_next_{{card_num}} hidden"
                 onclick="changeStat('{{stat}}',{{card_num}},{{num_cards}},'next');">
             {% endif %}
-                  <a class="text-secondary arrowlink" role="button">
+                  <a class="text-secondary arrow-link" role="button">
                     {% include "next_arrow.html" %}
                   </a>
               </div>
@@ -123,12 +123,12 @@
       {% for row in stat_list[10 * (page - 1) : 10 * page] %}
 
         <!-- Beginning of Player Row -->
-        <li class="list-group-item px-3 py-2" id="cardItem">
-          <div class="row justify-content-center" id="cardRow">
+        <li class="list-group-item px-3 py-2" id="card-item">
+          <div class="row justify-content-center pr-0">
 
             <!-- Team Logo Column -->
             <div class="col-2 text-center justify-content-left px-0">
-              <img class="teamLogo" src={{row.get("team_logo")}} height="28px"/>
+              <img class="team-logo" src={{row.get("team_logo")}} height="28px"/>
             </div>
 
             <!-- Filler Column
@@ -145,7 +145,7 @@
             {% endif %}
 
               <!-- Player Name Row -->
-              <div class="playerNameRank">
+              <div class="player-name-rank">
 
                 <!-- N/A Rank -->
                 {% if row.get('rank') == 'N/A.' %}
@@ -176,7 +176,7 @@
               <!-- Player Name Row End -->
 
               <!-- Player Team Row -->
-              <div class="teamName">
+              <div class="team-name">
                 {% if "header" in query_result.keys() %}
                   <fine>{{row.get("team_name")}}, {{row.get("league_name")}}</fine>
                 {% else %}
@@ -220,7 +220,7 @@
     {% endfor %}
 
     <!-- Pagination List Item Beginning -->
-    <li class="list-group-item border-0" id="paginationDiv">
+    <li class="list-group-item border-0" id="pagination-div">
       <!-- Pagination Row -->
       <div class="row h-100">
         <!-- Pagination Div -->

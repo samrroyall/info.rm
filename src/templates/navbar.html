@@ -1,47 +1,45 @@
 {% if search_query %}
   <script>
     $(document).ready( function() {
-      $("#navSearch").focus();
-      $("#navSearch").val("{{search_query}}");
-      var val_len = $("#navSearch").val().length;
-      $("#navSearch").get(0).setSelectionRange(val_len, val_len);
+      $("#nav-search").focus();
+      $("#nav-search").val("{{search_query}}");
+      var val_len = $("#nav-search").val().length;
+      $("#nav-search").get(0).setSelectionRange(val_len, val_len);
     });
   </script>
 {% endif %}
 
-<nav class="navbar navbar-light navbar-fixed-top bg-light border-bottom navbar-expand-lg align-items-center"
-  id="mainNav">
+<nav class="navbar navbar-light navbar-fixed-top bg-light border-bottom navbar-expand-lg align-items-center p-0">
     <!-- Logo -->
-    <a class="navbar-brand text-secondary" id="brand" 
+    <a class="navbar-brand text-secondary pr-0" id="brand"
       href="{{ url_for('home') }}">
         <strong>info.rm</strong>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
-      data-target="#main_nav_collapse" aria-controls="main_nav_collapse"
-      aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+            data-target="#main-nav-collapse" aria-controls="main-nav-collapse"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
     </button>
     <!-- Collapse Div Start -->
     {% if search_query %}
-      <div class="collapse navbar-collapse show text-left border-left mr-0" id="main_nav_collapse">
+      <div class="collapse navbar-collapse show text-left border-left mr-0" id="main-nav-collapse">
     {% else %}
-      <div class="collapse navbar-collapse text-left border-left mr-0" id="main_nav_collapse">
+      <div class="collapse navbar-collapse text-left border-left mr-0" id="main-nav-collapse">
     {% endif %}
 	  <!-- Builder -->
-          <a class="nav-item nav-link text-secondary px-0"
-	    id="builder-link"
-	    href="{{ url_for('builder') }}">
-            StatBuilder
-            {% include "builder_icon.html" %} 
+          <a class="nav-item nav-link text-secondary px-0 ml-0" id="builder-link"
+	           href="{{ url_for('builder') }}">
+               StatBuilder
+               {% include "builder_icon.html" %}
           </a>
-	<div id="searchForm">
+	<div id="search-form">
 	  <form class="form-inline dropdown show" autocomplete="off">
   	    {% if search_query %}
 	      <input class="form-control form-control-sm" type="search"
-	        placeholder="Player Search" aria-label="Search" id="navSearch">
+	        placeholder="Player Search" aria-label="Search" id="nav-search">
 	      <div class="dropdown-menu show" id="searchDropdown">
  	        {% for item in search_result %}
-                  <a class="dropdown-item text-dark searchName"
+                  <a class="dropdown-item text-dark search-name"
 		    href="{{ url_for('player', id=item[0]) }}">
 		      <strong>{{ item[1] }}</strong>
 	          </a>
@@ -49,12 +47,12 @@
 	      </div>
 	    {% elif search %}
 	       <input class="form-control form-control-sm" type="search"
-	       placeholder="Player Search" aria-label="Search" id="navSearch">
+	       placeholder="Player Search" aria-label="Search" id="nav-search">
 	    {% endif %}
 	  </form>
         </div>
       <!-- Leagues -->
-      {% include "league_nav.html" %} 
+      {% include "league_nav.html" %}
     </div>
   <!-- Collapse Div End -->
 </nav>

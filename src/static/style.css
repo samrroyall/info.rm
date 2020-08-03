@@ -1,84 +1,34 @@
 /***********************************************/
-/****************** GENERAL ********************/
+/******************** TAGS *********************/
 /***********************************************/
 
 body, html {
   height: 100%;
 }
 
-.hidden {
-  display: none;
-}
-
-.toggle {
-  font-size: 1.4em;
-  font-height: 1.3em;
+select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus {
+  cursor: pointer;
 }
 
 /***********************************************/
-/***************** WRAPPERS ********************/
+/***************** CLASSES *********************/
 /***********************************************/
 
-#page_wrapper {
-  position:relative;
-  max-width: 1000px;
-  height: auto;
-  min-height: 100%;
- }
+.custom-label { font-size: 1.3em; }
 
-#main_wrapper {
-  position:absolute;
-  min-height: 100%;
-  width: 100%;
-  top:0;
-  left:0;
-}
-
-#content_wrapper {
-  padding-bottom: 5%;
-}
-
-#per90_season_wrapper {
-  background: #F5F5F5;
-  padding-left: 45px;
-  padding-right: 30px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  margin-bottom: 3%;
-}
-
-/* Dashboard */
-
-#dashboard_section_wrapper {
-  padding-top: 2%;
-  padding-bottom: 0px;
-  margin: 5%;
-}
-
-/* Builder */
-
-#builder_wrapper {
-  margin-top: 5%;
-  padding: 10px;
+.dash-card {
   font-size: x-small;
-}
-
-/* Player Page */
-
-#playercards_wrapper {
-  padding-top: 5px;
-  padding-bottom: 10px;
-  width: 345px;
   background: #FAFAFA;
-  margin-bottom: 3%
 }
 
-/***********************************************/
-/******************* NAVBAR ********************/
-/***********************************************/
+/* change all `hidden` language to hide(), show(), and toggle() */
+.hidden { display: none; }
 
-#mainNav {
-  padding: 0px;
+.dropdown-league-logo, .league-logo { height: 35px; }
+
+.league-logo:hover {
+  margin-top: -6px;
+  height: 45px;
 }
 
 .navbar-toggler {
@@ -89,276 +39,186 @@ body, html {
   margin-right: 15px !important;
 }
 
-.navbar-toggler-icon {
+.navbar-toggler-icon { font-size: 0.7em; }
+
+.per90-label, .order-label {
+  font-size: .7em;
+  line-height: 2em;
+}
+
+.player-card { font-size: x-small; }
+
+.player-col {
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.player-name-rank {
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1em;
+  line-height: 1em;
+}
+
+.playerStat, .player-stat-per90, .player-stat-name, .player-stat-gameplay, .player-stat-pens, .player-stat-bio {
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 1.1em;
+}
+
+.search-name {
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 0.7em;
+  line-height: 1em;
 }
 
-.nav-item {
+.season-select { font-size: .7em; }
+
+.select-input { font-size: 1em; }
+
+.team-logo {
+  height: 23px;
+  width: 23px;
 }
 
-#navSearch {
-  width: 190px !important;
+.text-input {
+  font-size: .8em;
+  height: 100%;
 }
 
-#searchForm {
-  margin-right: 25px;
-  width: 195px !important;
+.team-name { font-size: 1em; }
+
+.toggle {
+  font-size: 2.4em;
+  font-height: 1.3em; /**** fix this? ******/
 }
+
+/***********************************************/
+/******************** IDS **********************/
+/***********************************************/
 
 #brand {
   font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;
   font-size: 1.5em;
   padding-left: 15px;
-  padding-right: 0px;
 }
 
-#league_nav {
-  height: 50px;
-  padding-left: 10px;
+#builder-card { background: #FAFAFA; }
+
+#builder-header {
+  background: #FAFAFA;
+  font-size: calc(70% + .1vw + .1vh);
 }
 
-#league_dropdown_menu {
-  min-width: 20px !important;
-  right: 0px;
+#builder-title {
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: calc(120% + .1vw + .1vh);
+  padding-top: 2%;
+}
+#builder-link { margin-right: 15px; }
+
+#builder-wrapper {
+  margin-top: 5%;
+  padding: 10px;
+  font-size: x-small;
 }
 
-#main_nav_collapse {
-  width: 100%;
-  padding-left: 15px;
-}
+#card-item { min-width: 325px; }
 
-#builder-link {
-  margin-left: 0px;
-  margin-right: 15px;
-}
+#content-wrapper { padding-bottom: 5% }
 
-#league_nav_link {
-  width: 100px;
-}
-
-#otherLeagueDropdown {
-  margin-top: 10px;
-}
-
-.dropdown_league_logo {
-  height: 35px;
-}
-
-#EuropaCrop {
-  height: 35px;
-  overflow: hidden;
-}
-
-#EuropaCropPlayer {
-  height: 20px;
-  width: 25px;
-  overflow: hidden;
-}
-
-.league_logo {
-  height: 35px;
-}
-.league_logo:hover {
-  margin-top: -6px;
-  height: 45px;
-}
-
-/***********************************************/
-/****************** DASHBOARD ******************/
-/***********************************************/
-
-#dashboardSectionTitle {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+#dashboard-section-title {
+  display: none;
   font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 0.9em;
   width: 325px;
   margin-bottom: 5px;
 }
 
-#dashCardTitle {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+#dash-card-title {
   font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 1.3em;
 }
 
-.dashCard {
-  padding-top: 10px;
-  font-size: x-small;
-  background: #FAFAFA;
+#europa-crop {
+  height: 35px;
+  overflow: hidden;
 }
 
-/***********************************************/
-/******************** CARD *********************/
-/***********************************************/
-
-/* Dashboard Card */
-
-.card-body {
-  padding-top: 0px;
-  padding-bottom: 0px;
+#europa-crop-player {
+  height: 20px;
+  width: 25px;
+  overflow: hidden;
 }
 
-.teamLogo {
-  height: 23px;
-  width: 23px;
+#league-dropdown-menu {
+  min-width: 20px !important;
+  right: 0px;
 }
 
-.teamName {
-  font-size: 1em;
+#league-nav {
+  height: 50px;
+  padding-left: 10px;
 }
 
-.searchName {
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 0.7em;
-  line-height: 1em;
+#league-nav-link { width: 100px; }
+
+#main-nav-collapse {
+  width: 100%;
+  padding-left: 15px;
 }
 
-.playerNameRank {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 1em;
-  line-height: 1em;
+#main-wrapper {
+  position:absolute;
+  min-height: 100%;
+  width: 100%;
+  top:0;
+  left:0;
 }
 
-.playerStat {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 1.1em;
+#nav-search { width: 190px !important; }
+
+#other-league-dropdown { margin-top: 10px; }
+
+#page-wrapper {
+  position:relative;
+  max-width: 1000px;
+  height: auto;
+  min-height: 100%;
 }
 
-.playerStatPer90 {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 1.1em;
+#pagination-div { background: #FAFAFA; }
+
+#per90-season-wrapper {
+  background: #F5F5F5;
+  padding-left: 45px;
+  padding-right: 30px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-bottom: 3%;
 }
 
-.playerStatGameplay {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 1.1em;
-}
-
-.playerStatPens {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 1.1em;
-}
-
-.playerStatBio {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 1.1em;
-}
-
-#paginationDiv {
-  background: #FAFAFA;
-}
-
-#cardItem {
-  min-width: 325px;
-}
-
-#cardRow {
-  padding-right: 0px;
-}
-
-/* Player Page Card */
-
-#playerCardHeader {
+#player-card-header {
   margin-bottom: 5px;
 }
 
-.playerCard {
-  font-size: x-small;
-}
-
-.playerStatName {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 1.1em;
-}
-
-#playerPageName {
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
-#playerCardTitle {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
+#player-card-title {
   font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: .9em;
 }
 
-.playerCol {
-  padding-left: 5%;
-  padding-right: 5%;
-}
-
-/***********************************************/
-/****************** BUILDER ********************/
-/***********************************************/
-
-#builderTitle {
-  /*font-family: "Century Gothic", CenturyGothic, AppliGothic, sans-serif;*/
-  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: calc(120% + .1vw + .1vh);
-  padding-top: 2%;
-}
-
-#builderCard {
+#player-cards-wrapper {
+  width: 345px;
   background: #FAFAFA;
+  margin-bottom: 3%
 }
 
-#builderCardBody {
-  padding-bottom: 0px;
-  padding-left: 0px;
-  padding-right: 0px;
+#player-page-name {
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
-#builderHeader {
-  background: #FAFAFA;
-  font-size: calc(70% + .1vw + .1vh);
+#player-per90-label { margin-top: 2px; }
+
+#search-form {
+  margin-right: 25px;
+  width: 195px !important;
 }
-
-/***********************************************/
-/***************** CUSTOMIZER ******************/
-/***********************************************/
-
-#custom_stats {
-}
-
-.select_input {
-  font-size: 1em;
-}
-
-.text_input {
-  font-size: .8em;
-  height: 100%;
-}
-
-.customLabel {
-  font-size: 1.3em;
-}
-
-/***********************************************/
-/******************* OTHER *********************/
-/***********************************************/
-
-select, .orderlabel, .arrowlink, .page-link, .filtericon, .plus {
-  cursor: pointer;
-}
-
-#player_per90Label {
-  margin-top: 2px;
-}
-
-.per90Label, .orderLabel {
-  cursor: pointer;
-  font-size: .7em;
-  line-height: 2em;
-}
-
-.seasonselect {
-  font-size: .7em;
-}
-
