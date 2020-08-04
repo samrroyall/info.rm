@@ -16,10 +16,10 @@
   </div>
 
   <!-- Dashboard Season Dropdown -->
-  <div class="col-4 col-xs-3 col-md-2 ml-auto">
+  <div class="col-5 col-sm-3 col-md-2 ml-auto">
       <select class="custom-select custom-select-sm season-select"
         id="season-select" value="">
-	  <option value="{{current_season}}">{{current_season}}/{{((current_season|int+1)|string)[2:]}}</option>
+	  <option value="{{current_season}}">{{current_season}}/{{current_season|int+1}}</option>
           {% for season in seasons %}
             {% if season != current_season %}
 	      <option value="{{season}}">{{season}}/{{((season|int+1)|string)[2:]}}</option>
@@ -33,7 +33,7 @@
 <!-- Loop Through Stat Sections -->
 {% for stat in query_result.keys() %}
   <!-- Section Wrapper -->
-  <div class="p-0 mx-5 my-4">
+  <div class="p-0 mx-5 mt-4">
     <!-- Section Heading -->
     <div class="ml-auto mr-auto text-left" id="dashboard-section-title">
       <strong>{{stat.upper()}}</strong>

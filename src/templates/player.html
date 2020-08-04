@@ -48,7 +48,7 @@
   </div>
 
   <!-- Seasons Dropdown -->
-  <div class="col-8 col-xs-3 col-md-2 ml-auto">
+  <div class="col-5 col-md-2 ml-auto">
     <select class="custom-select custom-select-sm season-select"
       id="player-season-select" value="">
         {% for season in seasons %}
@@ -105,10 +105,10 @@
 
         <div class="row">
           <!-- Player First Col -->
-          <div class="col player-col">
+          <div class="col-12 col-md-6">
 
             {% for card in ["player_bio.html", "player_fouling.html"] %}
-              <div class="card ml-auto shadow-sm rounded px-2 pt-3 pb-2" id="player-cards-wrapper">
+              <div class="card ml-auto mr-auto shadow-sm rounded px-2 pt-3 pb-2" id="player-cards-wrapper">
                 <!-- Player Card Body -->
                 <div class="py-0">
                   <!-- Player Cards Wrapper -->
@@ -129,10 +129,10 @@
           <!-- Player First Col End -->
 
           <!-- Player Second Col -->
-          <div class="col player-col">
+          <div class="col-12 col-md-6">
 
             {% for card in ["player_gameplay.html", "player_stats.html"] %}
-              <div class="card mr-auto shadow-sm rounded px-2 pt-3 pb-2" id="player-cards-wrapper">
+              <div class="card ml-auto mr-auto shadow-sm rounded px-2 pt-3 pb-2" id="player-cards-wrapper">
                 <!-- Player Card Body -->
                 <div class="py-0">
                   <!-- Player Cards Wrapper -->

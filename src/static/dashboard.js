@@ -1,30 +1,30 @@
 // Stat arrows JS
 function changeStat(stat, currPage, numPages, action) {
   if (action == "next") {
-    $("." + stat + "_card_" + currPage.toString()).addClass("hidden");
-    $("." + stat + "_prev_" + currPage.toString()).addClass("hidden");
-    $("." + stat + "_next_" + currPage.toString()).addClass("hidden");
+    $("." + stat + "_card_" + currPage.toString()).hide();
+    $("." + stat + "_prev_" + currPage.toString()).hide();
+    $("." + stat + "_next_" + currPage.toString()).hide();
     if (currPage != (numPages - 1)) {
-      $("." + stat + "_card_" + (currPage + 1).toString()).removeClass("hidden");
-      $("." + stat + "_prev_" + (currPage + 1).toString()).removeClass("hidden");
-      $("." + stat + "_next_" + (currPage + 1).toString()).removeClass("hidden");
+      $("." + stat + "_card_" + (currPage + 1).toString()).show();
+      $("." + stat + "_prev_" + (currPage + 1).toString()).show();
+      $("." + stat + "_next_" + (currPage + 1).toString()).show();
     } else { 
-      $("." + stat + "_card_0").removeClass("hidden");
-      $("." + stat + "_prev_0").removeClass("hidden");
-      $("." + stat + "_next_0").removeClass("hidden");
+      $("." + stat + "_card_0").show();
+      $("." + stat + "_prev_0").show();
+      $("." + stat + "_next_0").show();
     }
   } else if (action == "prev") {
-    $("." + stat + "_card_" + currPage.toString()).addClass("hidden");
-    $("." + stat + "_prev_" + currPage.toString()).addClass("hidden");
-    $("." + stat + "_next_" + currPage.toString()).addClass("hidden");
+    $("." + stat + "_card_" + currPage.toString()).hide();
+    $("." + stat + "_prev_" + currPage.toString()).hide();
+    $("." + stat + "_next_" + currPage.toString()).hide();
     if (currPage != 0) {
-      $("." + stat + "_card_" + (currPage - 1).toString()).removeClass("hidden");
-      $("." + stat + "_prev_" + (currPage - 1).toString()).removeClass("hidden");
-      $("." + stat + "_next_" + (currPage - 1).toString()).removeClass("hidden");
+      $("." + stat + "_card_" + (currPage - 1).toString()).show();
+      $("." + stat + "_prev_" + (currPage - 1).toString()).show();
+      $("." + stat + "_next_" + (currPage - 1).toString()).show();
     } else {
-      $("." + stat + "_card_" + (numPages - 1).toString()).removeClass("hidden");
-      $("." + stat + "_prev_" + (numPages - 1).toString()).removeClass("hidden");
-      $("." + stat + "_next_" + (numPages - 1).toString()).removeClass("hidden");
+      $("." + stat + "_card_" + (numPages - 1).toString()).show();
+      $("." + stat + "_prev_" + (numPages - 1).toString()).show();
+      $("." + stat + "_next_" + (numPages - 1).toString()).show();
     }
   }
 }
@@ -33,10 +33,10 @@ function changePage(stat, substat, page) {
   var i = 1;
   for (; i < 6; i++) {
      if (i != page) {
-       $("div#" + stat + "_" + substat + "_page_" + i.toString()).addClass("hidden");
+       $("div#" + stat + "_" + substat + "_page_" + i.toString()).hide();
        $("li#" + stat + "_" + substat + "_pagination_" + i.toString()).removeClass("active");
      } else {
-       $("div#" + stat + "_" + substat + "_page_" + i.toString()).removeClass("hidden");
+       $("div#" + stat + "_" + substat + "_page_" + i.toString()).show();
        $("li#" + stat + "_" + substat + "_pagination_" + i.toString()).addClass("active");
      }
   }

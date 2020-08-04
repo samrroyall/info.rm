@@ -1,15 +1,8 @@
 {% set stats = ["Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Fouls Drawn", "Fouls Committed", "Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Yellow Cards"] %}
 
-<!-- Duels/Dribbles Past
-<option>Dribbles Past</option>
-<option>Duels</option>
-<option>Duels Won</option>
-<option>Duels Won Percentage</option>
--->
-
 <!-- Customization Dropdown -->
-<div class="alert alert-light border hidden" id="customStat" role="alert">
-  <h6 class="alert-heading">Customize Your Stat</h6>
+<div class="alert alert-light border" id="custom-stat" role="alert">
+  <h6 class="alert-heading">Customize Your Query</h6>
   <strong>Use the options below to generate your own custom statistic.</strong>
   <hr>
   <form action="{{ url_for('custom_stat') }}" method="post" class="needs-validation"
@@ -20,7 +13,7 @@
       <label for="season_select" class="custom-label">
         Choose Season:
       </label>
-      <div class="form-row justify-content-left">
+      <div class="form-row">
         <div class="col-4">
           <select class="custom-select custom-select-sm select-input" id="season_select" name="season_select" value="{{current_season}}">
             {% for season in seasons %}
@@ -31,16 +24,16 @@
       </div>
     </div>
 
-    <div class="form-group" style="margin-top: 15px">
+    <div class="form-group mt-3">
       <label for="select_field_1_1" class="custom-label">
         Select Stats to Show:
       </label>
       <p><fine>Tip: This is the only required field!</fine></p>
       {% for select_row in range(1,4) %}
         {% if select_row != 1 %}
-          <div class="form-row justify-content-left hidden" id="select_div_{{select_row}}">
+          <div class="form-row hidden" id="select_div_{{select_row}}">
         {% else %}
-          <div class="form-row justify-content-left" id="select_div_{{select_row}}">
+          <div class="form-row" id="select_div_{{select_row}}">
         {% endif %}
           <div class="col-4">
             <select class="custom-select custom-select-sm select-input" name="select_field1_{{select_row}}" required>
@@ -71,8 +64,7 @@
           {% if select_row < 3 %}
             <div class="col-1">
               <div class="plus" id="select_plus_{{select_row}}">
-		{% include "plus.html" %}
-		<!-- <img src="{{ url_for('static', filename='plus.svg') }}" height="30px"> -->
+		            {% include "plus.html" %}
               </div>
             </div>
           {% endif %}
@@ -80,13 +72,13 @@
 
         <!-- Per 90 Button -->
         {% if select_row != 1 %}
-          <div class="custom-control custom-switch toggle hidden" id="select_per90_toggle_div_{{select_row}}" >
+          <div class="custom-control custom-switch builder-toggle hidden" id="select_per90_toggle_div_{{select_row}}" >
         {% else %}
-          <div class="custom-control custom-switch toggle" id="select_per90_toggle_div_{{select_row}}" >
+          <div class="custom-control custom-switch builder-toggle" id="select_per90_toggle_div_{{select_row}}" >
         {% endif %}
             <input type="checkbox" class="custom-control-input" id="select_per90_toggle_{{select_row}}"
               name="select_per90_toggle_{{select_row}}">
-            <label class="custom-control-label per90-label" for="select_per90_toggle_{{select_row}}">
+            <label class="custom-control-label builder-toggle-label" for="select_per90_toggle_{{select_row}}">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -94,7 +86,7 @@
     </div>
 
     <!-- FILTER FIELDS -->
-    <div class="form-group" style="margin-top: 15px">
+    <div class="form-group mt-3">
       <label for="select_field_1" class="custom-label">
         Choose Filters:
       </label>
@@ -115,7 +107,7 @@
       </div>
 
       <!-- Filter Age -->
-      <div class="hidden" id="filter_age_div" style="margin-top: 15px">
+      <div class="hidden mt-3" id="filter_age_div">
         <strong>Age:</strong>
         <div class="form-row">
           <div class="col-2">
@@ -139,7 +131,7 @@
       </div>
 
       <!-- Filter Club -->
-      <div class="hidden" id="filter_club_div" style="margin-top: 15px">
+      <div class="hidden mt-3" id="filter_club_div">
         <strong>Club:</strong>
         <div class="form-row">
           <div class="col-4" id="club_league_select_div">
@@ -167,7 +159,7 @@
       </div>
 
       <!-- Filter League -->
-      <div class="hidden" id="filter_league_div" style="margin-top: 15px">
+      <div class="hidden mt-3" id="filter_league_div">
         <strong>League:</strong>
         <div class="form-row">
           <div class="col-4" id="league_{{season}}_select_div">
@@ -183,7 +175,7 @@
       </div>
 
       <!-- Filter Minutes Played -->
-      <div class="hidden" id="filter_minutes_played_div" style="margin-top: 15px">
+      <div class="hidden mt-3" id="filter_minutes_played_div">
         <strong>Minutes Played:</strong>
         <div class="form-row">
           <div class="col-2">
@@ -213,7 +205,7 @@
       </div>
 
       <!-- Filter Nationality -->
-      <div class="hidden" id="filter_nationality_div" style="margin-top: 15px">
+      <div class="hidden mt-3" id="filter_nationality_div">
         <strong>Nation:</strong>
         <div class="form-row">
           {% for season in seasons %}
@@ -235,7 +227,7 @@
       </div>
 
       <!-- Filter Position -->
-      <div class="hidden" id="filter_position_div" style="margin-top: 15px">
+      <div class="hidden mt-3" id="filter_position_div">
         <strong>Position:</strong>
         <div class="form-row">
           <div class="col-4">
@@ -253,14 +245,14 @@
     </div>
 
     <!-- Filter Stat -->
-    <div class="hidden" id="filter_stat_div" style="margin-top: 15px">
+    <div class="hidden mt-3" id="filter_stat_div">
 
       <strong>Stats:</strong>
       {% for filter_row in range(1,4) %}
         {% if filter_row != 1 %}
-          <div  class="form-row justify-content-left hidden" id="stat_div_{{filter_row}}">
+          <div class="form-row hidden" id="stat_div_{{filter_row}}">
         {% else %}
-          <div  class="form-row justify-content-left" id="stat_div_{{filter_row}}">
+          <div class="form-row" id="stat_div_{{filter_row}}">
         {% endif %}
           <div class="col-4">
             <select class="custom-select custom-select-sm select-input" name="stat_field1_{{filter_row}}" id="stat_field1_{{filter_row}}">
@@ -290,7 +282,7 @@
           {% if filter_row < 3 %}
             <div class="col-1">
               <div class="plus" id="stat_plus_{{filter_row}}">
-	        {% include "plus.html" %} 
+	        {% include "plus.html" %}
 	        <!-- <img src="{{ url_for('static', filename='plus.svg') }}" height="30px"> -->
               </div>
             </div>
@@ -299,9 +291,9 @@
 
         <!-- Logical Expression -->
         {% if filter_row != 1 %}
-          <div  class="form-row hidden" id="stat_expression_{{filter_row}}" style="margin-top: 5px">
+          <div  class="form-row hidden mt-1" id="stat_expression_{{filter_row}}">
         {% else %}
-          <div  class="form-row" id="stat_expression_{{filter_row}}" style="margin-top: 5px">
+          <div  class="form-row mt-1" id="stat_expression_{{filter_row}}">
         {% endif %}
             <div class="col-2">
               <select class="custom-select custom-select-sm select-input" id="stat_cop_{{filter_row}}"
@@ -329,13 +321,13 @@
 
         <!-- Per 90 Button -->
         {% if filter_row != 1 %}
-          <div class="custom-control custom-switch toggle hidden" id="stat_per90_toggle_div_{{filter_row}}" >
+          <div class="custom-control custom-switch builder-toggle hidden" id="stat_per90_toggle_div_{{filter_row}}" >
         {% else %}
-          <div class="custom-control custom-switch toggle" id="stat_per90_toggle_div_{{filter_row}}">
+          <div class="custom-control custom-switch builder-toggle" id="stat_per90_toggle_div_{{filter_row}}">
         {% endif %}
             <input type="checkbox" class="custom-control-input" id="stat_per90_toggle_{{filter_row}}"
               name="stat_per90_toggle_{{filter_row}}">
-            <label class="custom-control-label per90-label" for="stat_per90_toggle_{{filter_row}}">
+            <label class="custom-control-label builder-toggle-label" for="stat_per90_toggle_{{filter_row}}">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
@@ -344,14 +336,14 @@
     </div>
 
     <!-- ORDER BY FIELDS -->
-    <div class="form-group" style="margin-top: 15px">
+    <div class="form-group mt-3">
 
       <label for="order_field1" class="custom-label">
         Choose a Stat to Order By:
       </label>
       <p><fine>Tip: Must be one of your selected stats! (This is an optional parameter. The default is your first selected stat.)</fine></p>
 
-      <div  class="form-row">
+      <div class="form-row">
         <div class="col-5">
           <select class="custom-select custom-select-sm select-input" id="order_field1" name="order_field1">
             <option value="">None</option>
@@ -381,29 +373,29 @@
 
       <div class="form-row">
         <div class="col-6 col-md-3">
-          <div class="custom-control custom-switch toggle">
+          <div class="custom-control custom-switch builder-toggle">
             <input type="checkbox" class="custom-control-input" name="order_per90_toggle"
               id="order_per90_toggle">
-            <label class="custom-control-label per90-label" for="order_per90_toggle">
+            <label class="custom-control-label builder-toggle-label" for="order_per90_toggle">
               <fine>Per 90 Minutes</fine>
             </label>
           </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="custom-control custom-switch toggle">
+          <div class="custom-control custom-switch builder-toggle">
             <input type="checkbox" class="custom-control-input" name="asc_toggle"
               id="asc_toggle">
-            <label class="custom-control-label order-label" for="asc_toggle">
+            <label class="custom-control-label builder-toggle-label" for="asc_toggle">
               <fine>Low to High</fine>
             </label>
           </div>
         </div>
       </div>
 
-      <div class="form-row text-center justify-content-center" style="padding-top: 15px">
+      <div class="form-row text-center justify-content-center mt-3">
         <div class="col-5 col-md-3">
           <button class="btn btn-sm btn-dark" type="submit">
-            <fine>Generate Stat</fine>
+            <strong class="builder-button">Generate Stat</strong>
           </button>
         </div>
       </div>
