@@ -10,6 +10,7 @@ CURRENT_SEASON = get_current_season()
 lops = ["+","-","*","/"]
 cops = ["<",">","=","><"]
 stats = {
+    "Minutes_Played": "stats.minutes_played",
     "Assists": "stats.assists",
     "Successful_Dribbles": "stats.dribbles_succeeded",
     "Successful_Dribbles_Percentage": "stats.dribbles_succeeded_pct",
