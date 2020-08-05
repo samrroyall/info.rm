@@ -30,7 +30,6 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   background: #FAFAFA;
 }
 
-/* change all `hidden` language to hide(), show(), and toggle() */
 .hidden { display: none; }
 
 .dropdown-league-logo, .league-logo { height: 35px; }
@@ -38,7 +37,7 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 .footer {
   position: relative;
   font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: .8em;
+  font-size: .65em;
 }
 
 .league-logo:hover {

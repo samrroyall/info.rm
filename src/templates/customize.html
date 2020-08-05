@@ -1,4 +1,4 @@
-{% set stats = ["Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Fouls Drawn", "Fouls Committed", "Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Yellow Cards"] %}
+{% set stats = ["Minutes Played","Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Fouls Drawn", "Fouls Committed", "Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Yellow Cards"] %}
 
 <!-- Customization Dropdown -->
 <div class="alert alert-light border" id="custom-stat" role="alert">
@@ -17,7 +17,7 @@
         <div class="col-4">
           <select class="custom-select custom-select-sm select-input" id="season_select" name="season_select" value="{{current_season}}">
             {% for season in seasons %}
-              <option>{{season}}</option>
+	      <option value="{{season}}">{{season}}/{{season|int+1}}</option>
             {% endfor %}
           </select>
         </div>
