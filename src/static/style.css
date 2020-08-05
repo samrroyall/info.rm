@@ -3,7 +3,7 @@
 /***********************************************/
 
 body, html {
-  height: 100%;
+  /*height: 100%;*/
 }
 
 select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus {
@@ -13,6 +13,15 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 /***********************************************/
 /***************** CLASSES *********************/
 /***********************************************/
+
+.builder-button {
+  font-size: .8em;
+}
+
+.builder-toggle-label {
+  font-size: 1em;
+  line-height: 2.3em;
+}
 
 .custom-label { font-size: 1.3em; }
 
@@ -26,20 +35,18 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 .dropdown-league-logo, .league-logo { height: 35px; }
 
+.footer {
+  position: relative;
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: .8em;
+}
+
 .league-logo:hover {
   margin-top: -6px;
   height: 45px;
 }
 
-.navbar-toggler {
-  padding-top: 0px !important;
-  padding-bottom: 1px !important;
-  padding-left: 2px !important;
-  padding-right: 2px !important;
-  margin-right: 15px !important;
-}
-
-.navbar-toggler-icon { font-size: 0.7em; }
+.navbar-toggler-icon { font-size: .7em; }
 
 .per90-label, .order-label {
   font-size: .7em;
@@ -59,7 +66,7 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   line-height: 1em;
 }
 
-.playerStat, .player-stat-per90, .player-stat-name, .player-stat-gameplay, .player-stat-pens, .player-stat-bio {
+.player-stat, .player-stat-per90, .player-stat-name, .player-stat-gameplay, .player-stat-pens, .player-stat-bio {
   font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 1.1em;
 }
@@ -86,11 +93,6 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 .team-name { font-size: 1em; }
 
-.toggle {
-  font-size: 2.4em;
-  font-height: 1.3em; /**** fix this? ******/
-}
-
 /***********************************************/
 /******************** IDS **********************/
 /***********************************************/
@@ -116,14 +118,10 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 #builder-link { margin-right: 15px; }
 
 #builder-wrapper {
-  margin-top: 5%;
-  padding: 10px;
   font-size: x-small;
 }
 
 #card-item { min-width: 325px; }
-
-#content-wrapper { padding-bottom: 5% }
 
 #dashboard-section-title {
   display: none;
@@ -193,7 +191,6 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   padding-right: 30px;
   padding-top: 5px;
   padding-bottom: 5px;
-  margin-bottom: 3%;
 }
 
 #player-card-header {
