@@ -4,3 +4,4 @@ requests
 sqlalchemy
 sqlalchemy_utils
 unidecode
+pyopenssl
