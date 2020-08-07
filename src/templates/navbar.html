@@ -16,23 +16,23 @@
         <strong>info-rm</strong>
     </a>
     <button class="navbar-toggler mr-3" type="button" data-toggle="collapse"
-            data-target="#main-nav-collapse" aria-controls="main-nav-collapse"
-            aria-expanded="false" aria-label="Toggle navigation">
+      data-target="#main-nav-collapse" aria-controls="main-nav-collapse"
+      aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <!-- Collapse Div Start -->
     {% if search_query %}
-      <div class="collapse navbar-collapse show text-left border-left mr-0" id="main-nav-collapse">
+      <div class="navbar-collapse collapse show text-left border-left mr-0" id="main-nav-collapse">
     {% else %}
-      <div class="collapse navbar-collapse text-left border-left mr-0" id="main-nav-collapse">
+      <div class="navbar-collapse collapse text-left border-left mr-0" id="main-nav-collapse">
     {% endif %}
-	  <!-- Builder -->
-          <a class="nav-item nav-link text-secondary px-0 ml-0" id="builder-link"
-	           href="{{ url_for('builder') }}">
-               StatBuilder
-               {% include "builder_icon.html" %}
-          </a>
-	<div id="search-form">
+	<!-- Builder -->
+        <a class="nav-item nav-link text-secondary px-0 ml-0" id="builder-link"
+	         href="{{ url_for('builder') }}">
+             StatBuilder
+             {% include "builder_icon.html" %}
+        </a>
+	<div id="search-wrapper">
 	  <form class="form-inline dropdown show" autocomplete="off">
   	    {% if search_query %}
 	      <input class="form-control form-control-sm" type="search"
@@ -40,19 +40,20 @@
 	      <div class="dropdown-menu show" id="searchDropdown">
  	        {% for item in search_result %}
                   <a class="dropdown-item text-dark search-name"
-		    href="{{ url_for('player', id=item[0]) }}">
-		      <strong>{{ item[1] }}</strong>
+	            href="{{ url_for('player', id=item[0]) }}">
+	              <strong>{{ item[1] }}</strong>
 	          </a>
 	        {% endfor %}
-	      </div>
 	    {% elif search %}
 	       <input class="form-control form-control-sm" type="search"
 	       placeholder="Player Search" aria-label="Search" id="nav-search">
 	    {% endif %}
 	  </form>
-        </div>
-      <!-- Leagues -->
-      {% include "league_nav.html" %}
-    </div>
+	</div>
+        <!-- Leagues -->
+	<div class="flex-column">
+          {% include "league_nav.html" %}
+	</div>
+      </div>
   <!-- Collapse Div End -->
 </nav>

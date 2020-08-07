@@ -45,6 +45,8 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   height: 45px;
 }
 
+.league-nav-link { width: 100px; }
+
 .navbar-toggler-icon { font-size: .7em; }
 
 .per90-label, .order-label {
@@ -114,11 +116,12 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   font-size: calc(120% + .1vw + .1vh);
   padding-top: 2%;
 }
-#builder-link { margin-right: 15px; }
-
-#builder-wrapper {
-  font-size: x-small;
+#builder-link { 
+  margin-right: 15px; 
+  width: 100px;
 }
+
+#builder-wrapper { font-size: x-small; }
 
 #card-item { min-width: 325px; }
 
@@ -146,17 +149,7 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   overflow: hidden;
 }
 
-#league-dropdown-menu {
-  min-width: 20px !important;
-  right: 0px;
-}
-
-#league-nav {
-  height: 50px;
-  padding-left: 10px;
-}
-
-#league-nav-link { width: 100px; }
+#league-nav { height: 50px; }
 
 #main-nav-collapse {
   width: 100%;
@@ -171,9 +164,20 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   left:0;
 }
 
-#nav-search { width: 190px !important; }
+#nav-search { 
+  width: 170px !important;
+  margin-right: 15px; 
+}
 
-#other-league-dropdown { margin-top: 10px; }
+#other-league-dropdown-button { 
+  margin-top: 10px; 
+  margin-left: -40px;
+}
+
+#other-league-dropdown {
+  height: 50px;
+  padding-right: 5px;
+}
 
 #page-wrapper {
   position:relative;
@@ -214,7 +218,4 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 #player-per90-label { margin-top: 2px; }
 
-#search-form {
-  margin-right: 25px;
-  width: 195px !important;
-}
+#search-wrapper { width: 185px !important; }
