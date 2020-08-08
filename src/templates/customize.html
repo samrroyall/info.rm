@@ -44,7 +44,7 @@
             </select>
             <div class="invalid-feedback select-validation"></div>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <select class="custom-select custom-select-sm select-input" name="select_op_{{select_row}}">
               <option value="">None</option>
               <option value="*">×</option>
@@ -110,7 +110,7 @@
       <div class="hidden mt-3" id="filter_age_div">
         <strong>Age:</strong>
         <div class="form-row">
-          <div class="col-2">
+          <div class="col-3">
             <select class="custom-select custom-select-sm select-input" id="age_op" name="age_op">
               <option value="">None</option>
               <option>=</option>
@@ -119,11 +119,11 @@
               <option value="><">Between</option>
             </select>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <input type="number" class="form-control text-center text-input" id="age_input1" name="age_input1" value="">
             <div class="invalid-feedback numeric-validation"></div>
           </div>
-          <div class="col-2 hidden" id="age_input2_div">
+          <div class="col-3 hidden" id="age_input2_div">
               <input type="number" class="form-control text-center text-input" id="age_input2" name="age_input2" value="">
               <div class="invalid-feedback numeric-validation"></div>
           </div>
@@ -178,7 +178,7 @@
       <div class="hidden mt-3" id="filter_minutes_played_div">
         <strong>Minutes Played:</strong>
         <div class="form-row">
-          <div class="col-2">
+          <div class="col-3">
             <select class="custom-select custom-select-sm select-input" id="minutes_played_op"
               name="minutes_played_op">
               <option value="">None</option>
@@ -262,7 +262,7 @@
               {% endfor %}
             </select>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <select class="custom-select custom-select-sm select-input" name="stat_lop_{{filter_row}}" id="stat_lop_{{filter_row}}">
               <option value="">None</option>
               <option>×</option>
@@ -295,7 +295,7 @@
         {% else %}
           <div  class="form-row mt-1" id="stat_expression_{{filter_row}}">
         {% endif %}
-            <div class="col-2">
+            <div class="col-3">
               <select class="custom-select custom-select-sm select-input" id="stat_cop_{{filter_row}}"
                 name="stat_cop_{{filter_row}}">
                 <option value="">None</option>
@@ -305,12 +305,12 @@
                 <option value="><">Between</option>
               </select>
             </div>
-            <div class="col-3">
+            <div class="col-4">
               <input type="number" class="form-control text-center text-input" name="stat_input1_{{filter_row}}"
                 id="stat_input1_{{filter_row}}" value="">
               <div class="invalid-feedback numeric-validation"></div>
             </div>
-            <div class="col-3">
+            <div class="col-4">
               <div class="hidden" id="stat_input2_div_{{filter_row}}">
                 <input type="number" class="form-control text-center text-input" name="stat_input2_{{filter_row}}"
                   id="stat_input2_{{filter_row}}" value="">
@@ -344,7 +344,7 @@
       <p><fine>Tip: Must be one of your selected stats! (This is an optional parameter. The default is your first selected stat.)</fine></p>
 
       <div class="form-row">
-        <div class="col-5">
+        <div class="col-4">
           <select class="custom-select custom-select-sm select-input" id="order_field1" name="order_field1">
             <option value="">None</option>
             {% for stat in stats %}
@@ -352,7 +352,7 @@
             {% endfor %}
           </select>
         </div>
-        <div class="col-2">
+        <div class="col-3">
           <select class="custom-select custom-select-sm select-input" name="order_op">
             <option value="">None</option>
             <option value="*">×</option>
@@ -361,7 +361,7 @@
             <option>-</option>
           </select>
         </div>
-        <div class="col-5">
+        <div class="col-4">
           <select class="custom-select custom-select-sm select-input" id="order_field2" name="order_field2">
             <option value="">None</option>
             {% for stat in stats %}
