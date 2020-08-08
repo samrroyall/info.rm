@@ -127,12 +127,25 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 #card-item { min-width: 325px; }
 
+#dashboard-league-flag {
+  height: 25px;
+}
+
+#dashboard-per90 {
+  margin-left: -15px;
+}
+
 #dashboard-section-title {
   display: none;
   font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 0.9em;
   width: 325px;
   margin-bottom: 5px;
+}
+
+#dashboard-title {
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: .65em;
 }
 
 #dash-card-title {
@@ -144,7 +157,10 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   height: 30px;
   overflow: hidden;
 }
-
+#europa-crop-dashboard {
+  height: 25px;
+  overflow: hidden;
+}
 #europa-crop-player {
   height: 20px;
   width: 25px;

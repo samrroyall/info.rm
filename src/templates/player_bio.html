@@ -69,14 +69,14 @@
       </div>
       <div class="col-7 text-right player-stat-bio">
         {% set birthdate_list = player_data.get("birth_date").split("-") %}
-	{% set year = birthdate_list[0] %}
-	{% set month = birthdate_list[1] %}
-	{% set day = birthdate_list[2] %}
-	        {% if year == "1900" and month == "1" and day == "1" %}
-	          <strong>NULL</strong>
-	        {% else %}
-            <strong>{{month|int}}/{{day|int}}/{{year|int}}</strong>
-          {%endif%}
+	      {% set year = birthdate_list[0] %}
+	      {% set month = birthdate_list[1] %}
+	      {% set day = birthdate_list[2] %}
+	      {% if year == "1900" and month == "1" and day == "1" %}
+	        <strong>NULL</strong>
+	      {% else %}
+          <strong>{{month|int}}/{{day|int}}/{{year|int}}</strong>
+        {%endif%}
         <strong>({{player_data.get("age")}})</strong>
       </div>
     </div>

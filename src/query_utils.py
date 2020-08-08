@@ -32,106 +32,106 @@ TOP_5 = ["78", "61", "39", "140", "135"]
 TOP_5_STR = "(78, 61, 39, 140, 135)"
 
 stats_keys = {
-        0: "id", 
-        1: "player_id",
-        2: "name", 
-        3: "firstname", 
-        4: "lastname", 
-        5: "season", 
-        6: "is_current",
-        7: "league_id", 
-        8: "league_name", 
-        9: "team_id", 
-        10: "team_name", 
-        11: "position", 
-        12: "rating", 
-        13: "shots", 
-        14: "shots_on", 
-        15: "shots_on_pct",
-        16: "goals",
-        17: "goals_conceded",
-        18: "assists",
-        19: "passes",
-        20: "passes_key",
-        21: "passes_accuracy",
-        22: "tackles",
-        23: "blocks",
-        24: "interceptions",
-        25: "duels",
-        26: "duels_won",
-        27: "duels_won_pct",
-        28: "dribbles_past",
-        29: "dribbles_attempted",
-        30: "dribbles_succeeded",
-        31: "dribbles_succeeded_pct",
-        32: "fouls_drawn",
-        33: "fouls_committed",
-        34: "cards_yellow",
-        35: "cards_red",
-        36: "penalties_won",
-        37: "penalties_committed",
-        38: "penalties_scored",
-        39: "penalties_missed",
-        40: "penalties_scored_pct",
-        41: "penalties_saved",
-        42: "games_appearances",
-        43: "minutes_played",
-        44: "games_started",
-        45: "substitutions_in",
-        46: "substitutions_out",
-        47: "games_bench"
-    }
+    0: "id", 
+    1: "player_id",
+    2: "name", 
+    3: "firstname", 
+    4: "lastname", 
+    5: "season", 
+    6: "is_current",
+    7: "league_id", 
+    8: "league_name", 
+    9: "team_id", 
+    10: "team_name", 
+    11: "position", 
+    12: "rating", 
+    13: "shots", 
+    14: "shots_on", 
+    15: "shots_on_pct",
+    16: "goals",
+    17: "goals_conceded",
+    18: "assists",
+    19: "passes",
+    20: "passes_key",
+    21: "passes_accuracy",
+    22: "tackles",
+    23: "blocks",
+    24: "interceptions",
+    25: "duels",
+    26: "duels_won",
+    27: "duels_won_pct",
+    28: "dribbles_past",
+    29: "dribbles_attempted",
+    30: "dribbles_succeeded",
+    31: "dribbles_succeeded_pct",
+    32: "fouls_drawn",
+    33: "fouls_committed",
+    34: "cards_yellow",
+    35: "cards_red",
+    36: "penalties_won",
+    37: "penalties_committed",
+    38: "penalties_scored",
+    39: "penalties_missed",
+    40: "penalties_scored_pct",
+    41: "penalties_saved",
+    42: "games_appearances",
+    43: "minutes_played",
+    44: "games_started",
+    45: "substitutions_in",
+    46: "substitutions_out",
+    47: "games_bench"
+}
 
 players_keys = {
-        0: "id",
-        1: "name",
-        2: "firstname",
-        3: "lastname",
-        4: "age",
-        5: "birth_date",
-        6: "nationality",
-        7: "flag",
-        8: "height",
-        9: "weight"
-    }
+    0: "id",
+    1: "name",
+    2: "firstname",
+    3: "lastname",
+    4: "age",
+    5: "birth_date",
+    6: "nationality",
+    7: "flag",
+    8: "height",
+    9: "weight"
+}
 
 teams_keys = {
-        0: "id",
-        1: "name",
-        2: "logo"
-    }
+    0: "id",
+    1: "name",
+    2: "logo"
+}
 
 leagues_keys = {
-        0: "id",
-        1: "name",
-        2: "type",
-        3: "country",
-        4: "logo",
-        5: "flag"
-    }
+    0: "id",
+    1: "name",
+    2: "type",
+    3: "country",
+    4: "logo",
+    5: "flag"
+}
 
 static_keys = [
-        "id", 
-        "player_id",
-        "name", 
-        "firstname", 
-        "lastname", 
-        "season", 
-        "league_id", 
-        "league_name", 
-        "team_id", 
-        "team_name", 
-        "position", 
-        "rating"
-    ]
+    "id", 
+    "player_id",
+    "name", 
+    "firstname", 
+    "lastname", 
+    "season", 
+    "league_id", 
+    "league_name", 
+    "team_id", 
+    "team_name", 
+    "position", 
+    "rating"
+]
 
 pct_keys = [
-        "shots_on_pct", 
-        "passes_accuracy", 
-        "duels_won_pct", 
-        "dribbles_succeeded_pct",
-        "penalties_scored_pct"
-    ]
+    "shots_on_pct", 
+    "passes_accuracy", 
+    "duels_won_pct", 
+    "dribbles_succeeded_pct",
+    "penalties_scored_pct"
+]
         
 
 # format query result into a dict
@@ -298,6 +298,21 @@ def get_leagues() -> List[Tuple[str, int]]:
     for tup in leagues_result:
         result[str(tup[1])] = tup[0]
     return result 
+
+def get_flags() -> List[Tuple[str, int]]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get leagues
+    cursor.execute("SELECT flag, id FROM leagues;")
+    leagues_result = cursor.fetchall()
+    connection.commit()
+
+    result = dict()
+    for tup in leagues_result:
+        result[str(tup[1])] = tup[0]
+    return result
 
 def get_world_leagues() -> List[int]:
 # open DB connection

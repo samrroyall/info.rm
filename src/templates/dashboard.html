@@ -6,7 +6,8 @@
 
 <div class="row align-items-center border-bottom" id="per90-season-wrapper">
   <!-- Dashboard Per 90 Toggle -->
-  <div class="col-4 col-3-xs col-md-2 mr-auto custom-control custom-switch">
+  <div class="col-4 col-sm-3 col-md-2 pr-0 custom-control custom-switch"
+    id="dashboard-per90">
       <input type="checkbox" class="custom-control-input"
         id="main_per90_toggle">
       <label class="custom-control-label align-self-center per90-label"
@@ -14,12 +15,23 @@
           <strong class="text-secondary">Per 90</strong>
       </label>
   </div>
-
+  <!-- League Flag -->
+  <div class="col text-secondary text-center">
+    {% if current_league == "Top-5" %}
+      <strong id="dashboard-title">Top 5 Leagues</strong>
+    {% elif current_league == "3" %}
+      <div class="ml-auto mr-auto" id="europa-crop-dashboard">
+        <img src="{{current_league_flag}}" height="50px">
+	    </div>
+    {% else %}
+      <img id="dashboard-league-flag" src="{{current_league_flag}}"/>
+    {% endif %}
+  </div>
   <!-- Dashboard Season Dropdown -->
-  <div class="col-5 col-sm-3 col-md-2 ml-auto">
+  <div class="col-4 col-sm-3 col-md-2">
       <select class="custom-select custom-select-sm season-select"
         id="season-select" value="">
-	  <option value="{{current_season}}">{{current_season}}/{{current_season|int+1}}</option>
+	  <option value="{{current_season}}">{{current_season}}/{{((current_season|int+1)|string)[2:]}}</option>
           {% for season in seasons %}
             {% if season != current_season %}
 	      <option value="{{season}}">{{season}}/{{((season|int+1)|string)[2:]}}</option>
