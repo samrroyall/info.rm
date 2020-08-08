@@ -8,7 +8,7 @@ function changeStat(stat, currPage, numPages, action) {
       $("." + stat + "_card_" + (currPage + 1).toString()).show();
       $("." + stat + "_prev_" + (currPage + 1).toString()).show();
       $("." + stat + "_next_" + (currPage + 1).toString()).show();
-    } else { 
+    } else {
       $("." + stat + "_card_0").show();
       $("." + stat + "_prev_0").show();
       $("." + stat + "_next_0").show();
@@ -42,13 +42,27 @@ function changePage(stat, substat, page) {
   }
 }
 
-// Per 90 Toggler and Season Dropdown JS
+// remove league div borders when navbar collapsed
+function leagueBorders() {
+  if ( $("#league-nav").is(":visible") ){
+    $("#league-nav").addClass("border-left")
+    $("#other-league-nav").addClass("border-left")
+  } else {
+    $("#league-nav").removeClass("border-left")
+    $("#other-league-nav").removeClass("border-left")
+  }
+}
+
 $(document).ready( function() {
-  $(function() {
-    $("#main_per90_toggle").change(function () {
+  // check league div borders
+  leagueBorders();
+  $(window).resize( function() {
+    leagueBorders();
+  });
+  // Per 90 Toggler and Season Dropdown JS
+  $("#main_per90_toggle").change(function () {
       $(".cardList").toggleClass("hidden")
       $(".per90CardList").toggleClass("hidden")
-    });
   });
   $(function () {
     var split_loc = window.location.href.split("/");
@@ -56,23 +70,19 @@ $(document).ready( function() {
       $("#player_per90_toggle").prop("checked", true);
     }
   });
-  $(function() {
-    $("#season-select").change(function () {
+  $("#season-select").change(function () {
       var val = $(this).val();
       var split_loc = window.location.href.split("/");
       if (split_loc[split_loc.length - 1] == "per-90") {
         split_loc[split_loc.length - 2] = val;
-        window.location.href = split_loc.join("/") 
+        window.location.href = split_loc.join("/")
       } else {
         split_loc[split_loc.length - 1] = val;
-        window.location.href = split_loc.join("/") 
+        window.location.href = split_loc.join("/")
       }
-    });
   });
   // Search Bar JS
-  $("#nav-search").bind("keyup", function (evt) { 
-    //if (window.event && event.type == "propertychange" && event.propertyName != "value")
-    //  return;
+  $("#nav-search").bind("keyup", function (evt) {
     var val = $(this).val().toString();
     var preSearch = window.location.href.split("/search/")[0];
     window.clearTimeout($(this).data("timeout"));

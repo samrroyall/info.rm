@@ -32,7 +32,9 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 .hidden { display: none; }
 
-.dropdown-league-logo, .league-logo { height: 35px; }
+.league-logo { height: 35px; }
+
+.dropdown-league-logo { height: 25px}
 
 .footer {
   position: relative;
@@ -116,8 +118,8 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   font-size: calc(120% + .1vw + .1vh);
   padding-top: 2%;
 }
-#builder-link { 
-  margin-right: 15px; 
+#builder-link {
+  margin-right: 15px;
   width: 100px;
 }
 
@@ -139,7 +141,7 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 }
 
 #europa-crop {
-  height: 35px;
+  height: 30px;
   overflow: hidden;
 }
 
@@ -164,17 +166,17 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   left:0;
 }
 
-#nav-search { 
+#nav-search {
   width: 170px !important;
-  margin-right: 15px; 
+  margin-right: 15px;
 }
 
-#other-league-dropdown-button { 
-  margin-top: 10px; 
-  margin-left: -40px;
+#other-league-nav-button {
+  margin-top: 10px;
+  margin-left: -20px;
 }
 
-#other-league-dropdown {
+#other-league-nav {
   height: 50px;
   padding-right: 5px;
 }

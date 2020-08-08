@@ -36,15 +36,15 @@
   </a>
   <!-- Dropdown Button -->
   <a class="nav-link col league-nav-link px-0 text-center" role="button"
-    data-toggle="collapse" href="#other-league-dropdown"
-    aria-expanded="false" aria-controls="#other-league-dropdown"
-    id="other-league-dropdown-button">
+    data-toggle="collapse" href="#other-league-nav"
+    aria-expanded="false" aria-controls="#other-league-nav"
+    id="other-league-nav-button">
     {% include "dropdown_caret.html" %}
   </a>
 </div>
 <!-- Dropdown -->
 <div class="navbar-nav flex-row collapse justify-content-center border-left"
-  id="other-league-dropdown">
+  id="other-league-nav">
   <!-- Champions League -->
   <a class="nav-link col px-0 text-center"
     title="UEFA Champions League"
@@ -59,7 +59,7 @@
       href="{{url_for('dashboard', league='3', season=current_season)}}">
     <div id="europa-crop">
       <img src="https://media.api-sports.io/football/leagues/3.png"
-        height="70px">
+        width="40px">
     </div>
   </a>
   <!-- Portuguese League -->
