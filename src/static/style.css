@@ -125,15 +125,15 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 #builder-wrapper { font-size: x-small; }
 
+@-moz-document url-prefix() {
+  #bundesliga-link, #champions-link { margin-left: -10px; }
+}
+
 #card-item { min-width: 325px; }
 
-#dashboard-league-flag {
-  height: 25px;
-}
+#dashboard-league-flag { height: 25px; }
 
-#dashboard-per90 {
-  margin-left: -15px;
-}
+#dashboard-per90 { margin-left: -15px; }
 
 #dashboard-section-title {
   display: none;

@@ -1,7 +1,7 @@
 <div class="navbar-nav flex-row justify-content-center px-0 border-left" id="league-nav">
   <!-- Bundesliga -->
   <a class="nav-link col league-nav-link px-0 text-center"
-    title="German Bundesliga"
+    title="German Bundesliga" id="bundesliga-link"
     href="{{url_for('dashboard', league='78', season=current_season)}}">
       <img class="league-logo"
         src="https://media.api-sports.io/football/leagues/78.png">
@@ -48,7 +48,8 @@
   <!-- Champions League -->
   <a class="nav-link col px-0 text-center"
     title="UEFA Champions League"
-      href="{{url_for('dashboard', league='2', season=current_season)}}">
+    href="{{url_for('dashboard', league='2', season=current_season)}}"
+    id="champions-link">
     <img class="dropdown-league-logo"
       src="https://media.api-sports.io/football/leagues/2.png">
 
@@ -56,7 +57,7 @@
   <!-- Europa League -->
   <a class="nav-link col px-0 text-center"
     title="UEFA Europa League"
-      href="{{url_for('dashboard', league='3', season=current_season)}}">
+    href="{{url_for('dashboard', league='3', season=current_season)}}">
     <div id="europa-crop">
       <img src="https://media.api-sports.io/football/leagues/3.png"
         width="40px">

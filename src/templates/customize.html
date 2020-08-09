@@ -1,7 +1,11 @@
 {% set stats = ["Minutes Played","Assists","Successful Dribbles","Successful Dribbles Percentage","Attempted Dribbles","Goals","Shots","Shots on Target","Shots on Target Percentage","Penalties Won","Penalties Scored","Penalties Scored Percentage","Penalties Missed","Passes","Pass Accuracy","Key Passes","Blocks","Interceptions","Tackles","Fouls Drawn", "Fouls Committed", "Penalties Committed","Goals Conceded","Player Rating","Penalties Saved","Red Cards","Yellow Cards"] %}
 
 <!-- Customization Dropdown -->
-<div class="alert alert-light border" id="custom-stat" role="alert">
+{% if custom_season is defined %}
+  <div class="alert alert-light border hidden" id="custom-stat" role="alert">
+{% else %}
+  <div class="alert alert-light border" id="custom-stat" role="alert">
+{% endif %}
   <h6 class="alert-heading">Customize Your Query</h6>
   <strong>Use the options below to generate your own custom statistic.</strong>
   <hr>
