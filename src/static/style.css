@@ -133,8 +133,6 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 #dashboard-league-flag { height: 25px; }
 
-/*#dashboard-per90 { margin-left: -15px; }*/
-
 #dashboard-section-title {
   display: none;
   font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
