@@ -133,7 +133,7 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 #dashboard-league-flag { height: 25px; }
 
-#dashboard-per90 { margin-left: -15px; }
+/*#dashboard-per90 { margin-left: -15px; }*/
 
 #dashboard-section-title {
   display: none;
@@ -206,13 +206,7 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 #pagination-div { background: #FAFAFA; }
 
-#per90-season-wrapper {
-  background: #F5F5F5;
-  padding-left: 45px;
-  padding-right: 30px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
+#per90-season-wrapper { background: #F5F5F5; }
 
 #player-card-header {
   margin-bottom: 5px;
