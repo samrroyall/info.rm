@@ -2,7 +2,7 @@
 src/__pycache__/
 venv/
 log/
-src/info.rm.db
-src/MANIFEST
-src/config.ini
+info.rm.db
+MANIFEST
+config.ini
 info-rm.wsgi
