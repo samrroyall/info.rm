@@ -2,8 +2,8 @@
 /******************** TAGS *********************/
 /***********************************************/
 
-body, html {
-  /*height: 100%;*/
+body {
+  height: 100vh;
 }
 
 select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus {
