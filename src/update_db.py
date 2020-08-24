@@ -97,7 +97,6 @@ def setup(args):
     """ Function for writing arguments to config file."""
     config_args = {
         "token": args.get("token"),
-        "subscription_time": args.get("subscription_time")
     }
     write_config(config_args)
     set_manifest_arg("leagues", args.get("leagues"))
@@ -137,7 +136,7 @@ def main(**kwargs):
             update_db(engine, action, processed_data.get("players"))
             update_db(engine, "stats", processed_data.get("stats"))
         else:
-            update_db(engine, action, action_type, processed_data)
+            update_db(engine, action, processed_data)
 
 if __name__ == "__main__":
     args = vars(initialize_parser())

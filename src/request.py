@@ -42,12 +42,9 @@ class Request(metaclass=Registry):
     _REGISTER: bool = False
     _API_URL: str = "https://api-football-beta.p.rapidapi.com/"
     _API_HOST: str = "api-football-beta.p.rapidapi.com"
-    #_API_RATELIMIT_HEADER: str = "x-ratelimit-requests-limit"
-    #_API_RATELIMIT_REMAINING_HEADER: str = "x-ratelimit-requests-remaining"
     
     def __init__(self, season: str) -> None:
         cls = self.__class__
-        subscription_time = get_config_arg("subscription_time")
         token = get_config_arg("token")
         self.season: str = season
         self.headers: Dict[str,str] = {
