@@ -41,24 +41,23 @@ def get_manifest_arg(arg, season=None):
         return None
 
 def set_manifest_arg(arg, value, season=None):
-    """ Function for writing IDs to  manifest """
+    """ Function for writing IDs to manifest """
     if manifest_exists():
         manifest_args = read_manifest()
     else:
         manifest_args = dict()
-    if arg in manifest_args:
-        result = manifest_args.get(arg) 
-        if season is None:
-            manifest_args[arg] = value
-        else:
-            assert isinstance(result, dict)
-            manifest_args[arg][season] = value
+    if season is None:
+        manifest_args[arg] = value
     else:
-        if season is None:
-            manifest_args[arg] = value
+        if arg in manifest_args:
+            current_arg = eval(manifest_args.get(arg))
         else:
-            manifest_args[arg] = dict()
-            manifest_args[arg][season] = value
+            current_arg = dict()
+        if season in current_arg and isinstance(value, dict):
+            current_arg[season].update(value)
+        else:
+            current_arg[season] = value
+        manifest_args[arg] = current_arg
 
     write_manifest(manifest_args)
 

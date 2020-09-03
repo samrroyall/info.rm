@@ -61,7 +61,8 @@ def get_data(action, engine, season):
     # player and team requests do require ids from prior calls
     else:
         # get ids
-        ids = get_manifest_arg("league_ids") if action == "teams" else get_manifest_arg("team_ids", season)
+        id_key = "league_ids" if action == "teams" else "team_ids"
+        ids = get_manifest_arg(id_key, season)
         assert ids is not None, \
             f"ERROR: Required IDs not present for {action} procedure."
 
@@ -84,11 +85,11 @@ def get_data(action, engine, season):
                
     # update manifest with new IDs
     if action == "players": 
-        set_manifest_arg("player_ids", set(processed_players.keys()))
+        set_manifest_arg("player_ids", set(processed_players.keys()), season)
         return {"players": processed_players.values(), "stats": processed_stats.values()}
     else:
         if action == "leagues":
-            set_manifest_arg("league_ids", response_ids)
+            set_manifest_arg("league_ids", response_ids, season)
         elif action == "teams":
             set_manifest_arg("team_ids", response_ids, season)
         return processed_data

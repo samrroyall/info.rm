@@ -85,9 +85,7 @@ def rank_response(select_fields, filter_fields, order_field):
 
             # values of 0 are only n/a if stats are presented descending
             if stat is None:
-               value = "n/a" 
-            elif float(stat) == 0.0:
-                value = "n/a"
+                value = "n/a" 
             elif field in floats or field_logical(field):
                 value = str(round(float(stat), 2)).ljust(4,"0")
             else:
@@ -107,23 +105,20 @@ def rank_response(select_fields, filter_fields, order_field):
             order_by_stat = "n/a"
         else:
             order_by_stat = float(order_by_value)
-            if order_by_stat == 0.0:
-                order_by_stat = "n/a"
+            #if order_by_stat == 0.0: and order_by_field not in {'stats.goals_conceded', 'stats.penalties_saved'}:
+            #    continue
 
         # rank
-        if order_by_stat != "n/a":
-            count += 1
-            if desc is True and round(order_by_stat, 3) < prev_result:
-                rank = count
-            elif desc is False and round(order_by_stat, 3) > prev_result:
-                rank = count
-            prev_result = round(order_by_stat, 3)
-        else:
-            rank = "N/A."
+        count += 1
+        if desc is True and round(order_by_stat, 3) < prev_result:
+            rank = count
+        elif desc is False and round(order_by_stat, 3) > prev_result:
+            rank = count
+        prev_result = round(order_by_stat, 3)
 
         # return
         ranked_tup = {
-            "rank": (str(rank) + ".").ljust(3," ") if rank != "N/A." else rank,
+            "rank": (str(rank) + ".").ljust(3," "),
             "name": name,
             "id": player.get("players.id"),
             "league_name": player.get("leagues.name"),

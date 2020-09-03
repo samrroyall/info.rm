@@ -202,17 +202,20 @@ class TeamsRequest(Request):
 
         # get team IDs 
         current_teams = get_manifest_arg("team_ids")
-        if current_teams and self.season in current_teams:
+        if current_teams:
             current_teams = current_teams.get(self.season)
 
         team_ids = dict()
         for idx in range(len(teams)):
+            team = teams[idx]
+            
+            # ensure team data has not already been gathered
             if current_teams is not None and team.get("team").get("id") in current_teams:
                 continue
-            team = teams[idx]
-            temp_team = dict()
+
 
             # team
+            temp_team = dict()
             for key in ["id", "name", "logo"]:
                 temp_team[key] = team.get("team").get(key)
 
@@ -540,15 +543,21 @@ class PlayersRequest(Request):
             self.__class__._WORLD_LEAGUES = get_world_leagues()
 
         players = response_data.get("response") # api response
-        leagues_dict = get_manifest_arg("league_ids") # leagues processed
+        leagues_dict = get_manifest_arg("league_ids").get(self.season) # leagues processed
+
         current_players = get_manifest_arg("player_ids") # players processed
+        if current_players:
+            current_players = current_players.get(self.season)
+
         attributes = getattr(Stats, "_TYPES") # variable types
 
         for idx in range(len(players)):
             player = players[idx]
 
             # grab player stats from response
-            player_stats = player.get("statistics") if isinstance(player.get("statistics"), list) else [player.get("statistics")]
+            player_stats = player.get("statistics")
+            if not isinstance(player.get("statistics"), list):
+                player_stats = [player_stats]
 
             for stats in player_stats:
                 temp_player = dict()
