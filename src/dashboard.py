@@ -1,5 +1,5 @@
 from query import Query
-from query_utils import get_max, get_top_five
+from query_utils import get_max, get_top_five, get_num_stats
 from web_query import rank_response
 
 DEFAULT_FILTER = None
@@ -163,6 +163,9 @@ def other_stats():
 ##########################
 
 def dashboard_stats(league, season, per_90):
+    num_stats = get_num_stats(league, season)
+    if not num_stats:
+        return dict()
 
     global PER_90
     PER_90 = per_90
