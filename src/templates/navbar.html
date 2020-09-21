@@ -41,6 +41,7 @@
 	              <div class="dropdown-menu show" id="searchDropdown">
  	                {% for item in search_result %}
                           <a class="dropdown-item text-dark search-name"
+			    title="{{ item[1] }}"
 	                    href="{{ url_for('player', id=item[0]) }}">
 		              {% set name = item[1] %}
 		              {% if (name|length) > 20 %}
