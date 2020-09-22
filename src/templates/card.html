@@ -178,7 +178,9 @@
               <!-- Player Team Row -->
               <div class="team-name">
                 {% if "header" in query_result.keys() %}
-                  <fine>{{row.get("team_name")}}, {{row.get("league_name")}}</fine>
+	 	  <fine>{{row.get("team_name")}}</fine>
+		  <br>
+		  <fine class="text-secondary">{{row.get("league_name")}}</fine>
                 {% else %}
                   <fine>{{row.get("team_name")}}</fine>
                 {% endif %}
