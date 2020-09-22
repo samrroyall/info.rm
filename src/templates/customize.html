@@ -20,8 +20,11 @@
       <div class="form-row">
         <div class="col-4">
           <select class="custom-select custom-select-sm select-input" id="season_select" name="season_select" value="{{current_season}}">
+	    <option value="{{current_season}}">{{current_season}}/{{((current_season|int+1)|string)[2:]}}</option>
             {% for season in seasons %}
-	      <option value="{{season}}">{{season}}/{{((season|int+1)|string)[2:]}}</option>
+	      {% if season != current_season %}
+	      	<option value="{{season}}">{{season}}/{{((season|int+1)|string)[2:]}}</option>
+	      {% endif %}
             {% endfor %}
           </select>
         </div>
