@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-from src.orm import Leagues, Teams, Players, Stats, Base
-
 import pathlib
 from sqlalchemy import and_, create_engine
 from sqlalchemy.orm import sessionmaker, session, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy_utils import create_database, database_exists
 import sys
+
+from orm import Leagues, Teams, Players, Stats, Base
 
 def initialize_engine():
     db_path = pathlib.Path(__file__).parent.absolute()

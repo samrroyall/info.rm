@@ -1,12 +1,14 @@
-from src.query_utils import get_max, get_select_data, get_current_season, get_positions
-from src.web_query import rank_response
+#!/usr/bin/env python3
+
+from query_utils import get_max, get_positions, get_seasons, get_select_data
+from web_query import rank_response
 
 ########################
 ##### FORM INPUTS ######
 ########################
 
 positions = get_positions()
-CURRENT_SEASON = get_current_season()
+CURRENT_SEASON = str(max(get_seasons()))
 lops = ["+","-","*","/"]
 cops = ["<",">","=","><"]
 stats = {

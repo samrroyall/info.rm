@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 
-  {% set player_data = data.get("player") %}
-  {% set player_stats = data.get("stats") %}
-  {% set player_stats_per90 = per90_data.get("stats") %}
-  {% set seasons = player_stats.keys() %}
+{% set player_data = data.get("player") %}
+{% set player_stats = data.get("stats") %}
+{% set player_stats_per90 = per90_data.get("stats") %}
+{% set seasons = player_stats.keys() %}
+{% set current_season = max([(season|int) for season in seasons]) %}
 
 <script>
   $(document).ready( function() {

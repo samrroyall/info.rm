@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import pathlib
 import sqlite3
@@ -346,11 +348,6 @@ def get_seasons() -> List[str]:
     season_result = [str(tup[0]) for tup in cursor.fetchall()]
     connection.commit()
     return season_result 
-
-def get_current_season() -> str:
-    seasons = get_seasons()
-    int_seasons = [int(season) for season in seasons]
-    return str(max(int_seasons))
 
 def get_players() -> Dict[str, int]:
     # open DB connection

@@ -1,5 +1,7 @@
-from src.search import insert, search
-from src.query_utils import get_players
+#!/usr/bin/env python3
+
+from search import insert, search
+from query_utils import get_players
 
 PLAYER_DICT = None
 

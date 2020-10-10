@@ -1,10 +1,11 @@
-from src.query import Query, Statement, grab_columns
-from src.query_utils import get_pct_stats, get_float_stats
+#!/usr/bin/env python3
+
+from query import Query, Statement, grab_columns
+from query_utils import get_pct_stats, get_float_stats
 
 default_select_fields = ["teams.logo", "players.name", "players.lastname", "players.id", "teams.name", "leagues.name"]
 floats = get_float_stats()
 pcts = get_pct_stats()
-
 
 def stmt(select_fields, filter_fields, order_field):
     select_fields = default_select_fields + select_fields

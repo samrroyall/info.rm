@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import pathlib
 
 current_path = pathlib.Path(__file__).parent.absolute()

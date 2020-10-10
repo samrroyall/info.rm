@@ -1,6 +1,4 @@
-##############
-#### TREE ####
-#############
+#!/usr/bin/env python3
 
 class Tree:
     """ String search Tree implementation
@@ -19,10 +17,6 @@ class Tree:
     def has_data(self):
         return self.data is not None
 
-###############
-#### STACK ####
-###############
-
 class Stack:
     def __init__(self):
         self.data = []
@@ -38,16 +32,8 @@ class Stack:
     def clear(self):
         self.data = []
 
-#################
-#### GLOBALS ####
-#################
-
 TREE = Tree("", None)
 PLAYER_DICT = None
-
-###############
-### INSERT  ###
-###############
 
 def create_child(label, prefix, name):
     tree = Tree(

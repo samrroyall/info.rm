@@ -1,6 +1,6 @@
 interface playerNode {
 	name: string,
-	id: number
+	id: Array<number>
 }
 
 interface trieNode {
@@ -13,7 +13,11 @@ class playerTrie {
 	_head: trieNode;
 
 	searchTrie(s: string): playerNode {
-		return { name: "none", id: 0 };
+		return { name: "none", id: [0] };
+	}
+
+	generateTrie(): void {
+
 	}
 
 	constructor() {
@@ -22,11 +26,5 @@ class playerTrie {
 			data: [],
 			children: []
 		});
-		// query DB for player name and ID information
-		let players: string = "SELECT players.firstname, players.lastname, players.id FROM players ORDER BY players.firstname;";
-		// convert players to playerNodes
-		// ...
-		// insert playerNodes into trie
-		// ...
 	}
 }
