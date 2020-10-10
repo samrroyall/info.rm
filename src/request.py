@@ -6,10 +6,10 @@ from requests import get
 from time import sleep
 from typing import Type, Dict, Set, Any, Optional, List, Tuple
 
-from config import get_config_arg
-from manifest import get_manifest_arg
-from orm import Leagues, Teams, Players, Stats
-from query_utils import get_world_leagues
+from src.config import get_config_arg
+from src.manifest import get_manifest_arg
+from src.orm import Leagues, Teams, Players, Stats
+from src.query_utils import get_world_leagues
 
 ####################################
 ########## CLASS REGISTRY ##########

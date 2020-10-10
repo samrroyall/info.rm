@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-from config import write_config
-from db import initialize_engine, modify_db_row 
-from manifest import set_manifest_arg, get_manifest_arg
-from orm import Leagues, Teams, Players, Stats
-from cli_parser import initialize_parser
-from request import Request
+from src.config import write_config
+from src.db import initialize_engine, modify_db_row 
+from src.manifest import set_manifest_arg, get_manifest_arg
+from src.orm import Leagues, Teams, Players, Stats
+from src.cli_parser import initialize_parser
+from src.request import Request
 
 ########################
 ### GLOBAL VARIABLES ###

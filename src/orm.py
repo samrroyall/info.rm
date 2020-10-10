@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from datetime import datetime,date
-
 from sqlalchemy import Column, Integer, String, Date, Boolean, Float, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 

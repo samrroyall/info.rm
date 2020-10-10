@@ -2,10 +2,10 @@
 
 from flask import Flask, render_template, request, redirect, url_for
 
-from builder import default_stats, custom_stats
-from dashboard import dashboard_stats
-from query_utils import get_player_data, get_current_season, get_seasons, get_leagues, get_top_five, get_flags
-from search_players import generate_tree, search_tree
+from src.builder import default_stats, custom_stats
+from src.dashboard import dashboard_stats
+from src.query_utils import get_player_data, get_current_season, get_seasons, get_leagues, get_top_five, get_flags
+from src.search_players import generate_tree, search_tree
 
 info_rm = Flask(__name__)
 

@@ -1,5 +1,5 @@
-from query_utils import get_max, get_select_data, get_current_season, get_positions
-from web_query import rank_response
+from src.query_utils import get_max, get_select_data, get_current_season, get_positions
+from src.web_query import rank_response
 
 ########################
 ##### FORM INPUTS ######
@@ -128,11 +128,6 @@ def get_stat_values(form_data_dict, type = "select"):
 #############################
 
 def default_stats():
-    season_data = get_select_data()
-    clubs_dict = season_data.get("clubs")
-    leagues = season_data.get("leagues")
-    nations = season_data.get("nations")
-
     select_fields = [
         "stats.rating",
         "stats.goals",
@@ -145,10 +140,9 @@ def default_stats():
         ("leagues.country", "!=", "World")
     ],"AND")]
     order_field = (["stats.rating"], True)
-
-    # ******include season in filter*****
-
     query_result = rank_response(select_fields, filter_fields, order_field)
+
+    season_data = get_select_data()
     return query_result, season_data
 
 def custom_stats(form_data):

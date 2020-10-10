@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from orm import Leagues, Teams, Players, Stats, Base
+from src.orm import Leagues, Teams, Players, Stats, Base
 
 import pathlib
 from sqlalchemy import and_, create_engine

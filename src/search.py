@@ -129,49 +129,6 @@ def insert(prefix, name):
             return
 
 ###############
-### DISPLAY ###
-###############
-
-#def print_tree(tree, level):
-#    padding = ".."*level
-#    print(f"{padding}label: {tree.label}")
-#    print(f"{padding}data: {tree.data}")
-#    if tree.has_children():
-#        print(f"{padding}children:")
-#    else:
-#        print(f"{padding}children: NULL")
-#        print(f"{padding}..............")
-#
-#def print_children(tree):
-#    level = 0
-#    print_tree(tree, level)
-#    if tree.has_children():
-#        STACK = Stack()
-#        level = 1
-#        for child in tree.children.values():
-#            STACK.push( (child, level) )
-#    else:
-#        return
-#    while len(STACK.data) > 0:
-#        current_tree, level = STACK.pop()
-#        print_tree(current_tree, level)
-#        if current_tree.has_children():
-#            for child in current_tree.children.values():
-#                STACK.push( (child, level + 1) )
-#
-#def display(search_key):
-#    next_label = search_key[0]
-#    current_tree = TREE
-#    while True:
-#        current_tree = current_tree.children.get(next_label)
-#        if current_tree.has_children():
-#            for child in current_tree.children.values():
-#                if child.label == search_key:
-#                    return print_children(child)
-#                elif search_key.startswith(child.label):
-#                    next_label = child.label
-
-###############
 ### SEARCH  ###
 ###############
 

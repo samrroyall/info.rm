@@ -1,5 +1,5 @@
-from query import Query, Statement, grab_columns
-from query_utils import get_pct_stats, get_float_stats
+from src.query import Query, Statement, grab_columns
+from src.query_utils import get_pct_stats, get_float_stats
 
 default_select_fields = ["teams.logo", "players.name", "players.lastname", "players.id", "teams.name", "leagues.name"]
 floats = get_float_stats()

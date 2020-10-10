@@ -1,6 +1,6 @@
-from query import Query
-from query_utils import get_max, get_top_five, get_num_stats
-from web_query import rank_response
+from src.query import Query
+from src.query_utils import get_max, get_top_five, get_num_stats
+from src.web_query import rank_response
 
 DEFAULT_FILTER = None
 MP_FILTER = None
