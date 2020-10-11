@@ -38,9 +38,7 @@
                 {% set column = header[i] %}
                 <script>
                   $(document).ready( function() {
-                    $(function() {
-                      getColumnName("{{column}}", "custom_stat_heading_{{i}}")();
-                    });
+                    getColumnName("{{column}}", "custom_stat_heading_{{i}}");
                   });
                 </script>
                 <div class="col-2 px-0 text-center text-secondary">

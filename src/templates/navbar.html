@@ -1,15 +1,34 @@
-{% if search_query %}
-  <script>
-    $(document).ready( function() {
-      $("#nav-search").focus();
-      $("#nav-search").val("{{search_query}}");
-      var val_len = $("#nav-search").val().length;
-      $("#nav-search").get(0).setSelectionRange(val_len, val_len);
-    });
-  </script>
-{% endif %}
+<script>
+  $(document).ready( function () {
+    generateTrie('{{players|tojson|safe}}');
+    $("#nav-search").keyup( function () {
+      let dropdown = document.getElementById("search-dropdown");
+      while (dropdown.firstChild) {
+        dropdown.removeChild(dropdown.firstChild);
+      }
+      let searchResults = searchTrie($(this).val());
+      for (let result of searchResults) {
+        let parent = document.getElementById("nav-search");
+        let parentPos = parent.getBoundingClientRect();
+        dropdown.setAttribute("style", "position: fixed; top: " + (parentPos.top + 30).toString() + "px; left: " + parentPos.left.toString() + "px;");
 
-<nav class="navbar navbar-light navbar-fixed-top bg-light border-bottom navbar-expand-lg align-items-center p-0">
+        let playerLink = document.createElement("a");
+        playerLink.setAttribute("class", "list-group-item list-group-item-action p-2 search-name");
+        let newUrl = window.location.href.split("/")[0] + "/player/" + result.id.toString();
+        playerLink.setAttribute("onClick", "window.location.href = '" + newUrl + "'");
+
+        let playerName = document.createElement("strong");
+        playerName.appendChild(document.createTextNode(result.name))
+
+        playerLink.appendChild(playerName);
+
+        dropdown.appendChild(playerLink);
+      }
+    });
+  });
+</script>
+<nav class="navbar navbar-light navbar-fixed-top bg-light border-bottom navbar-expand-lg align-items-center p-0"
+  id="main-nav">
     <!-- Logo -->
     <a class="navbar-brand text-secondary pr-0" id="brand"
       href="{{ url_for('home') }}">
@@ -34,30 +53,11 @@
         </a>
         <!-- Player Search -->
 	      <div id="search-wrapper">
-	        <form class="form-inline dropdown show" autocomplete="off">
-  	        {% if search_query %}
+	        <form class="form-inline" autocomplete="off">
 	          <input class="form-control form-control-sm" type="search"
 	            placeholder="Player Search" aria-label="Search" id="nav-search">
-	              <div class="dropdown-menu show" id="searchDropdown">
- 	                {% for item in search_result %}
-                          <a class="dropdown-item text-dark search-name"
-			    title="{{ item[1] }}"
-	                    href="{{ url_for('player', id=item[0]) }}">
-		              {% set name = item[1] %}
-		              {% if (name|length) > 20 %}
-	                        <strong>{{ name[:20] }}...</strong>
-		              {% else %}
-	                        <strong>{{ name }}</strong>
-		              {% endif %}
-	                  </a>
-	                {% endfor %}
-		      </div>
-		  </input>
-	        {% elif search %}
-	          <input class="form-control form-control-sm" type="search"
-	            placeholder="Player Search" aria-label="Search" id="nav-search">
-		  </input>
-	        {% endif %}
+	              <ul class="list-group" id="search-dropdown"></ul>
+		        </input>
 	        </form>
 	      </div>
         <!-- Leagues -->

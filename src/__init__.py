@@ -9,7 +9,7 @@ from query_utils import get_leagues, get_flags, get_players, get_player_data, ge
 info_rm = Flask(__name__)
 
 SEASONS = get_seasons()
-CURRENT_SEASON = str(max(SEASONS))
+CURRENT_SEASON = max(SEASONS)
 LEAGUES_DICT = get_leagues()
 FLAGS_DICT = get_flags()
 PLAYERS = get_players()
@@ -29,6 +29,7 @@ def dashboard(league="Top-5", season=CURRENT_SEASON):
             "query_result_per90": dashboard_stats(league, season, True),
             "current_league": league,
             "current_league_flag": FLAGS_DICT.get(league),
+            "current_season": season,
             "players": PLAYERS,
             "seasons": SEASONS
         }
@@ -44,13 +45,12 @@ def player(id):
     data = get_player_data(id, False)
     per90_data = get_player_data(id, True)
     if data and per90_data:
-        temp_season = str(max([int(season) for season in data.get("stats").keys()]))
-
+        curr_seasons = [int(s) for s in list(data.get("stats").keys())]
         params = {
             "data": data,
             "per90_data": per90_data,
             "players": PLAYERS,
-            "current_season": temp_season
+            "current_season": str(max(curr_seasons))
         }
 
         return render_template("player.html", **params)
@@ -62,6 +62,7 @@ def builder():
     default_query_result, season_data = default_stats()
 
     params = {
+        "current_season": CURRENT_SEASON,
         "query_result": default_query_result,
         "players": PLAYERS,
         "season_data": season_data,
@@ -76,6 +77,7 @@ def custom_stat():
     query_result, season_data, season = custom_stats(form_data)
 
     params = {
+        "current_season": CURRENT_SEASON,
         "query_result": query_result,
         "players": PLAYERS,
         "season_data": season_data,

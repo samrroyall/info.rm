@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 import os
 import pathlib
 import sqlite3
@@ -359,18 +360,18 @@ def get_players() -> Dict[str, int]:
     player_result = cursor.fetchall()
     connection.commit()
 
-    player_dict = dict()
+    players = [] 
     for tup in player_result:
         name = f"{tup[0]} {tup[1]}"
         decoded_name = unidecode.unidecode(name.lower())
         id = tup[2]
 
-        if decoded_name in player_dict:
-            player_dict[decoded_name].append( id )
-        else:
-            player_dict[decoded_name] = [ id ]
+        players.append({
+            "name": decoded_name,
+            "id": id
+        })
 
-    return player_dict
+    return players
 
 def get_num_stats(league: str, season: str) -> int:
     connection = sqlite3.connect(db_path)

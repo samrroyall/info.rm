@@ -81,13 +81,4 @@ $(document).ready( function() {
         window.location.href = split_loc.join("/")
       }
   });
-  // Search Bar JS
-  $("#nav-search").bind("keyup", function (evt) {
-    var val = $(this).val().toString();
-    var preSearch = window.location.href.split("/search/")[0];
-    window.clearTimeout($(this).data("timeout"));
-    $(this).data("timeout", setTimeout(function () {
-      window.location.href = preSearch + "/search/" + "'" + val + "'";
-    }, 750));
-  });
 });

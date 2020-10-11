@@ -5,12 +5,10 @@
 {% set player_stats = data.get("stats") %}
 {% set player_stats_per90 = per90_data.get("stats") %}
 {% set seasons = player_stats.keys() %}
-{% set current_season = max([(season|int) for season in seasons]) %}
 
 <script>
   $(document).ready( function() {
     $(function() {
-
       $("#player-season-select").val("{{current_season}}");
       $("#player-" + "{{current_season}}" + "-select").removeClass("hidden");
 
@@ -56,7 +54,7 @@
       id="player-season-select" value="">
         {% for season in seasons %}
           {% if season != current_season %}
-	    <option value="{{season}}">{{season}}/{{((season|int+1)|string)[2:]}}</option>
+	          <option value="{{season}}">{{season}}/{{((season|int+1)|string)[2:]}}</option>
           {% endif %}
         {% endfor %}
     </select>
