@@ -74,6 +74,11 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   font-size: 1.1em;
 }
 
+.search-section {
+  font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 0.7em;
+}
+
 .search-name {
   cursor: pointer;
   font-family: PremierSans-Bold, Arial, Helvetica Neue, Helvetica, sans-serif;
@@ -95,6 +100,8 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 }
 
 .team-name { font-size: 1em; }
+
+.team-player-names { font-size: x-small; }
 
 /***********************************************/
 /******************** IDS **********************/
@@ -226,6 +233,11 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
   margin-bottom: 3%
 }
 
+#team-page-name {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
 #player-page-name {
   margin-top: 10px;
   margin-bottom: 20px;
@@ -237,5 +249,7 @@ select, .order-label, .per90-label, .arrow-link, .page-link, .filter-icon, .plus
 
 #search-dropdown {
   margin-top: 3px;
-  z-index: 2;
+  z-index: 2000;
+  border: none !important;
+  min-width: 300px !important;
 }

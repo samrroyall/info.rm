@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script>
+  $(document).ready( function() {
+    $("#team-season-select").change(function () {
+      let season = $(this).val();            
+      let split_loc = window.location.href.split("/");
+      split_loc[split_loc.length-1] = season;
+      window.location.href = split_loc.join("/");
+    });
+  });
+</script>
+
+<div class="row justify-content-center border-bottom px-2 py-1" id="per90-season-wrapper">
+  <!-- Seasons Dropdown -->
+  <div class="col-7 col-sm-5 col-md-4 col-lg-3 ml-auto">
+    <select class="custom-select custom-select-sm season-select"
+      id="team-season-select" value="{{current_season}}">
+        <option value="{{current_season}}">{{current_season}}/{{((current_season|int+1)|string)[2:]}}</option>
+        {% for season in seasons %}
+          {% if season != current_season %}
+	          <option value="{{season}}">{{season}}/{{((season|int+1)|string)[2:]}}</option>
+          {% endif %}
+        {% endfor %}
+    </select>
+  </div>
+</div>
+
+<div class="row justify-content-center" id="team-page-name">
+    <img class="float-left mr-3" src="{{team_players.get('teams').get('logo')}}" height="40px" width="40px"/>
+    <h4 class="float-right text-left text-secondary" style="margin-top: 5px">
+        {{team_players.get("teams").get("name")}}
+    </h4>
+</div>
+{% set positions = ["attacker", "midfielder", "defender", "goalkeeper"] %}
+
+<div class="row justify-content-center">
+{% for position in positions %}
+    <div class="col-10 col-md-6 col-lg-3 m-0 p-0">
+        <div class="text-center">
+            <strong class="text-secondary player-card-title">{{position.capitalize()}}s</strong>
+        </div>
+        <ul class="list-group p-1 player-name-rank team-player-names">
+            {% for player in team_players.get("players").get(position.capitalize()) %}                
+                <a href="{{url_for('player', id=player.get('id'))}}" class="list-group-item list-group-action">                            
+                    {% include "avatar.html" %}
+                    <strong class="text-dark">{{player.get("name")}}</strong>
+                </a>
+            {% endfor %}
+        </ul>
+    </div>
+{% endfor %}
+</div>
+
+{% endblock %}

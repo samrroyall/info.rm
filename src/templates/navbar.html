@@ -1,28 +1,128 @@
 <script>
   $(document).ready( function () {
-    generateTrie('{{players|tojson|safe}}');
-    $("#nav-search").keyup( function () {
+    let playerRoot = generateTrie('{{players|tojson|safe}}');
+    let teamRoot = generateTrie('{{teams|tojson|safe}}');
+    let leagueRoot = generateTrie('{{leagues|tojson|safe}}');
+    let searchDP = new Map();
+
+    function title(words) {
+      let wordList = words.split(" ");
+      for (let i = 0; i < wordList.length; i++) {
+        wordList[i] = wordList[i].charAt(0).toUpperCase() + wordList[i].slice(1);
+      }
+      return wordList.join(' ');
+    }
+
+    function displayResults(searchResults, section) {
       let dropdown = document.getElementById("search-dropdown");
+      // add section name divider
+      if (searchResults.length > 0) {
+        let sectionNameRow = document.createElement("div");
+        sectionNameRow.setAttribute("class", "list-group-item p-2 search-section");
+        let sectionName = document.createElement("strong");
+        sectionName.setAttribute("class", "text-success");
+        sectionName.appendChild(document.createTextNode(section));
+        sectionNameRow.appendChild(sectionName);
+        dropdown.appendChild(sectionNameRow);
+      }
+      for (let result of searchResults) {
+        // CSS for result row
+        let itemLink = document.createElement("a");
+        itemLink.setAttribute("class", "list-group-item list-group-item-action p-2 search-name");
+        // CSS for result image           
+        let itemLogo;
+        if (result.hasOwnProperty("logo")) {
+          itemLogo = document.createElement("img");
+          itemLogo.setAttribute("class", "float-left");
+          itemLogo.setAttribute("height", "20px");
+          itemLogo.setAttribute("width", "20px");
+          itemLogo.setAttribute("src", result.logo);
+        } else {
+          itemLogo = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          itemLogo.setAttribute("viewBox", "0 0 16 16");
+          itemLogo.setAttribute("height", "1.5em");
+          itemLogo.setAttribute("width", "1.5em");
+          itemLogo.setAttribute("class", "float-left bi bi-person-fill");
+          itemLogo.setAttribute("fill", "currentColor");
+          itemLogo.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+          let itemLogoPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          itemLogoPath.setAttribute("fill-rule", "evenodd");
+          itemLogoPath.setAttribute("d", "M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z");
+          itemLogo.appendChild(itemLogoPath);
+        }
+        // CSS for result row link/text
+        // league and team URL
+        let searchType = section.slice(0, section.length - 1).toLowerCase();
+        let newUrl;
+        if (searchType === "league" || searchType === "team") {
+          newUrl = (
+            window.location.href.split("/")[0] 
+            + "/" 
+            + searchType 
+            + "/"
+            + result.id.toString()
+            + "/season/{{current_season}}" 
+          );
+        // player URLs
+        } else {
+          newUrl = (
+            window.location.href.split("/")[0] 
+            + "/" 
+            + searchType 
+            + "/" 
+            + result.id.toString()
+          );
+        }
+        itemLink.setAttribute("onClick", "window.location.href = '" + newUrl + "'");
+        let itemName = document.createElement("strong");
+        itemName.setAttribute("class", "float-right mx-2");
+        itemName.appendChild(document.createTextNode(title(result.name)));
+        // add item to dropdown
+        itemLink.appendChild(itemName);
+        itemLink.appendChild(itemLogo);
+        dropdown.appendChild(itemLink);
+      }
+    }
+
+    $("#nav-search").keyup( function () {
+      let searchQuery = $(this).val();
+
+      // set CSS for dropdown 
+      let dropdown = document.getElementById("search-dropdown");
+      let parentPos = document.getElementById("nav-search").getBoundingClientRect();
+      // delete previous results in dropdown
       while (dropdown.firstChild) {
         dropdown.removeChild(dropdown.firstChild);
       }
-      let searchResults = searchTrie($(this).val());
-      for (let result of searchResults) {
-        let parent = document.getElementById("nav-search");
-        let parentPos = parent.getBoundingClientRect();
-        dropdown.setAttribute("style", "position: fixed; top: " + (parentPos.top + 30).toString() + "px; left: " + parentPos.left.toString() + "px;");
 
-        let playerLink = document.createElement("a");
-        playerLink.setAttribute("class", "list-group-item list-group-item-action p-2 search-name");
-        let newUrl = window.location.href.split("/")[0] + "/player/" + result.id.toString();
-        playerLink.setAttribute("onClick", "window.location.href = '" + newUrl + "'");
-
-        let playerName = document.createElement("strong");
-        playerName.appendChild(document.createTextNode(result.name))
-
-        playerLink.appendChild(playerName);
-
-        dropdown.appendChild(playerLink);
+      // search trie or return stored result
+      if (searchDP.has(searchQuery)) {
+        let results = searchDP.get(searchQuery);
+        // get player results
+        displayResults(results.players, "PLAYERS");
+        // get team results
+        displayResults(results.teams, "TEAMS");
+        // get league results
+        displayResults(results.leagues, "LEAGUES");
+      } else {
+        // get player results
+        let playerResults = searchTrie(searchQuery, playerRoot);
+        displayResults(playerResults, "PLAYERS");
+        // get team results
+        let teamResults = searchTrie(searchQuery, teamRoot);
+        displayResults(teamResults, "TEAMS");
+        // get league results
+        let leagueResults = searchTrie(searchQuery, leagueRoot);
+        displayResults(leagueResults, "LEAGUES");
+        // add results to DP
+        searchDP.set(
+          searchQuery,
+          {
+            "players": playerResults,
+            "teams": teamResults,
+            "leagues": leagueResults
+          }
+        );
       }
     });
   });
@@ -53,11 +153,14 @@
         </a>
         <!-- Player Search -->
 	      <div id="search-wrapper">
-	        <form class="form-inline" autocomplete="off">
-	          <input class="form-control form-control-sm" type="search"
-	            placeholder="Player Search" aria-label="Search" id="nav-search">
-	              <ul class="list-group" id="search-dropdown"></ul>
+	        <form class="form-inline dropdown" autocomplete="off">
+            <input class="form-control form-control-sm" 
+              type="search"
+              placeholder="Search" 
+              aria-label="Search" 
+              id="nav-search">
 		        </input>
+	          <ul class="list-group dropdown-menu p-0" id="search-dropdown"></ul>
 	        </form>
 	      </div>
         <!-- Leagues -->

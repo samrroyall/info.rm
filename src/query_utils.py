@@ -287,7 +287,7 @@ def get_select_data() -> Dict[str, Any]:
 
     return result
 
-def get_leagues() -> List[Tuple[str, int]]:
+def get_leagues_dict() -> List[Tuple[str, int]]:
     # open DB connection
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -350,13 +350,13 @@ def get_seasons() -> List[str]:
     connection.commit()
     return season_result 
 
-def get_players() -> Dict[str, int]:
+def get_players() -> Dict[str, Any]:
     # open DB connection
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
 
     # get players names and IDs
-    cursor.execute("SELECT players.firstname, players.lastname, players.id FROM players ORDER BY players.firstname;")
+    cursor.execute("SELECT players.firstname, players.lastname, players.id FROM players;")
     player_result = cursor.fetchall()
     connection.commit()
 
@@ -372,6 +372,132 @@ def get_players() -> Dict[str, int]:
         })
 
     return players
+
+def get_team_seasons(team_id: int) -> List[int]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get team data 
+    cursor.execute(f"SELECT DISTINCT(stats.season) FROM stats JOIN teams ON stats.team_id=teams.id WHERE teams.id = {team_id};")
+    season_data = cursor.fetchall()
+    connection.commit()
+
+    team_seasons = []
+    for season in season_data:
+        team_seasons.append(season[0])
+
+    team_seasons.sort()
+    return team_seasons
+
+def get_team_players(team_id: int, season: int) -> Dict[str, Any]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get team data 
+    cursor.execute(f"SELECT teams.name, teams.logo FROM teams WHERE teams.id = {team_id};")
+    team_data = cursor.fetchall()
+    connection.commit()
+    team_name = team_data[0][0]
+    team_logo = team_data[0][1]
+
+    # get player data 
+    cursor.execute(f"""
+        SELECT players.firstname, players.lastname, players.id, stats.position 
+        FROM stats 
+        JOIN players ON stats.player_id=players.id
+        WHERE stats.team_id={team_id} AND stats.season={season};
+    """)
+    team_player_result = cursor.fetchall()
+    connection.commit()
+
+    team_players = {}
+    team_players["teams"] = {
+        "name": team_name,
+        "logo": team_logo
+    }
+    team_players["players"] = {}
+    player_ids = set()
+    for tup in team_player_result:
+        if tup[1] not in player_ids:
+            player_ids.add(tup[1])
+        else:
+            continue
+        player_data = {
+            "name": tup[0] + " " + tup[1],
+            "id": tup[2]
+        }
+        position = tup[3]
+        if position in team_players.get("players").keys():
+            team_players["players"][position].append(player_data)
+        else:
+            team_players["players"][position] = [player_data]
+
+    for position in team_players.get("players").keys():
+        players = sorted(
+            team_players.get("players").get(position),
+            key=lambda p: p["name"]
+        )
+        team_players["players"][position] = players
+
+    return team_players
+
+def get_teams() -> Dict[str, Any]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get team names and IDs
+    cursor.execute("SELECT teams.name, teams.logo, teams.id FROM teams;")
+    team_result = cursor.fetchall()
+    connection.commit()
+
+    teams = [] 
+    for tup in team_result:
+        if (tup[0] is None or tup[1] is None or tup[2] is None):
+            continue
+
+        name = tup[0]
+        decoded_name = unidecode.unidecode(name.lower())
+        logo = tup[1] 
+        id = tup[2]
+
+        teams.append({
+            "name": decoded_name,
+            "logo": logo,
+            "id": id
+        })
+
+    return teams
+
+def get_leagues() -> Dict[str, Any]:
+    # open DB connection
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # get league names and IDs
+    cursor.execute("SELECT leagues.name, leagues.logo, leagues.id FROM leagues;")
+    team_result = cursor.fetchall()
+    connection.commit()
+
+    leagues = [] 
+    for tup in team_result:
+        if (tup[0] is None or tup[1] is None or tup[2] is None):
+            continue
+
+        name = tup[0]
+        decoded_name = unidecode.unidecode(name.lower())
+        logo = tup[1] 
+        id = tup[2]
+
+        leagues.append({
+            "name": decoded_name,
+            "logo": logo,
+            "id": id
+        })
+
+    return leagues
 
 def get_num_stats(league: str, season: str) -> int:
     connection = sqlite3.connect(db_path)

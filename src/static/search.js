@@ -1,9 +1,4 @@
-let root = ({
-    "value": null,
-    "children": new Map()
-});
-
-function addPlayer(name, player) {
+function addWord(name, data, root) {
     let currNode = root;
     // traverse trie and set new children when needed
     for (let i = 0; i < name.length; i++) {
@@ -18,14 +13,14 @@ function addPlayer(name, player) {
     }
     // set value of last node 
     if (currNode.value !== null) {
-        currNode.value.push(player);
+        currNode.value.push(data);
     } else {
         currNode.value = new Array();
-        currNode.value.push(player);
+        currNode.value.push(data);
     }
 }
 
-function searchTrie(queryString) {
+function searchTrie(queryString, root) {
     let queryResult = new Set();
 
     let query = queryString.trim().toLocaleLowerCase();
@@ -89,11 +84,16 @@ function searchTrie(queryString) {
     );
 }
 
-function generateTrie(playerDict) {
-    let data = $.parseJSON(playerDict);
-    for (let player of data) {
-        for (let word of player.name.split(" ")) {                
-            addPlayer(word, player);
+function generateTrie(dict) {
+    let data = $.parseJSON(dict);
+    let root = ({
+        "value": null,
+        "children": new Map()
+    });
+    for (let item of data) {
+        for (let word of item.name.split(" ")) {                
+            addWord(word, item, root);
         }
     }
+    return root;
 }
