@@ -12,12 +12,10 @@ function addWord(name, data, root) {
         currNode = currNode.children.get(letter);
     }
     // set value of last node 
-    if (currNode.value !== null) {
-        currNode.value.push(data);
-    } else {
+    if (currNode.value === null) {
         currNode.value = new Array();
-        currNode.value.push(data);
     }
+    currNode.value.push(data);
 }
 
 function searchTrie(queryString, root) {
@@ -33,18 +31,16 @@ function searchTrie(queryString, root) {
 
         let word = words[i];
         let strLen = word.length;
-        if (strLen == 0) {
-            continue;
-        }
         let currNode = root;
 
         // traverse trie and print contents of last node
-        for (let j = 0; j < strLen; j++) {
+        for (let j = 0; j < word.length; j++) {
             letter = word.charAt(j);
             if (currNode.children.has(letter)) {
                 currNode = currNode.children.get(letter);
             } else {
                 currNode = null;
+                break;
             }
         }
 

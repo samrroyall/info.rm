@@ -46,14 +46,14 @@ def dashboard(league="Top-5", season=CURRENT_SEASON):
 def team(id, season=CURRENT_SEASON):
     team_seasons = query_utils.get_team_seasons(id)
     data = query_utils.get_team_players(id, season)
-    if season not in team_seasons:
-        season = max(team_seasons)
+    if int(season) not in team_seasons:
+        return redirect(url_for("team", id=id, season=str(max(team_seasons))))
     if data:
         params = {
             "current_season": season,
             "leagues": LEAGUES,
             "players": PLAYERS,
-            "seasons": team_seasons,
+            "seasons": [str(s) for s in team_seasons],
             "teams": TEAMS,
             "team_players": data
         }
