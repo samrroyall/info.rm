@@ -1,0 +1,40 @@
+/* global CSS */
+* {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    vertical-align: middle;
+    font-size: 100%;
+    font-family: 'Arial', sans-serif;
+}
+
+a { 
+    text-decoration: none; 
+    color: grey;
+    cursor: pointer;
+}
+
+ul { list-style-type: none; }
+
+.hide { display: none; }
+
+h1 { font-size: calc(20px + .4vw); }
+
+h5 { 
+    font-weight: lighter;
+    font-size: calc(10px + .4vw);
+}
+
+body { 
+    width: 100%;
+    color: #9a9fa1; 
+}
+
+/* main CSS */
+main {
+    min-height: 75vh;
+    padding: 50px 1%;
+    text-align: center;
+}
+
+

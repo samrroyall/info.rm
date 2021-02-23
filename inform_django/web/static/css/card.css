@@ -1,0 +1,69 @@
+div.cardTitle {
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: calc(10px + 0.4vw);
+    font-weight: bold;
+}
+
+div.card, div.cardBody {
+    margin: 3% 2%;
+    border: 1px solid lightgrey;
+    border-radius: 3px;
+}
+
+div.card { 
+    background-color: whitesmoke;
+    width: 400px; 
+    padding: 5px;
+}
+div.cardBody {
+    background-color: white;
+}
+
+div.cardBody li { 
+    border-bottom: 1px solid lightgrey; 
+    height: 30px;
+    padding: 5px 10px;
+    text-align: left;
+}
+div.cardBody li:last-of-type { border-bottom: 0; }
+
+div.cardPagination ul {
+    display: flex;
+    font-size: 10px;
+    justify-content: center;
+}
+
+div.cardPagination li {
+    height: 25px;
+    width: 30px;
+    background-color: white;
+    color: #007bff;
+    border-top: 0.5px solid lightgrey;
+    border-bottom: 0.5px solid lightgrey;
+    border-right: 0.5px solid lightgrey;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+div.cardPagination li.active {
+    background-color: #007bff;
+    color: white;
+}
+div.cardPagination li.active:hover {
+    background-color: #007bff;
+    color: white;
+}
+div.cardPagination li:hover {
+    background-color: whitesmoke;
+}
+div.cardPagination li:first-of-type {
+    border-left: 0.5px solid lightgrey;
+    border-radius: 3px 0 0 3px;
+}
+div.cardPagination li:last-of-type {
+    border-radius: 0 3px 3px 0;
+}
