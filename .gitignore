@@ -1,8 +1,6 @@
+__pycache__
 *.pyc
-src/__pycache__/
 venv/
-log/
-info.rm.db
-MANIFEST
-config.ini
-info-rm.wsgi
+inform_django/*.sqlite3
+inform_django/web/management/commands/log/*.log
+inform_django/web/migrations/*_initial.py

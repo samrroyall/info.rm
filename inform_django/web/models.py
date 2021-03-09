@@ -1,13 +1,16 @@
 from django.db import models
+from datetime import *
 
 class Season(models.Model):
     start_year = models.IntegerField()
     end_year = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class Country(models.Model):
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=2)
-    flag = models.CharField(max_length=255) # url
+    code = models.CharField(max_length=2, null=True)
+    flag = models.CharField(max_length=255, null=True) # url
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -25,6 +28,7 @@ class Team(models.Model):
     name = models.CharField(max_length=255)
     logo = models.CharField(max_length=255) # url
     league = models.ForeignKey(League, related_name="teams", on_delete=models.CASCADE)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -35,7 +39,7 @@ class Player(models.Model):
     age = models.IntegerField()
     height = models.CharField(max_length=10)
     weight = models.CharField(max_length=10)
-    birth_date = models.DateField()
+    birthdate = models.DateField()
     nationality = models.ForeignKey(Country, related_name="players", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -47,6 +51,8 @@ class PlayerStat(models.Model):
         ("defender", "defender"),
         ("goalkeeper", "goalkeeper"),
     ]
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     player = models.ForeignKey(Player, related_name="stats", on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     league = models.ForeignKey(League, on_delete=models.CASCADE)

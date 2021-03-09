@@ -1,5 +1,6 @@
 import os
 from typing import List
+import logging
 
 # API URL
 # api_url: str = "https://api-football-v1.p.rapidapi.com/v3/" # v3 url
@@ -14,7 +15,7 @@ api_key_header: str = "x-rapidapi-key"
 # CURRENT SEASON
 current_season: int = 2020
 # CURRENT LEAGUES
-current_league_ids: List[int] = [
+initial_league_ids: List[int] = [
     78, # Bundesliga 1, Germany
     61, # Ligue 1, France
     39, # Premier League, England
@@ -29,3 +30,5 @@ current_league_ids: List[int] = [
     218, # Tipp3 Bundesliga, Austria
     119, # Superligaen, Denmark
 ]
+# List of allowable log levels
+LogLevel = [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL]
