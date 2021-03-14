@@ -15,12 +15,14 @@ nav#mainNav li {
 }
 
 nav#mainNav a#brand { 
+    font-family: 'Century Gothic', sans-serif;
     margin: 0 2% 0 0;
     border-right: 1px solid lightgrey;
     padding: 10px 3%;
     color:  #6c757d;
     font-weight: bold; 
 }
+nav#mainNav a#brand:hover { color: black; }
 nav#mainNav li.regularNav {
     width: calc(50% - 1px);
     border-right: 1px solid lightgrey; 
@@ -54,7 +56,11 @@ nav#mainNav li.leagueNav div.firstRow a {
     margin: 0 5%; 
     display: inline-block;
 }
-nav#mainNav li.leagueNav div.firstRow i { color: #007bff; }
+nav#mainNav li.leagueNav div.firstRow i { 
+    color: grey; 
+    cursor: pointer;
+}
+nav#mainNav li.leagueNav div.firstRow i:hover { color: black; }
 nav#mainNav li.leagueNav div.firstRow img { height: calc(20px + 1vw); }
 nav#mainNav li.leagueNav div.firstRow img:hover { height: calc(25px + 1vw); }
 

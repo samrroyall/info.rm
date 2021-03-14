@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>
+        info-rm |
+        {% if current_league %}
+            {{current_league.name|title}}
+        {% else %}
+            Dashboard
+        {% endif %}
+    </title>
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <!-- JQuery Link -->
@@ -13,23 +20,15 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/global.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboards.css' %}">
-    <link rel="stylesheet" href="{% static 'css/nav.css' %}">
-    <link rel="stylesheet" href="{% static 'css/dashNav.css' %}">
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-    <link rel="stylesheet" href="{% static 'css/card.css' %}">
 </head>
 <body>
     {% include 'nav.html' %} 
     {% include 'dashNav.html' %}
     <main>
-        <h1>Dashboards</h1>
         <section id="cards">
-            {% include 'card.html' with title="Card 1" data=data %}
-            {% include 'card.html' with title="Card 2" data=data %}
-            {% include 'card.html' with title="Card 3" data=data %}
-            {% include 'card.html' with title="Card 4" data=data %}
-            {% include 'card.html' with title="Card 5" data=data %}
-            {% include 'card.html' with title="Card 6" data=data %}
+            {% for card_list in card_data %}
+                {% include 'card.html' with type="dashboard" cards=card_list.cards %}
+            {% endfor %}
         </section>
     </main>
     {% include 'footer.html' %}

@@ -1,4 +1,5 @@
 {% load static %}
+<link rel="stylesheet" href="{% static 'css/nav.css' %}">
 <script src="{% static 'js/nav.js' %}"></script>
 <nav id="mainNav">
     <ul>
@@ -16,48 +17,20 @@
         </li>
         <li class="leagueNav">
             <div class="firstRow">
-                <a>
-                    <img src="https://media.api-sports.io/football/leagues/78.png" />
-                </a>
-                <a>
-                    <img src="https://media.api-sports.io/football/leagues/61.png" />
-                </a>
-                <a>
-                    <img src="https://media.api-sports.io/football/leagues/39.png" />
-                </a>
-                <a>
-                    <img src="https://media.api-sports.io/football/leagues/140.png" />
-                </a>
-                <a>
-                    <img src="https://media.api-sports.io/football/leagues/135.png" />
-                </a>
-                <a id="leagueDropdown"><i class="bi bi-caret-down-fill"></i></a>
+                {% for league in first_row_leagues %}
+                    <a href="/league/{{league.league_id}}/{{current_season.start_year}}">
+                        <img src="{{league.logo}}"/>
+                    </a>
+                {% endfor %}
+                <i class="bi bi-caret-down-fill"></i>
+                <i class="bi bi-caret-up-fill hide"></i>
             </div>
             <div class="secondRow">
-                    <a>
-                        <img src="https://media.api-sports.io/football/leagues/2.png" />
+                {% for league in second_row_leagues %}
+                    <a href="/league/{{league.league_id}}/{{current_season.start_year}}">
+                        <img src="{{league.logo}}"/>
                     </a>
-                    <a>
-                        <img src="https://media.api-sports.io/football/leagues/3.png" />
-                    </a>
-                    <a>
-                        <img src="https://media.api-sports.io/football/leagues/94.png" />
-                    </a>
-                    <a>
-                        <img src="https://media.api-sports.io/football/leagues/235.png" />
-                    </a>
-                    <a>
-                        <img src="https://media.api-sports.io/football/leagues/88.png" />
-                    </a>
-                    <a>
-                        <img src="https://media.api-sports.io/football/leagues/203.png" />
-                    </a>
-                    <a>
-                        <img src="https://media.api-sports.io/football/leagues/218.png" />
-                    </a>
-                    <a>
-                        <img src="https://media.api-sports.io/football/leagues/119.png" />
-                    </a>
+                {% endfor %}
             </div>
         </li>
     </ul>

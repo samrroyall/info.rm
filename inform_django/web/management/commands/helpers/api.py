@@ -35,8 +35,7 @@ class Request:
 
     def api_get_request(self, page: int) -> Response:
         current_params: Dict[str, Union[str, int]] = self.params.copy()
-        if page > 1:
-            current_params["page"] = page
+        current_params["page"] = page
         logging.info(f"Request to '{self._url}{self.endpoint}' attempted with the following parameters: {current_params}.")
         response: Response = get(
             url=f"{self._url}{self.endpoint}", 
@@ -53,31 +52,30 @@ class Request:
         try:
             return self.api_get_request(page)
         except:
-            retries = 1
-            while retries <= max_retries:
-                logging.warning(f"Retrying... ({retries}/{max_retries})")
-                try:
-                    return self.api_get_request(page)
-                except:
-                    retries += 1
-            logging.error(f"Request to '{self._url}{self.endpoint}' failed after {max_retries} retries.")
+            logging.error(f"Request to '{self._url}{self.endpoint}' failed.")
+            # retries = 1
+            # while retries <= max_retries:
+            #     logging.warning(f"Retrying... ({retries}/{max_retries})")
+            #     try:
+            #         return self.api_get_request(page)
+            #     except:
+            #         retries += 1
+            # logging.error(f"Request to '{self._url}{self.endpoint}' failed after {max_retries} retries.")
 
     def handle_pagination(self, max_retries: int) -> List[Json]:
         data_dict: Dict[int, Json] = {}
         total_pages: Union[int, None] = None
         page: int = 1
         # for each page, add paginated result to dictionary
-        while (total_pages is None or page < total_pages):
+        while (total_pages is None or page <= total_pages):
             json_response: Json = self.handle_call(max_retries, page).json()
             # handle paging    
             if "paging" not in json_response:
                 logging.critical(f"Response to request to '{self._url}{self.endpoint}' does not contain key `paging`.")
-                exit(1)
-            if "total" not in json_response.get("paging"):
+            if "total" not in json_response["paging"]:
                 logging.critical(f"Response to request to '{self._url}{self.endpoint}' does not contain key `paging['total']`.")
-                exit(1)
             # update total_pages variable
-            total_pages = json_response.get("paging").get("total") if total_pages is None else total_pages
+            total_pages = json_response["paging"]["total"] if total_pages is None else total_pages
             # update data dictionary with response
             data_dict[page] = json_response
             page += 1
@@ -86,9 +84,8 @@ class Request:
         for results in data_dict.values():
             if "response" not in results:
                 logging.critical(f"Response to request to '{self._url}{self.endpoint}' does not contain key `response`.")
-                exit(1)
                 
-            data_list.extend(results.get("response"))
+            data_list.extend(results["response"])
         logging.info(f"Response to request to '{self._url}{self.endpoint}' yielded {len(data_list)} results.")
         return data_list
 

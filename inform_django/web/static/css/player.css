@@ -1,0 +1,40 @@
+div#playerStatCards {
+    display: flex;
+}
+div#playerStatCards div.bioCard {
+    background-color: whitesmoke;
+    width: 400px; 
+    padding: 15px;
+    border: 1px solid lightgrey;
+    border-radius: 3px;
+}
+
+div#playerStatCards div.bioCard div.cardTitle h2 {
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: calc(10px + 0.4vw);
+    font-weight: bold;
+}
+
+div#playerStatCards div.bioCard ul.playerBio {
+    border: 1px solid lightgrey;
+}
+
+div#playerStatCards div.bioCard ul.playerBio li {
+    height: calc(30px + 0.5vw);
+    border-bottom: 1px solid lightgrey; 
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+}
+div#playerStatCards div.bioCard ul.playerBio li span.heading {
+    font-weight: bold;
+}
+div#playerStatCards div.bioCard ul.playerBio li img {
+    height: 40px;
+    width: auto;
+}

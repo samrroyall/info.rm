@@ -12,6 +12,10 @@ nav#dashNav div#placeholder {
     align-items: center;
     font-size: calc(12px + 0.4vw); 
 }
+nav#dashNav div#placeholder img { 
+    height: calc(20px + 0.5vw);
+    width: auto;
+}
 nav#dashNav div#placeholder h4 { display: inline-block; }
 nav#dashNav form { 
     display: flex;
@@ -35,11 +39,11 @@ nav#dashNav select, input[type='checkbox'] {
 }
 
 /* toggle CSS */
-nav#dashNav div#perNinetyLabel { font-weight: bold; }
+nav#dashNav label span { font-weight: bold; }
 nav#dashNav label.switch {
     position: relative;
     display: inline-block;
-    margin-left: 10px; 
+    margin-left: calc(2px + 0.3vw); 
     width: 30px;
     height: 17px;
 }

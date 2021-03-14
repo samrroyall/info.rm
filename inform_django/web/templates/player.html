@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        info.rm |
+        {{current_player.first_name|title}} {{current_player.last_name|title}}
+    </title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <!-- JQuery Link -->
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <!-- Self-defined CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/player.css' %}">
+</head>
+<body>
+    {% include 'nav.html' %} 
+    <main>
+        <h1>{{current_player.first_name|title}} {{current_player.last_name|title}}</h1>
+        <div id="playerStatCards">
+        {% for playerstat in current_playerstats %}
+        <div class="bioCard">
+            <div class="cardTitle">
+                <h2>Bio</h2>
+            </div>
+            <ul class="playerBio">
+                <li>
+                    <span class="heading">Position</span>
+                    <span>{{playerstat.get_position_display|title}}</span>
+                </li>
+                <li>
+                    <span class="heading">Team</span>
+                    <div>
+                        <span>{{playerstat.team.name|title}} {{playerstat.team.season.start_year}}</span>
+                        <img src="{{playerstat.team.logo}}" />
+                    </div>
+                </li>
+                <li>
+                    <span class="heading">League</span>
+                    <div>
+                        <span>{{playerstat.team.league.name|title}}</span>
+                        <img src="{{playerstat.team.league.logo}}" />
+                    </div>
+                </li>
+                <li>
+                    <span class="heading">Nationality</span>
+                    <div>
+                        <span>{{current_player.nationality.name|title}}</span>
+                        <img src="{{current_player.nationality.flag}}" />
+                    </div>
+                </li>
+                <li>
+                    <span class="heading">Date of Birth</span>
+                    <div>
+                        <span>{{current_player.birthdate}} ({{current_player.age}})</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="heading">Height</span>
+                    <div>
+                        <span>{{current_player.height}}</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="heading">Weight</span>
+                    <div>
+                        <span>{{current_player.weight}}</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!-- {% include 'card.html' with type="player" cards=card_list.cards %} -->
+        {% endfor %}
+        </div>
+    </main>
+    {% include 'footer.html' %} 
+</body>
+</html>

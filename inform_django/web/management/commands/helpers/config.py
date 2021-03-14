@@ -12,15 +12,15 @@ api_host_header: str = "x-rapidapi-host"
 assert "API_KEY" in os.environ, "'API_KEY' is not defined as an environment variable"
 api_key: str = os.environ.get("API_KEY")
 api_key_header: str = "x-rapidapi-key"
-# CURRENT SEASON
-current_season: int = 2020
 # CURRENT LEAGUES
-initial_league_ids: List[int] = [
+top_five_league_ids: List[int] = [
     78, # Bundesliga 1, Germany
     61, # Ligue 1, France
     39, # Premier League, England
     140, # Primera Division, Spain
-    135, # Serie A, Italy
+    135 # Serie A, Italy
+]
+other_league_ids: List[int] = [
     2, # UEFA Champions League
     3, # UEFA Europa League
     94, # Primeira Liga, Portugal
@@ -28,7 +28,12 @@ initial_league_ids: List[int] = [
     88, # Eredivisie, Netherlands
     203, # Super Lig, Turkey
     218, # Tipp3 Bundesliga, Austria
-    119, # Superligaen, Denmark
+    119 # Superligaen, Denmark
+]
+initial_league_ids: List[int] = top_five_league_ids + other_league_ids
+international_league_ids: List[int] = [
+    2, # UEFA Champions League
+    3, # UEFA Europa League
 ]
 # List of allowable log levels
 LogLevel = [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL]
