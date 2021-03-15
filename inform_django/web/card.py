@@ -42,6 +42,23 @@ class DashCardEntry(CardEntry):
 
     def get_player_name(self):
         return f"{self.first_name[0].upper()}. {self.last_name.title()}"
+
+class StatCardEntry(CardEntry):
+    def __init__(
+        self, 
+        title: str,
+        value: Union[int, float],
+    ) -> None:
+        super(value, data)
+
+ class BioCardEntry(CardEntry):
+    def __init__(
+        self, 
+        title: str,
+        value: Union[int, float],
+        logo: Union[str, None] = None,
+    ) -> None:
+        super(value, data)
     
 class Card:
     def __init__(
@@ -118,9 +135,7 @@ class StatCard(Card):
         title: str,
         data: List[CardEntry]
     ) -> None:
-        self.title = title
-        self.data = data
-        self.num_pages = math.ceil(len(self.data)/10)
+        super(title, data)
 
     @classmethod
     def from_playerstat(playerstat: PlayerStat):
@@ -131,13 +146,43 @@ class BioCard(Card):
         self, 
         data: List[CardEntry]
     ) -> None:
-        self.title = "Bio"
-        self.data = data
-        self.num_pages = math.ceil(len(self.data)/10)
+        super("Bio", data)
     
     @classmethod
     def from_playerstat(playerstat: PlayerStat):
-        pass
+        data = []
+        data.append(BioCardEntry(
+            title="Position",
+            value=playerstat.position,
+        ))
+        data.append(BioCardEntry(
+            title="Team",
+            value=playerstat.team.name,
+            logo=playerstat.team.logo
+        ))
+        data.append(BioCardEntry(
+            title="League",
+            value=playerstat.team.league.name,
+            logo=playerstat.team.league.logo
+        ))
+        data.append(BioCardEntry(
+            title="Nationality",
+            value=playerstat.player.nationality.name,
+            logo=playerstat.player.nationality.flag
+        ))
+        data.append(BioCardEntry(
+            title="Date of Birth",
+            value=f"{playerstat.player.birthdate} ({playerstat.player.age})",
+        ))
+        data.append(BioCardEntry(
+            title="Height",
+            value=playerstat.player.height
+        ))
+        data.append(BioCardEntry(
+            title="Weight",
+            value=playerstat.player.weight
+        ))
+        return BioCard(data=data)
 
 class CardList:
     def __init__(self, cards: List[Card]) -> None:

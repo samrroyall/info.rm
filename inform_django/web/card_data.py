@@ -1,8 +1,8 @@
 from django.db.models import F, FloatField, QuerySet
 from django.db.models.functions import Cast 
-from typing import List, Union, Tuple
+from typing import Dict, List, Union
 
-from .card import DashCard, StatCard, BioCard, CardList
+from .card import Card, DashCard, StatCard, BioCard, CardList
 from .models import Season, League, Player, PlayerStat
 from .queryset import get_max
 
@@ -148,18 +148,12 @@ def get_dashboard_data(queryset: QuerySet, per_ninety: bool) -> List[CardList]:
         CardList([ rating_card, goals_conceded_card, penalties_saved_card ])
     ]
 
-def get_player_data(
-    player: Player,
-    playerstats: List[PlayerStat],
-) -> Tuple[BioCard, StatCard]:
+def get_player_data(playerstats: List[PlayerStat]) -> Dict[str, Card]:
     # create bio card
     bio_card = BioCard.from_playerstat(playerstats)
-        # Position: playerstat.get_position_display
-        # Team: playerstat.team.name / playerstat.team.logo
-        # League: playerstat.team.league.name / playerstat.team.league.logo
-        # Nationality: current_player.nationality.name / current_player.nationality.flag
-        # Date of Birth: current_player.birthdate / current_player.age
-        # Height: current_player.height
-        # Weight: current_player.weight
     # create player stat card
-    pass
+    stat_card = StatCard.from_playerstat(playerstats)
+    return {
+        "bio": bio_card,
+        "stats": stat_card
+    }
