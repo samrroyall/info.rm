@@ -2,21 +2,26 @@
 <link rel="stylesheet" href="{% static 'css/dashNav.css' %}">
 <script src="{% static 'js/dashNav.js' %}"></script>
 <nav id="dashNav">
-    <!--<form id="perNinetyForm" action="/change_per_ninety" method="POST">-->
-    <form id="perNinetyForm">
-        {% csrf_token %}
-        <label for="per_ninety">
-            <span>Per 90</span>
-            <label class="switch">
-                <input type="checkbox" id="perNinetyInput" name="per_ninety"
-                    {% if per_ninety and per_ninety is True %} checked {% endif %}
-                >
-                <span class="slider round"></span>
+    {% if perNinety and perNinety is True %}
+        <form id="perNinetyForm">
+            {% csrf_token %}
+            <label for="per_ninety">
+                <span>Per 90</span>
+                <label class="switch">
+                    <input type="checkbox" id="perNinetyInput" name="per_ninety"
+                        {% if per_ninety and per_ninety is True %} checked {% endif %}
+                    >
+                    <span class="slider round"></span>
+                </label>
             </label>
-        </label>
-    </form>
+        </form>
+    {% else %}
+        <!-- Blank space -->
+        <div></div>
+    {% endif %}
 
-    <div id="placeholder">
+    {% if navTitle and navTitle is True %}
+    <div id="navTitle">
         {% if current_league and current_league.country.flag %}
             <img src="{{current_league.country.flag}}" />
         {% elif current_league %}
@@ -25,6 +30,11 @@
             <h4>Top 5 Leagues</h4>
         {% endif %}
     </div>
+    {% else %}
+        <!-- Blank space -->
+        <div></div>
+    {% endif %}
+
     <form id="seasonForm">
         {% csrf_token %}
         <select name="start_year">

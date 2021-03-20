@@ -1,10 +1,19 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.template.defaulttags import register
 
-from .card_data import get_dashboard_data, get_from_cache, insert_to_cache
+from .card_data import get_dashboard_data, get_player_data, get_from_cache, insert_to_cache
 from .queryset import initial_queryset
 from .management.commands.helpers.config import top_five_league_ids, other_league_ids, international_league_ids
 from .models import Season, League, Team, Player, PlayerStat 
+
+#################################
+##### CUSTOM DJANGO FILTERS #####
+#################################
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
 
 #############################
 ########## HELPERS ##########
@@ -44,12 +53,21 @@ def default_context(season):
         "seasons": Season.objects.order_by("-start_year"),
     }
 
+def get_player_cards(playerstats, per_ninety):
+    card_dict = {}
+    for playerstat in playerstats:
+        card_dict[playerstat.team.id] = get_player_data(playerstat, per_ninety)
+    return {
+        "cards": card_dict,
+        "teams": sorted([ps.team for ps in playerstats], key=lambda team: team.id)
+    }
+    
 #############################
 ########## ROUTES ###########
 #############################
 
 def home(request):
-    return dashboard(request, get_current_season().start_year)
+    return redirect(f"/dashboard/{get_current_season().start_year}")
 
 def dashboard(request, season):
     # create context dict
@@ -89,22 +107,28 @@ def teams(request, id, season):
     context["current_playerstats"] = context["current_team"].stats.all()
     # get player positions 
     context["positions"] = [pos for pos in PlayerStat.POSITIONS if pos[0] != PlayerStat.DEFAULT_POSITION]
+    # get team seasons
+    # context["team_seasons"] = [ps.team.season for ps in ...]
     # render page
     return render(request, "team.html", context)
 
 def players(request, id, season):
     # create context dict
     context = default_context(season)
+    # set/get per ninety
+    context["per_ninety"] = get_per_ninety(request)
     # get current players
     players = Player.objects.filter(player_id=id)
     if len(players) != 1:
         return redirect("/")
     current_player = players[0]
-    context["player_cards"] = get_player_data( 
-        current_player.stats.filter(
-            team__season = context["current_season"]
-        ) 
+    context["current_player"] = current_player 
+    context["current_playerstats"] = current_player.stats.filter(
+        team__season = context["current_season"]
     )
+    # get player seasons
+    # context["player_seasons"] = [ps.team.season for ps in ...]
+    context["player_cards"] = get_player_cards(context["current_playerstats"], context["per_ninety"])
     # render page
     return render(request, "player.html", context)
 

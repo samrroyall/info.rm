@@ -23,7 +23,7 @@
 </head>
 <body>
     {% include 'nav.html' %} 
-    {% include 'dashNav.html' %}
+    {% include 'dashNav.html' with perNinety=True navTitle=True %}
     <main>
         <section id="cards">
             {% for card_list in card_data %}

@@ -2,7 +2,7 @@ from django.db.models import F, FloatField, QuerySet
 from django.db.models.functions import Cast 
 from typing import Dict, List, Union
 
-from .card import Card, DashCard, StatCard, BioCard, CardList
+from .card import Card, DashCard, BioCard, CardList
 from .models import Season, League, Player, PlayerStat
 from .queryset import get_max
 
@@ -148,12 +148,131 @@ def get_dashboard_data(queryset: QuerySet, per_ninety: bool) -> List[CardList]:
         CardList([ rating_card, goals_conceded_card, penalties_saved_card ])
     ]
 
-def get_player_data(playerstats: List[PlayerStat]) -> Dict[str, Card]:
+def get_player_data(
+    playerstat: PlayerStat,
+    per_ninety: bool
+) -> Dict[str, List[Union[Card, CardList]]]:
+    player_data = {}
     # create bio card
-    bio_card = BioCard.from_playerstat(playerstats)
+    player_data["bio"] = CardList([
+        BioCard.from_playerstat(playerstat) 
+    ])
     # create player stat card
-    stat_card = StatCard.from_playerstat(playerstats)
-    return {
-        "bio": bio_card,
-        "stats": stat_card
-    }
+    attacking_card = Card.from_list(
+        title="Scoring",
+        per_ninety=per_ninety,
+        minutes_played=playerstat.minutes_played,
+        stats=[
+            { "title": "Goals", "value": playerstat.goals },
+            { 
+                "title": "Goals Per Shot",
+                "value": float(playerstat.goals)/playerstat.shots if playerstat.goals > 0 else 0.0,
+                "per_ninety": False,
+            },
+            { "title": "Shots On Target", "value": playerstat.shots_on_target },
+            { "title": "Shots", "value": playerstat.shots },
+            { 
+                "title": "Shots On Target %", 
+                "value": playerstat.shots_on_target_pct, 
+                "per_ninety": False,
+                "pct": True
+            },
+            { "title": "Penalties Scored", "value": playerstat.penalties_scored },
+            { "title": "Penalties Taken", "value": playerstat.penalties_taken },
+            { 
+                "title": "Penalty Success Rate", 
+                "value": playerstat.penalties_scored_pct,
+                "per_ninety": False,
+                "pct": True,
+            }, 
+        ]
+    )
+    creation_card = Card.from_list(
+        title="Attacking",
+        per_ninety=per_ninety,
+        minutes_played=playerstat.minutes_played,
+        stats=[
+            { "title": "Assists", "value": playerstat.assists },
+            { "title": "Passes", "value": playerstat.passes },
+            { "title": "Key Passes", "value": playerstat.passes_key },
+            { 
+                "title": "Pass Accuracy", 
+                "value": playerstat.passes_accuracy,
+                "per_ninety": False,
+                "pct": True,
+            },
+            { "title": "Successful Dribble", "value": playerstat.dribbles_succeeded },
+            { "title": "Attempted Dribbles", "value": playerstat.dribbles_attempted },
+            { 
+                "title": "Dribble Success Rate", 
+                "value": playerstat.dribbles_succeeded_pct,
+                "per_ninety": False,
+                "pct": True,
+            },
+            { "title": "Fouls Drawn", "value": playerstat.fouls_drawn },
+            { "title": "Penalties Drawn", "value": playerstat.penalties_won },
+        ]
+    )
+    defensive_card = Card.from_list(
+        title="Defense",
+        per_ninety=per_ninety,
+        minutes_played=playerstat.minutes_played,
+        stats=[
+            { "title": "Blocks", "value": playerstat.blocks },
+            { "title": "Tackles", "value": playerstat.tackles },
+            { "title": "Interceptions", "value": playerstat.interceptions },
+            { "title": "Successful Duels", "value": playerstat.duels_won },
+            { "title": "Attempted Duels", "value": playerstat.duels },
+            { 
+                "title": "Duel Success Rate", 
+                "value": playerstat.duels_won_pct,
+                "per_ninety": False,
+                "pct": True,
+            },
+        ]
+    )
+    gameplay_card = Card.from_list(
+        title="Gameplay",
+        per_ninety=per_ninety,
+        minutes_played=playerstat.minutes_played,
+        stats=[
+            { "title": "Minutes Played", "value": playerstat.minutes_played, "per_ninety": False },
+            { "title": "Appearances", "value": playerstat.appearances, "per_ninety": False },
+            { "title": "Starts", "value": playerstat.starts, "per_ninety": False },
+            { "title": "Benches", "value": playerstat.benches, "per_ninety": False },
+            { "title": "Substitutions In", "value": playerstat.substitutions_in, "per_ninety": False },
+            { "title": "Substitutions Out", "value": playerstat.substitutions_out, "per_ninety": False },
+        ]
+    )
+    fouling_card = Card.from_list(
+        title="Fouling",
+        per_ninety=per_ninety,
+        minutes_played=playerstat.minutes_played,
+        stats=[
+            { "title": "Yellow Cards", "value": playerstat.yellows, "per_ninety": False },
+            { "title": "Red Cards", "value": playerstat.reds, "per_ninety": False },
+            { "title": "Fouls Committed", "value": playerstat.fouls_committed },
+            { "title": "Penalties Committed", "value": playerstat.penalties_committed },
+
+        ]
+    )
+    goalkeeping_card = Card.from_list(
+        title="Goalkeeping",
+        per_ninety=per_ninety,
+        minutes_played=playerstat.minutes_played,
+        stats=[
+            { "title": "Goals Conceded", "value": playerstat.goals_conceded },
+            { "title": "Goals Saved", "value": playerstat.goals_saved },
+            { "title": "Penalties Saved", "value": playerstat.penalties_saved, "per_ninety": False },
+        ]
+    )
+    player_data["stats"] = CardList([
+        attacking_card, 
+        creation_card, 
+        defensive_card, 
+        gameplay_card, 
+        fouling_card, 
+        goalkeeping_card
+    ])
+
+    return player_data 

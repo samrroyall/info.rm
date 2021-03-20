@@ -1,6 +1,14 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/card.css' %}">
-<div class="card">
+<div 
+    {% if type == "dashboard" %}
+        class="card dashCard"
+    {% elif type == "bio" %}
+        class="card bioCard"
+    {% else %}
+        class="card"
+    {% endif %}
+>
     {% for card in cards %}
         <!-- Card Content -->
         <div 
@@ -11,9 +19,13 @@
             {% endif %}
         >
             <div class="cardTitle">
-                <i class="bi bi-caret-left-fill"></i>
+                {% if not singleCard %}
+                    <i class="bi bi-caret-left-fill"></i>
+                {% endif %}
                 <span>{{card.title}}</span>
-                <i class="bi bi-caret-right-fill"></i>
+                {% if not singleCard %}
+                    <i class="bi bi-caret-right-fill"></i>
+                {% endif %}
             </div>
 
             <!-- DASHBOARD CARD BODY -->
@@ -61,8 +73,40 @@
                     </li>
                 {% endfor %}
                 </ul>
-            <!-- OTHER CARD BODY -->
+            <!-- BIO CARD BODY -->
+            {% elif type == "bio" %}
+                <div class="cardBody">
+                    <ul>
+                        {% for entry in card.data %}
+                            <li class="cardEntry">
+                                <span class="title">{{entry.title}}</span>
+                                <div>
+                                    <span class="value">{{entry.value}}</span>
+                                    {% if entry.logo is not None and entry.link is not None %}
+                                        <a href="{{entry.link}}{{current_season.start_year}}">
+                                            <img src="{{entry.logo}}") />
+                                        </a>
+                                    {% elif entry.logo is not None %}
+                                        <img src="{{entry.logo}}" />
+                                    {% endif %}
+                                </div>
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            <!-- REGULAR CARD BODY -->
             {% else %}
+                <div class="cardBody">
+                    <ul>
+                        {% for entry in card.data %}
+                            <li class="cardEntry">
+                                <span class="title">{{entry.title}}</span>
+                                <span class="value">{{entry.value}}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             <!-- ... -->
             {% endif %}
         </div>

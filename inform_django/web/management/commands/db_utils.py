@@ -478,7 +478,7 @@ class Command(BaseCommand):
             # passes
             passes=self.not_null( stats.passes["total"] ),
             passes_key=self.not_null( stats.passes["key"] ),
-            passes_accuracy=float(self.not_null( stats.passes["accuracy"]))/100,
+            passes_accuracy=float(self.not_null( stats.passes["accuracy"] ))/100,
             # defense
             tackles=self.not_null( stats.tackles["total"] ),
             blocks=self.not_null( stats.tackles["blocks"] ),

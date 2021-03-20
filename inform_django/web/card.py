@@ -1,18 +1,22 @@
 from django.db.models import FloatField, IntegerField, QuerySet
 import math
-from typing import Union, List, Callable, Any
+from typing import Any, Callable, Dict, List, Union
 
 from .models import PlayerStat
 from .queryset import order_queryset, filter_queryset, initial_queryset 
 
+#############################
+######## CARDENTRY ##########
+#############################
+
 class CardEntry:
     def __init__(
         self, 
-        value: Union[int, float, str],
-        playerstat: PlayerStat
+        title: str,
+        value: Union[int, float, str]
     ) -> None:
+        self.title = title
         self.value = value
-        self.data = playerstat
 
     @classmethod
     def display_float(cls, value: float, pct: bool) -> str:
@@ -27,10 +31,11 @@ class DashCardEntry(CardEntry):
     def __init__(
         self, 
         value: Union[int, float],
-        playerstat: PlayerStat,
+        data: PlayerStat,
         rank: int
     ) -> None:
-        super(value, playerstat)
+        super().__init__("", value)
+        self.data = data
         self.rank = rank
         self.player_id = self.data.player.player_id
         self.first_name = self.data.player.first_name
@@ -43,22 +48,21 @@ class DashCardEntry(CardEntry):
     def get_player_name(self):
         return f"{self.first_name[0].upper()}. {self.last_name.title()}"
 
-class StatCardEntry(CardEntry):
-    def __init__(
-        self, 
-        title: str,
-        value: Union[int, float],
-    ) -> None:
-        super(value, data)
-
- class BioCardEntry(CardEntry):
+class BioCardEntry(CardEntry):
     def __init__(
         self, 
         title: str,
         value: Union[int, float],
         logo: Union[str, None] = None,
+        link: Union[str, None] = None
     ) -> None:
-        super(value, data)
+        super().__init__(title, value)
+        self.logo = logo
+        self.link = link
+
+#############################
+########### CARD ############
+#############################
     
 class Card:
     def __init__(
@@ -68,8 +72,41 @@ class Card:
     ) -> None:
         self.title = title
         self.data = data
-        self.num_pages = math.ceil(len(self.data)/10)
+
+    @classmethod
+    def from_list(
+        cls,
+        title: str,
+        per_ninety: bool,
+        minutes_played: int,
+        stats: List[Dict[str, Union[str, float, int]]]
+    ) -> Any:
+        entries = []
+        for stat in stats: 
+            format_per_ninety = per_ninety is True and ("per_ninety" not in stat or stat["per_ninety"] is True)
+            formatted_title = stat["title"] + " Per 90" if format_per_ninety is True else stat["title"]
+            pct = ("pct" in stat and stat["pct"] is True)
+            if format_per_ninety:
+                formatted_value = CardEntry.display_float(float(stat["value"])*90/float(minutes_played), pct)
+            elif type(stat["value"]) == float or pct is True:
+                formatted_value = CardEntry.display_float(float(stat["value"]), pct)
+            else:
+                formatted_value = stat["value"]
+            entries.append( CardEntry(title=formatted_title, value=formatted_value) )
+        return Card(
+            title=title,
+            data=entries
+        )
     
+class DashCard(Card):
+    def __init__(
+        self, 
+        title: str,
+        data: List[DashCardEntry]
+    ) -> None:
+        super().__init__(title, data)
+        self.num_pages = math.ceil(len(self.data)/10)
+
     def get_pages(self) -> List[ List[CardEntry] ]:
         pages = []
         for i in range(self.num_pages):
@@ -77,14 +114,6 @@ class Card:
             end = (i+1)*10 if (i+1)*10 <= len(self.data) else len(self.data)
             pages.append( self.data[start:end] )
         return pages
-
-class DashCard(Card):
-    def __init__(
-        self, 
-        title: str,
-        data: List[DashCardEntry]
-    ) -> None:
-        super(title, data)
 
     @classmethod
     def format_data( 
@@ -106,7 +135,7 @@ class DashCard(Card):
             entries.append(DashCardEntry(
                 rank=rank, 
                 value=DashCardEntry.display_float(val, pct) if type(val) != int else val, 
-                playerstat=playerstat
+                data=playerstat
             ))
         return entries
 
@@ -129,58 +158,52 @@ class DashCard(Card):
             data=cls.format_data(ordered_queryset, per_ninety, pct)
         )
 
-class StatCard(Card):
-    def __init__(
-        self, 
-        title: str,
-        data: List[CardEntry]
-    ) -> None:
-        super(title, data)
-
-    @classmethod
-    def from_playerstat(playerstat: PlayerStat):
-        pass
-
 class BioCard(Card):
     def __init__(
         self, 
-        data: List[CardEntry]
+        data: List[BioCardEntry]
     ) -> None:
-        super("Bio", data)
+        super().__init__("Bio", data)
     
     @classmethod
-    def from_playerstat(playerstat: PlayerStat):
+    def from_playerstat(cls, playerstat: PlayerStat):
         data = []
         data.append(BioCardEntry(
             title="Position",
-            value=playerstat.position,
+            value=playerstat.get_position_display().title(),
         ))
         data.append(BioCardEntry(
             title="Team",
-            value=playerstat.team.name,
-            logo=playerstat.team.logo
+            value=playerstat.team.name.title(),
+            logo=playerstat.team.logo,
+            link=f"/team/{playerstat.team.team_id}/"
         ))
         data.append(BioCardEntry(
             title="League",
-            value=playerstat.team.league.name,
-            logo=playerstat.team.league.logo
+            value=playerstat.team.league.name.title(),
+            logo=playerstat.team.league.logo,
+            link=f"/league/{playerstat.team.league.league_id}/"
         ))
         data.append(BioCardEntry(
             title="Nationality",
-            value=playerstat.player.nationality.name,
+            value=playerstat.player.nationality.name.title(),
             logo=playerstat.player.nationality.flag
         ))
+        birthdate = playerstat.player.birthdate
+        birthdate_str = birthdate.strftime(f"%B {birthdate.day}, %Y")
         data.append(BioCardEntry(
             title="Date of Birth",
-            value=f"{playerstat.player.birthdate} ({playerstat.player.age})",
+            value=f"{birthdate_str} ({playerstat.player.age})",
         ))
+        height_in = float(playerstat.player.height[:-3])*0.3937008
         data.append(BioCardEntry(
             title="Height",
-            value=playerstat.player.height
+            value=f"{math.floor(height_in/12)}'{round(height_in % 12)}''"
         ))
+        weight_lb = float(playerstat.player.weight[:-3])*2.204623
         data.append(BioCardEntry(
             title="Weight",
-            value=playerstat.player.weight
+            value=f"{round(weight_lb)} lbs"
         ))
         return BioCard(data=data)
 

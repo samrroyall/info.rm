@@ -19,64 +19,43 @@
 </head>
 <body>
     {% include 'nav.html' %} 
+    {% include 'dashNav.html' with perNinety=True page="player"%} 
     <main>
-        <h1>{{current_player.first_name|title}} {{current_player.last_name|title}}</h1>
-        <div id="playerStatCards">
-        {% for playerstat in current_playerstats %}
-        <div class="bioCard">
-            <div class="cardTitle">
-                <h2>Bio</h2>
-            </div>
-            <ul class="playerBio">
-                <li>
-                    <span class="heading">Position</span>
-                    <span>{{playerstat.get_position_display|title}}</span>
-                </li>
-                <li>
-                    <span class="heading">Team</span>
-                    <div>
-                        <span>{{playerstat.team.name|title}} {{playerstat.team.season.start_year}}</span>
-                        <img src="{{playerstat.team.logo}}" />
-                    </div>
-                </li>
-                <li>
-                    <span class="heading">League</span>
-                    <div>
-                        <span>{{playerstat.team.league.name|title}}</span>
-                        <img src="{{playerstat.team.league.logo}}" />
-                    </div>
-                </li>
-                <li>
-                    <span class="heading">Nationality</span>
-                    <div>
-                        <span>{{current_player.nationality.name|title}}</span>
-                        <img src="{{current_player.nationality.flag}}" />
-                    </div>
-                </li>
-                <li>
-                    <span class="heading">Date of Birth</span>
-                    <div>
-                        <span>{{current_player.birthdate}} ({{current_player.age}})</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="heading">Height</span>
-                    <div>
-                        <span>{{current_player.height}}</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="heading">Weight</span>
-                    <div>
-                        <span>{{current_player.weight}}</span>
-                    </div>
-                </li>
-            </ul>
+        <div id="playerPageHeader">
+            <h1>{{current_player.first_name|title}} {{current_player.last_name|title}}</h1>
+            <select id="cardsSelect">
+                {% for team in player_cards.teams %}
+                    <option value="{{team.id}}">{{team.name|title}}, {{team.league.name|title}}</option>
+                {% endfor %}
+            </select>
         </div>
-        <!-- {% include 'card.html' with type="player" cards=card_list.cards %} -->
+
+        {% for team in player_cards.teams %}
+            {% with curr_team_id=team.id %}
+            {% with curr_cards=player_cards.cards|get_item:curr_team_id %}
+                <div id="cards-{{curr_team_id}}"
+                    {% if forloop.counter == 1 %}
+                        class="playerCards active" 
+                    {% else %}
+                        class="playerCards" 
+                    {% endif %}
+                >
+                    {% include 'card.html' with type="bio" singleCard=True cards=curr_cards.bio.cards %}
+                    {% include 'card.html' with cards=curr_cards.stats.cards %}
+                </div>
+            {% endwith %}
+            {% endwith %}
         {% endfor %}
-        </div>
+
     </main>
     {% include 'footer.html' %} 
+<script>
+    $(document).ready( function () {
+        $("select#cardsSelect").change( e => {
+            $("div.playerCards").removeClass("active");
+            $(`div#cards-${e.target.value}`).addClass("active");
+        });
+    });
+</script>
 </body>
 </html>

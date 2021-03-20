@@ -61,7 +61,7 @@ class PlayerStat(models.Model):
     DEFAULT_POSITION = 5
     position = models.PositiveSmallIntegerField(default=DEFAULT_POSITION, choices=POSITIONS)
 
-    rating = models.DecimalField(max_digits=4, decimal_places=2)
+    rating = models.DecimalField(max_digits=5, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # shots
@@ -75,7 +75,7 @@ class PlayerStat(models.Model):
     # passes
     passes = models.IntegerField()
     passes_key = models.IntegerField()
-    passes_accuracy = models.DecimalField(max_digits=4, decimal_places=1)
+    passes_accuracy = models.DecimalField(max_digits=4, decimal_places=3)
     # defense
     blocks = models.IntegerField()
     tackles = models.IntegerField()

@@ -1,40 +1,34 @@
-div#playerStatCards {
+div#playerPageHeader {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5%;
 }
-div#playerStatCards div.bioCard {
-    background-color: whitesmoke;
-    width: 400px; 
-    padding: 15px;
+
+div#playerPageHeader h1 {
+    font-size: calc(20px + 1vw);
+}
+
+div#playerPageHeader select {
+    margin: 0 30px;
     border: 1px solid lightgrey;
     border-radius: 3px;
+    padding: 3px;
+    font-size: calc(8px + 0.4vw); 
 }
 
-div#playerStatCards div.bioCard div.cardTitle h2 {
-    padding: 10px 30px;
+div.playerCards {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: calc(10px + 0.4vw);
-    font-weight: bold;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+div.playerCards:not(.active) {
+    display: none;
 }
 
-div#playerStatCards div.bioCard ul.playerBio {
-    border: 1px solid lightgrey;
-}
-
-div#playerStatCards div.bioCard ul.playerBio li {
-    height: calc(30px + 0.5vw);
-    border-bottom: 1px solid lightgrey; 
-    padding: 5px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: white;
-}
-div#playerStatCards div.bioCard ul.playerBio li span.heading {
-    font-weight: bold;
-}
-div#playerStatCards div.bioCard ul.playerBio li img {
-    height: 40px;
-    width: auto;
+div#playerCards div#playerBioCards,
+div#playerCards div#playerStatCards {
+    margin: 0 2%;
 }
