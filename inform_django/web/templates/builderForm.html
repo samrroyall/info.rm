@@ -1,0 +1,120 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/builder.css' %}">
+<form id="builderForm">
+    {% csrf_token %}
+    
+    <!-- Season Select -->
+    <label for="season">
+        <p>Choose Season:</p> 
+        <select name="season">
+            {% for season in seasons %}
+                {% if season.start_year != current_season.start_year %}
+                <option value="{{season.start_year}}">
+                    {{season.start_year}}/{{season.end_year|stringformat:"i"|slice:"2:"}}
+                </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </label>
+
+    <!-- Stats Select -->
+    <label>
+        <p>
+            Select Query Fields:
+            <p class="subheading">
+                At least one field must be selected for the query!
+            </p>
+        </p>
+        <div class="selectStats">
+            <div class="multipleSelects">
+                <!-- Stat 1 -->
+                <select name="stat1">
+                    <option></option>
+                    {% for stat in stats %}
+                        <option val="{{stat.0}}">{{stat.1}}</option>
+                    {% endfor %}
+                </select>
+                <!-- Arithmetic Operator -->
+                <select>
+                    <option></option>
+                    <option value="*">×</option>
+                    <option value="/">÷</option>
+                    <option>+</option>
+                    <option>-</option>
+                </select>
+                <!-- Stat 2 -->
+                <select name="stat2">
+                    <option></option>
+                    {% for stat in stats %}
+                        <option val="{{stat.0}}">{{stat.1}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <i class="bi bi-plus-circle-fill"></i>
+        </div>
+        {% include 'toggle.html' with label="Per 90" %}
+        <!-- Additional Select Fields -->
+    </label>
+
+    <!-- Stats Select -->
+    <label>
+        <p>
+            Select Query Filters:
+            <p class="subheading">
+                Tip: If querying Per 90 fields, try filtering by Minutes Played!
+            </p>
+        </p>
+        <select>
+            <option></option>
+            <option>Age</option>
+            <option>Club</option>
+            <option>League</option>
+            <option>Minutes Played</option>
+            <option>Nationality</option>
+            <option>Position</option>
+            <option>Stats</option>
+        </select>
+    </label>
+
+    <!-- Stats Select -->
+    <label>
+        <p>
+            Select Order-By Field:
+            <p class="subheading">
+                By default, results will be sorted by the first seleted field!
+            </p>
+        </p>
+        <div class="multipleSelects">
+            <!-- Stat 1 -->
+            <select name="stat1">
+                <option></option>
+                {% for stat in stats %}
+                    <option val="{{stat.0}}">{{stat.1}}</option>
+                {% endfor %}
+            </select>
+            <!-- Arithmetic Operator -->
+            <select>
+                <option></option>
+                <option value="*">×</option>
+                <option value="/">÷</option>
+                <option>+</option>
+                <option>-</option>
+            </select>
+            <!-- Stat 2 -->
+            <select name="stat2">
+                <option></option>
+                {% for stat in stats %}
+                    <option val="{{stat.0}}">{{stat.1}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="multipleToggles">
+            {% include 'toggle.html' with label="Per 90" %}
+            {% include 'toggle.html' with label="Low to High" %}
+        </div>
+        <!-- Additional Select Fields -->
+    </label>
+    <label id="submitLabel">
+        <input type="submit" value="Make Query" />
+    </label>
+</form>

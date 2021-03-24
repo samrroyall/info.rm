@@ -90,7 +90,7 @@ nav#mainNav input[type='text'] {
 }
 nav#mainNav input[type='text']:focus { 
     color: grey;
-    border: 3px solid #DAA99B;
+    border: 1px solid #DAA99B;
 }
 
 /* mobile */

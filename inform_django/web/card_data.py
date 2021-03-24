@@ -6,9 +6,16 @@ from .card import Card, DashCard, BioCard, CardList
 from .models import Season, League, Player, PlayerStat
 from .queryset import get_max
 
+#################################
+#####   CACHE AND HELPERS   #####
+#################################
+
 card_cache = {
     # '{League.league_id}-{Season.start_year}-{per_ninety}' -> List[ CardList ]
 }
+
+def clear_cache() -> None:
+    card_cache = {}
 
 def card_cache_key(season: Season, per_ninety: bool, league: League) -> str:
     league_str = "Top5" if league is None else league.league_id
@@ -19,6 +26,10 @@ def get_from_cache(season: Season, per_ninety: bool, league: League) -> List[Car
 
 def insert_to_cache(season: Season, per_ninety: bool, league: League, data: List[CardList]) -> None:
     card_cache[card_cache_key(season, per_ninety, league)] = data
+
+#################################
+####   CARD DATA FUNCTIONS   ####
+#################################
 
 def get_dashboard_data(queryset: QuerySet, per_ninety: bool) -> List[CardList]:
     # GOALS CARDS

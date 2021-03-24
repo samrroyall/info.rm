@@ -5,18 +5,9 @@
     {% if perNinety and perNinety is True %}
         <form id="perNinetyForm">
             {% csrf_token %}
-            <label for="per_ninety">
-                <span>Per 90</span>
-                <label class="switch">
-                    <input type="checkbox" id="perNinetyInput" name="per_ninety"
-                        {% if per_ninety and per_ninety is True %} checked {% endif %}
-                    >
-                    <span class="slider round"></span>
-                </label>
-            </label>
+            {% include 'toggle.html' with label="Per 90"%}
         </form>
     {% else %}
-        <!-- Blank space -->
         <div></div>
     {% endif %}
 
@@ -31,7 +22,6 @@
         {% endif %}
     </div>
     {% else %}
-        <!-- Blank space -->
         <div></div>
     {% endif %}
 

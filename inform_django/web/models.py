@@ -47,10 +47,41 @@ class Player(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class PlayerStat(models.Model):
+    STATS = [
+        ["minutes_played", "Minutes Played"],
+        ["rating", "Player Rating"],
+        ["shots", "Total Shots"],
+        ["shots_on_target", "Shots on Target"],
+        ["goals", "Goals"],
+        ["goals_conceded", "Goals Conceded"],
+        ["goals_saved", "Goals Saved"],
+        ["assists", "Assists"],
+        ["passes", "Passes"],
+        ["passes_key", "Key Passes"],
+        ["passes_accuracy", "Pass Accuracy"],
+        ["blocks", "Blocks"],
+        ["tackles", "Tackles"],
+        ["interceptions", "Interceptions"],
+        ["duels", "Attempted Duels"],
+        ["duels_won", "Duels Won"],
+        ["dribbles_attempted", "Attempted Dribbles"],
+        ["dribbles_succeeded", "Dribbles Succeeded"],
+        ["fouls_drawn", "Fouls Drawn"],
+        ["yellows", "Yellow Cards"],
+        ["reds", "Red Cards"],
+        ["penalties_won", "Penalties Won"],
+        ["penalties_committed", "Penalties Committed"],
+        ["penalties_scored", "Penalties Scored"],
+        ["penalties_taken", "Penalties Taken"],
+        ["penalties_saved", "Penalties Saved"]
+    ]
+
     class Meta:
         unique_together = (('player', 'team'),)
     team = models.ForeignKey(Team, related_name="stats", on_delete=models.CASCADE)
     player = models.ForeignKey(Player, related_name="stats", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     POSITIONS = [
         (1, "attacker"),
         (2, "midfielder"),
@@ -60,10 +91,7 @@ class PlayerStat(models.Model):
     ]
     DEFAULT_POSITION = 5
     position = models.PositiveSmallIntegerField(default=DEFAULT_POSITION, choices=POSITIONS)
-
     rating = models.DecimalField(max_digits=5, decimal_places=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     # shots
     shots = models.IntegerField()
     shots_on_target = models.IntegerField()

@@ -41,7 +41,7 @@ def get_card_data(season, per_ninety, league = None):
     insert_to_cache(season, per_ninety, league, card_data)
     return card_data
 
-def default_context(season):
+def default_context(season = None):
     # grab current season
     current_season = get_current_season(season) 
     return {
@@ -97,18 +97,18 @@ def leagues(request, id, season):
 def teams(request, id, season):
     # create context dict
     context = default_context(season)
-    # get current team
     teams = Team.objects.filter( team_id=id, season=Season.objects.get(start_year=season) )
+    # get current team
     context["current_team"] = teams[0]
     for team in teams:
         if team.league.league_id not in international_league_ids:
             context["current_team"] = team
+    # get team seasons
+    context["seasons"] = list(set([t.season for t in Team.objects.filter( team_id=id )]))
     # get current team's players
     context["current_playerstats"] = context["current_team"].stats.all()
     # get player positions 
     context["positions"] = [pos for pos in PlayerStat.POSITIONS if pos[0] != PlayerStat.DEFAULT_POSITION]
-    # get team seasons
-    # context["team_seasons"] = [ps.team.season for ps in ...]
     # render page
     return render(request, "team.html", context)
 
@@ -127,14 +127,15 @@ def players(request, id, season):
         team__season = context["current_season"]
     )
     # get player seasons
-    # context["player_seasons"] = [ps.team.season for ps in ...]
+    context["seasons"] = list(set([ps.team.season for ps in current_player.stats.all()]))
     context["player_cards"] = get_player_cards(context["current_playerstats"], context["per_ninety"])
     # render page
     return render(request, "player.html", context)
 
 def builder(request):
     # create context dict
-    context = default_context(season)
+    context = default_context()
+    context["stats"] = PlayerStat.STATS
     return render(request, "builder.html", context)
 
 #############################

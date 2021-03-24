@@ -1,0 +1,13 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/toggle.css' %}">
+<div class="toggleWrapper">
+    <label class="toggleLabel" for="toggle">
+        <span>{{label}}</span>
+        <label class="switch">
+            <input type="checkbox" id="toggleInput" name="toggle"
+                {% if per_ninety and per_ninety is True %} checked {% endif %}
+            >
+            <span class="slider round"></span>
+        </label>
+    </label>
+</div>

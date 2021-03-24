@@ -1,0 +1,73 @@
+div#builderFormWrapper { width: 100vw; }
+
+form#builderForm {
+    display: inline-block;
+    margin: 0 auto;
+    text-align: left;
+}
+
+form#builderForm label:not(.toggleLabel) { 
+    display: block;
+    margin: 30px 0; 
+}
+form#builderForm label#submitLabel { text-align: center; }
+
+form#builderForm label p { 
+    font-size: calc(12px + 0.4vw);
+    font-weight: bold; 
+}
+form#builderForm label p.subheading { 
+    padding: 3px 0;
+    font-size: calc(10px + 0.2vw);
+    font-weight: normal; 
+}
+
+form#builderForm label select {
+    margin: calc(4px + 0.2vw) calc(2px + 0.2vw);
+    border: 1px solid lightgrey;
+    border-radius: 3px;
+    outline: 0;
+    padding: calc(2px + 0.2vw) calc(4px + 0.2vw);
+    color: grey;
+    cursor: pointer;
+    font-size: calc(8px + 0.2vw);
+}
+form#builderForm label select:focus { border: 1px solid #DAA99B; }
+form#builderForm label select option { font-size: 12px; }
+
+form#builderForm label.toggleLabel { margin-left: 5px; }
+form#builderForm label.toggleLabel span { 
+    font-size: calc(10px + 0.2vw);
+    font-weight: normal; 
+}
+form#builderForm label.toggleLabel label.switch { margin: 0 10px 0; }
+
+form#builderForm label div.multipleSelects, 
+form#builderForm label div.selectStats,
+form#builderForm label div.multipleToggles {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+i.bi-plus-circle-fill {
+    margin-left: 10px;
+    color: #007bff;
+    cursor: pointer;
+}
+i.bi-plus-circle-fill:hover {
+    color: #0264ce;
+}
+
+form#builderForm input[type='submit'] { 
+    margin-left: auto;
+    display: inline-block;
+    border-radius: 3px;
+    padding: 10px 20px; 
+    background-color: #343a40;
+    color: white; 
+    font-size: calc(12px + 0.4vw);
+    font-weight: bold; 
+    cursor: pointer;
+}
+form#builderForm input[type='submit']:hover { background-color: black; }
