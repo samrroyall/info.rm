@@ -1,0 +1,55 @@
+<div class="statInput">
+    <div class="multipleSelects">
+        <!-- Stat 1 -->
+        <select 
+            {% if filter %} name="filterStat{{ key }}-firstStat" {% else %} name="selectStat{{ key }}-firstStat" {% endif %}
+        >
+            <option></option>
+            {% for stat in stats %}
+                <option val="{{stat.0}}">{{stat.1}}</option>
+            {% endfor %}
+        </select>
+        <!-- Arithmetic Operator -->
+        <select 
+            {% if filter %} name="filterStat{{ key }}-arithOp" {% else %} name="selectStat{{ key }}-arithOp" {% endif %}
+        >
+            <option></option>
+            <option value="*">×</option>
+            <option value="/">÷</option>
+            <option>+</option>
+            <option>-</option>
+        </select>
+        <!-- Stat 2 -->
+        <select 
+            {% if filter %} name="filterStat{{ key }}-secondStat" {% else %} name="selectStat{{ key }}-secondStat" {% endif %}
+        >
+            <option></option>
+            {% for stat in stats %}
+                <option val="{{stat.0}}">{{stat.1}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if not last %}
+        <i class="bi bi-plus-circle-fill"></i>
+    {% endif %}
+</div>
+{% if filter %}
+    <div class="multipleSelects">
+        <select name="filterStat{{ key }}-logicalOp">
+            <option></option>
+            <option>=</option>
+            <option><</option>
+            <option>></option>
+            <option value="><">Between</option>
+        </select>
+        <input type="text" name="filterStat{{ key }}-firstVal">
+        <input type="text" class="hide" name="filterStat{{ key }}-secondVal">
+        </select>
+    </div>
+    <script>
+        $(document).ready(() => {
+            showBetweenSecondValue("{{key}}");
+        });
+    </script>
+{% endif %}
+{% include 'toggle.html' with label="Per 90" name="select{{ key }}-PerNinety" %}

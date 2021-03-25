@@ -6,9 +6,13 @@ form#builderForm {
     text-align: left;
 }
 
+form#builderForm div#queryFilters {
+    padding-left: calc(30px + 0.4vw);
+}
+
 form#builderForm label:not(.toggleLabel) { 
     display: block;
-    margin: 30px 0; 
+    margin: calc(15px + 0.8vw) 0; 
 }
 form#builderForm label#submitLabel { text-align: center; }
 
@@ -22,16 +26,31 @@ form#builderForm label p.subheading {
     font-weight: normal; 
 }
 
-form#builderForm label select {
+form#builderForm input,
+form#builderForm select { 
     margin: calc(4px + 0.2vw) calc(2px + 0.2vw);
     border: 1px solid lightgrey;
     border-radius: 3px;
     outline: 0;
+    padding: 10px 20px;
     padding: calc(2px + 0.2vw) calc(4px + 0.2vw);
     color: grey;
-    cursor: pointer;
     font-size: calc(8px + 0.2vw);
 }
+
+form#builderForm input[type='submit'] { 
+    margin-left: auto;
+    padding: 10px 20px;
+    display: inline-block;
+    background-color: #343a40;
+    color: white; 
+    font-size: calc(12px + 0.4vw);
+    font-weight: bold; 
+    cursor: pointer;
+}
+
+form#builderForm input[type='submit']:hover { background-color: black; }
+form#builderForm label select { cursor: pointer; }
 form#builderForm label select:focus { border: 1px solid #DAA99B; }
 form#builderForm label select option { font-size: 12px; }
 
@@ -42,8 +61,8 @@ form#builderForm label.toggleLabel span {
 }
 form#builderForm label.toggleLabel label.switch { margin: 0 10px 0; }
 
+form#builderForm label div.statInput,
 form#builderForm label div.multipleSelects, 
-form#builderForm label div.selectStats,
 form#builderForm label div.multipleToggles {
     display: flex;
     justify-content: flex-start;
@@ -59,15 +78,3 @@ i.bi-plus-circle-fill:hover {
     color: #0264ce;
 }
 
-form#builderForm input[type='submit'] { 
-    margin-left: auto;
-    display: inline-block;
-    border-radius: 3px;
-    padding: 10px 20px; 
-    background-color: #343a40;
-    color: white; 
-    font-size: calc(12px + 0.4vw);
-    font-weight: bold; 
-    cursor: pointer;
-}
-form#builderForm input[type='submit']:hover { background-color: black; }

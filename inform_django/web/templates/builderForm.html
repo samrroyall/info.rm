@@ -1,5 +1,6 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/builder.css' %}">
+<script src="{% static 'js/builder.js' %}"></script>
 <form id="builderForm">
     {% csrf_token %}
     
@@ -25,38 +26,20 @@
                 At least one field must be selected for the query!
             </p>
         </p>
-        <div class="selectStats">
-            <div class="multipleSelects">
-                <!-- Stat 1 -->
-                <select name="stat1">
-                    <option></option>
-                    {% for stat in stats %}
-                        <option val="{{stat.0}}">{{stat.1}}</option>
-                    {% endfor %}
-                </select>
-                <!-- Arithmetic Operator -->
-                <select>
-                    <option></option>
-                    <option value="*">×</option>
-                    <option value="/">÷</option>
-                    <option>+</option>
-                    <option>-</option>
-                </select>
-                <!-- Stat 2 -->
-                <select name="stat2">
-                    <option></option>
-                    {% for stat in stats %}
-                        <option val="{{stat.0}}">{{stat.1}}</option>
-                    {% endfor %}
-                </select>
+        <div id="querySelects">
+            <div class="statsInputs" key="0">
+                {% include 'statsInputs.html' with key="0" %}
             </div>
-            <i class="bi bi-plus-circle-fill"></i>
+            <div class="statsInputs hide" key="1">
+                {% include 'statsInputs.html' with key="1" %}
+            </div>
+            <div class="statsInputs hide" key="2">
+                {% include 'statsInputs.html' with key="2" last="true" %}
+            </div>
         </div>
-        {% include 'toggle.html' with label="Per 90" %}
-        <!-- Additional Select Fields -->
     </label>
 
-    <!-- Stats Select -->
+    <!-- Filter Select -->
     <label>
         <p>
             Select Query Filters:
@@ -66,15 +49,81 @@
         </p>
         <select>
             <option></option>
-            <option>Age</option>
-            <option>Club</option>
             <option>League</option>
+            <option>Club</option>
             <option>Minutes Played</option>
+            <option>Stats</option>
+            <option>Age</option>
             <option>Nationality</option>
             <option>Position</option>
-            <option>Stats</option>
         </select>
     </label>
+
+    <div id="queryFilters">
+        <label for="league">
+            <p>League:</p>
+            <select name="league">
+                <option></option>
+            </select>
+        </label>
+
+        <label for="league">
+            <p>Club:</p>
+            <div class="multipleSelects">
+                <select name="teamLeague">
+                    <option></option>
+                </select>
+                <select name="team">
+                    <option></option>
+                </select>
+            </div>
+        </label>
+
+        <label for="minutesPlayed">
+            <p>Minutes Played:</p>
+            <input type="text" name="age">
+        </label>
+
+        <label>
+            <p>Stats:</p>
+            <div id="statsFilters">
+                <div class="statsInputs" key="0">
+                    {% include 'statsInputs.html' with filter="true" key="0"%}
+                </div>
+                <div class="statsInputs hide" key="1">
+                    {% include 'statsInputs.html' with filter="true" key="1" %}
+                </div>
+                <div class="statsInputs hide" key="2">
+                    {% include 'statsInputs.html' with filter="true" key="2" last="true" %}
+                </div>
+            </div>
+        </label>
+
+        <label for="age">
+            <p>Age:</p>
+            <input type="text" name="age">
+        </label>
+
+        <label for="nationality">
+            <p>Nationality:</p>
+            <select name="nationality">
+                <option></option>
+                {% for country in countries %}
+                    <option value="{{country.id}}">{{country.name|title}}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label for="position">
+            <p>Position:</p>
+            <select name="position">
+                <option></option>
+                {% for position in positions %}
+                    <option value="{{position.0}}">{{position.1|title}}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
 
     <!-- Stats Select -->
     <label>
@@ -86,14 +135,14 @@
         </p>
         <div class="multipleSelects">
             <!-- Stat 1 -->
-            <select name="stat1">
+            <select name="orderBy-firstStat">
                 <option></option>
                 {% for stat in stats %}
                     <option val="{{stat.0}}">{{stat.1}}</option>
                 {% endfor %}
             </select>
             <!-- Arithmetic Operator -->
-            <select>
+            <select name="orderBy-arithOp">
                 <option></option>
                 <option value="*">×</option>
                 <option value="/">÷</option>
@@ -101,7 +150,7 @@
                 <option>-</option>
             </select>
             <!-- Stat 2 -->
-            <select name="stat2">
+            <select name="orderBy-secondStat">
                 <option></option>
                 {% for stat in stats %}
                     <option val="{{stat.0}}">{{stat.1}}</option>
@@ -109,8 +158,8 @@
             </select>
         </div>
         <div class="multipleToggles">
-            {% include 'toggle.html' with label="Per 90" %}
-            {% include 'toggle.html' with label="Low to High" %}
+            {% include 'toggle.html' with label="Per 90" name="orderBy-PerNinety"%}
+            {% include 'toggle.html' with label="Low to High" name="orderBy-ASC"%}
         </div>
         <!-- Additional Select Fields -->
     </label>

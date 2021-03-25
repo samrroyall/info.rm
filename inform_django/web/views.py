@@ -5,7 +5,7 @@ from django.template.defaulttags import register
 from .card_data import get_dashboard_data, get_player_data, get_from_cache, insert_to_cache
 from .queryset import initial_queryset
 from .management.commands.helpers.config import top_five_league_ids, other_league_ids, international_league_ids
-from .models import Season, League, Team, Player, PlayerStat 
+from .models import Country, Season, League, Team, Player, PlayerStat 
 
 #################################
 ##### CUSTOM DJANGO FILTERS #####
@@ -135,6 +135,11 @@ def players(request, id, season):
 def builder(request):
     # create context dict
     context = default_context()
+    # get countries 
+    context["countries"] = sorted(list(Country.objects.all()), key=lambda x: x.name)
+    # get player positions 
+    context["positions"] = [pos for pos in PlayerStat.POSITIONS if pos[0] != PlayerStat.DEFAULT_POSITION]
+    # get player stats 
     context["stats"] = PlayerStat.STATS
     return render(request, "builder.html", context)
 
