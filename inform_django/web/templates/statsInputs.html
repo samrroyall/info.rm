@@ -33,8 +33,9 @@
         <i class="bi bi-plus-circle-fill"></i>
     {% endif %}
 </div>
-{% if filter %}
-    <div class="multipleSelects">
+<div class="multipleSelects">
+    {% if filter %}
+        {% include 'toggle.html' with label="Per 90" name="filterStat{{ key }}-perNinety" %}
         <select name="filterStat{{ key }}-logicalOp">
             <option></option>
             <option>=</option>
@@ -42,14 +43,9 @@
             <option>></option>
             <option value="><">Between</option>
         </select>
-        <input type="text" name="filterStat{{ key }}-firstVal">
-        <input type="text" class="hide" name="filterStat{{ key }}-secondVal">
-        </select>
-    </div>
-    <script>
-        $(document).ready(() => {
-            showBetweenSecondValue("{{key}}");
-        });
-    </script>
-{% endif %}
-{% include 'toggle.html' with label="Per 90" name="select{{ key }}-PerNinety" %}
+        <input type="number" name="filterStat{{ key }}-firstVal">
+        <input type="number" name="filterStat{{ key }}-secondVal" class="hide">
+    {% else %}
+        {% include 'toggle.html' with label="Per 90" name="selectStat{{ key }}-perNinety" %}
+    {% endif %}
+</div>

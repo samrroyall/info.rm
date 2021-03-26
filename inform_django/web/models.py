@@ -48,8 +48,6 @@ class Player(models.Model):
 
 class PlayerStat(models.Model):
     STATS = [
-        ["minutes_played", "Minutes Played"],
-        ["rating", "Player Rating"],
         ["shots", "Total Shots"],
         ["shots_on_target", "Shots on Target"],
         ["goals", "Goals"],
@@ -73,7 +71,8 @@ class PlayerStat(models.Model):
         ["penalties_committed", "Penalties Committed"],
         ["penalties_scored", "Penalties Scored"],
         ["penalties_taken", "Penalties Taken"],
-        ["penalties_saved", "Penalties Saved"]
+        ["penalties_saved", "Penalties Saved"],
+        ["rating", "Player Rating"],
     ]
 
     class Meta:
@@ -144,11 +143,3 @@ class PlayerStat(models.Model):
             if position == position_string.lower():
                 return n
         return cls.DEFAULT_POSITION
-
-
-
-
-
-
-
-

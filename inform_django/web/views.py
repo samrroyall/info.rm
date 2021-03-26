@@ -1,7 +1,10 @@
+from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.defaulttags import register
+import json
 
+from .builder import get_query_result, query_validator
 from .card_data import get_dashboard_data, get_player_data, get_from_cache, insert_to_cache
 from .queryset import initial_queryset
 from .management.commands.helpers.config import top_five_league_ids, other_league_ids, international_league_ids
@@ -14,6 +17,18 @@ from .models import Country, Season, League, Team, Player, PlayerStat
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+@register.filter
+def fst(list):
+    return list[0]
+
+@register.filter
+def snd(list):
+    return list[1]
+
+@register.filter
+def split(str, char):
+    return str.split(char)
 
 #############################
 ########## HELPERS ##########
@@ -61,6 +76,17 @@ def get_player_cards(playerstats, per_ninety):
         "cards": card_dict,
         "teams": sorted([ps.team for ps in playerstats], key=lambda team: team.id)
     }
+
+def get_all_leagues():
+    leagues_dict = {}
+    for league in League.objects.all():
+        league_str = f"{league.league_id}@{league.name}"
+        leagues_dict[league_str] = {}
+        for team in league.teams.all():
+            if team.season.start_year not in leagues_dict[league_str]:
+                leagues_dict[league_str][team.season.start_year] = []
+            leagues_dict[league_str][team.season.start_year].append(team)
+    return leagues_dict
     
 #############################
 ########## ROUTES ###########
@@ -141,6 +167,10 @@ def builder(request):
     context["positions"] = [pos for pos in PlayerStat.POSITIONS if pos[0] != PlayerStat.DEFAULT_POSITION]
     # get player stats 
     context["stats"] = PlayerStat.STATS
+    # get leagues/teams for each season
+    context["leagues"] = get_all_leagues()
+    # builder form errors
+    context["errors"] = request.session["errors"] if "errors" in request.session else {}
     return render(request, "builder.html", context)
 
 #############################
@@ -153,3 +183,12 @@ def change_per_ninety(request):
     per_ninety_val = request.POST.get("per_ninety") == "true"
     request.session["per_ninety"] = per_ninety_val
     return JsonResponse({"message": "Per Ninety value changed successfully"}, status=200) 
+
+def make_query(request):
+    if request.method != "POST" or not request.is_ajax():
+        return redirect("/builder")
+    errors = query_validator( json.loads(list(request.POST.keys())[0]) )
+    if len(errors) > 0:
+        return JsonResponse(errors, status=400) 
+    else:
+        return JsonResponse({"message": "query was success"}, status=200) 

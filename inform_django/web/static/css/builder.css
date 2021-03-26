@@ -15,6 +15,7 @@ form#builderForm label:not(.toggleLabel) {
     margin: calc(15px + 0.8vw) 0; 
 }
 form#builderForm label#submitLabel { text-align: center; }
+form#builderForm label.hide:not(.toggleLabel) { display: none; }
 
 form#builderForm label p { 
     font-size: calc(12px + 0.4vw);
@@ -38,8 +39,12 @@ form#builderForm select {
     font-size: calc(8px + 0.2vw);
 }
 
-form#builderForm input[type='submit'] { 
+form#builderForm input[type="number"] {
+    width: calc(50px + 1vw);
+}
+form#builderForm input[type="submit"] { 
     margin-left: auto;
+    border-radius: 5px;
     padding: 10px 20px;
     display: inline-block;
     background-color: #343a40;
@@ -48,8 +53,8 @@ form#builderForm input[type='submit'] {
     font-weight: bold; 
     cursor: pointer;
 }
+form#builderForm input[type="submit"]:hover { background-color: black; }
 
-form#builderForm input[type='submit']:hover { background-color: black; }
 form#builderForm label select { cursor: pointer; }
 form#builderForm label select:focus { border: 1px solid #DAA99B; }
 form#builderForm label select option { font-size: 12px; }
@@ -69,12 +74,21 @@ form#builderForm label div.multipleToggles {
     align-items: center;
 }
 
-i.bi-plus-circle-fill {
+form#builderForm i.bi-plus-circle-fill {
     margin-left: 10px;
     color: #007bff;
     cursor: pointer;
 }
-i.bi-plus-circle-fill:hover {
+form#builderForm i.bi-plus-circle-fill:hover {
     color: #0264ce;
+}
+
+form#builderForm div.errors ul {
+    padding-left: calc(15px + 1vw);
+    list-style-type: disc;
+}
+form#builderForm div.errors li {
+    color: red;
+    font-size: calc(10px + 0.2vw);
 }
 

@@ -1,8 +1,3 @@
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-
 function changePerNinety(isChecked) {
     const token = $("form#perNinetyForm input[name='csrfmiddlewaretoken']").first().val();
     $.ajax({
