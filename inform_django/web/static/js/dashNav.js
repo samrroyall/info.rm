@@ -33,7 +33,7 @@ $(document).ready( function () {
         window.location.href = new_href + "/" + $(this).val();
     });
     $("nav#dashNav label.switch input").click( function () {
-        const isChecked = $("nav#dashNav label.switch input:checked").length > 0;
+        const isChecked = $("nav#dashNav label.switch input[type='checkbox']").first().is(":checked");
         changePerNinety(isChecked);
     });
 });

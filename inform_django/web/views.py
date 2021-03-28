@@ -187,8 +187,10 @@ def change_per_ninety(request):
 def make_query(request):
     if request.method != "POST" or not request.is_ajax():
         return redirect("/builder")
-    errors = query_validator( json.loads(list(request.POST.keys())[0]) )
+    post_data = json.loads(list(request.POST.keys())[0])
+    errors = query_validator(post_data)
     if len(errors) > 0:
         return JsonResponse(errors, status=400) 
-    else:
-        return JsonResponse({"message": "query was success"}, status=200) 
+    query_result = get_query_result(post_data)
+    # print([ f"{ps.player.first_name} {ps.player.last_name}: {ps.goalsFloatPer90}" for ps in query_result ])
+    return JsonResponse({"result": "query was success"}, status=200) 

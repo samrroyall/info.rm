@@ -42,3 +42,10 @@
         </select>
     </form>
 </nav>
+<script>
+    $(document).ready( () => {
+        {% if per_ninety is True %}
+            $("nav#dashNav form#perNinetyForm input[type='checkbox']").first().prop("checked", true);
+        {% endif %}
+    });
+</script>

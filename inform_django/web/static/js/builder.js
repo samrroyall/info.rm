@@ -59,7 +59,7 @@ const showQueryFilters = () => {
 
 const builderFormData = () => {
     return {
-        season_start: $("form#builderForm select[name='season']").first().val(),
+        seasonId: $("form#builderForm select[name='season']").first().val(),
         selectStats: [
             {
                 arithOp: $("form#builderForm select[name='selectStat0-arithOp']").first().val(),
@@ -80,10 +80,10 @@ const builderFormData = () => {
                 perNinety: $("form#builderForm input[name='selectStat1-perNinety']").first().is(":checked"),
             },
         ],
-        league_id: $("form#builderForm select[name='league']").first().val(),
+        leagueId: $("form#builderForm select[name='league']").first().val(),
         team: {
             id: $("form#builderForm select[name='team']").first().val(),
-            league_id: $("form#builderForm select[name='teamLeague']").first().val(),
+            leagueId: $("form#builderForm select[name='teamLeague']").first().val(),
         },
         age: {
             logicalOp: $("form#builderForm select[name='age-logicalOp']").first().val(),
@@ -126,12 +126,12 @@ const builderFormData = () => {
         ],
         country: $("form#builderForm select[name='nationality']").first().val(),
         position: $("form#builderForm select[name='position']").first().val(),
-        orderBy: {
-            arithOp: $("form#builderForm select[name='orderBy-arithOp']").first().val(),
-            firstStat: $("form#builderForm select[name='orderBy-firstStat']").first().val(),
-            secondStat: $("form#builderForm select[name='orderBy-secondStat']").first().val(),
-            perNinety: $("form#builderForm input[name='orderBy-perNinety']").first().is(":checked"),
-            lowToHigh: $("form#builderForm input[name='orderBy-lowToHigh']").first().is(":checked"),
+        orderByStat: {
+            arithOp: $("form#builderForm select[name='orderByStat-arithOp']").first().val(),
+            firstStat: $("form#builderForm select[name='orderByStat-firstStat']").first().val(),
+            secondStat: $("form#builderForm select[name='orderByStat-secondStat']").first().val(),
+            perNinety: $("form#builderForm input[name='orderByStat-perNinety']").first().is(":checked"),
+            lowToHigh: $("form#builderForm input[name='orderByStat-lowToHigh']").first().is(":checked"),
         },
     }
 }
@@ -159,7 +159,7 @@ const builderFormSubmit = () => {
             },
             method: "POST",
             url: "/make_query",
-            data: JSON.stringify(formData),
+            data: encodeURIComponent(JSON.stringify(formData)),
             dataType: 'json',
             success: res => { console.log(res); },
             error: errs => { displayErrors(errs.responseJSON); },

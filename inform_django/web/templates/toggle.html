@@ -4,9 +4,7 @@
     <label class="toggleLabel" for="toggle">
         <span>{{label}}</span>
         <label class="switch">
-            <input type="checkbox" id="toggleInput" name="{{name}}"
-                {% if per_ninety and per_ninety is True %} checked {% endif %}
-            >
+            <input type="checkbox" class="toggleInput" name="{{prefix}}-{{type}}">
             <span class="slider round"></span>
         </label>
     </label>

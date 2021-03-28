@@ -1,51 +1,47 @@
+{% with prefix=name|add:"Stat"|add:key %}
 <div class="statInput">
     <div class="multipleSelects">
         <!-- Stat 1 -->
-        <select 
-            {% if filter %} name="filterStat{{ key }}-firstStat" {% else %} name="selectStat{{ key }}-firstStat" {% endif %}
-        >
+        <select name="{{prefix}}-firstStat">
             <option></option>
             {% for stat in stats %}
-                <option val="{{stat.0}}">{{stat.1}}</option>
+                <option value="{{stat.0}}">{{stat.1}}</option>
             {% endfor %}
         </select>
         <!-- Arithmetic Operator -->
-        <select 
-            {% if filter %} name="filterStat{{ key }}-arithOp" {% else %} name="selectStat{{ key }}-arithOp" {% endif %}
-        >
+        <select name="{{prefix}}-arithOp">
             <option></option>
             <option value="*">×</option>
             <option value="/">÷</option>
-            <option>+</option>
-            <option>-</option>
+            <option >+</option>
+            <option >-</option>
         </select>
         <!-- Stat 2 -->
-        <select 
-            {% if filter %} name="filterStat{{ key }}-secondStat" {% else %} name="selectStat{{ key }}-secondStat" {% endif %}
-        >
+        <select name="{{prefix}}-secondStat">
             <option></option>
             {% for stat in stats %}
-                <option val="{{stat.0}}">{{stat.1}}</option>
+                <option value="{{stat.0}}">{{stat.1}}</option>
             {% endfor %}
         </select>
     </div>
-    {% if not last %}
+    {% if not last and name != "orderBy" %}
         <i class="bi bi-plus-circle-fill"></i>
     {% endif %}
 </div>
 <div class="multipleSelects">
-    {% if filter %}
-        {% include 'toggle.html' with label="Per 90" name="filterStat{{ key }}-perNinety" %}
-        <select name="filterStat{{ key }}-logicalOp">
+    {% include 'toggle.html' with label="Per 90" prefix=prefix type="perNinety" %}
+    {% if name == "filter" %}
+        <select name="{{prefix}}-logicalOp">
             <option></option>
             <option>=</option>
             <option><</option>
             <option>></option>
             <option value="><">Between</option>
         </select>
-        <input type="number" name="filterStat{{ key }}-firstVal">
-        <input type="number" name="filterStat{{ key }}-secondVal" class="hide">
-    {% else %}
-        {% include 'toggle.html' with label="Per 90" name="selectStat{{ key }}-perNinety" %}
+        <input type="number" step=".01" name="{{prefix}}-firstVal">
+        <input type="number" step=".01" name="{{prefix}}-secondVal" class="hide">
+    {% elif name == "orderBy" %}
+        {% include 'toggle.html' with label="Low to High" prefix=prefix type="lowToHigh" %}
     {% endif %}
 </div>
+{% endwith %}
