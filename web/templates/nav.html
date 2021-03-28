@@ -1,0 +1,37 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/nav.css' %}">
+<script src="{% static 'js/nav.js' %}"></script>
+<nav id="mainNav">
+    <ul>
+        <li class="regularNav">
+            <a href="/" id="brand">
+                <h1>info-rm</h1>
+            </a>
+            <a class="collapsible" href="/builder">
+                <h5> StatBuilder </h5>
+                <i class="bi bi-hammer"></i>
+            </a>
+            <form class="collapsible">
+                <h5><input type="text" placeholder="Search" /></h5>
+            </form>
+        </li>
+        <li class="leagueNav">
+            <div class="firstRow">
+                {% for league in first_row_leagues %}
+                    <a href="/league/{{league.league_id}}/{{current_season.start_year}}">
+                        <img src="{{league.logo}}"/>
+                    </a>
+                {% endfor %}
+                <i class="bi bi-caret-down-fill"></i>
+                <i class="bi bi-caret-up-fill hide"></i>
+            </div>
+            <div class="secondRow">
+                {% for league in second_row_leagues %}
+                    <a href="/league/{{league.league_id}}/{{current_season.start_year}}">
+                        <img src="{{league.logo}}"/>
+                    </a>
+                {% endfor %}
+            </div>
+        </li>
+    </ul>
+</nav>

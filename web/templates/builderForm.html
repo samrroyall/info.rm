@@ -1,0 +1,197 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/builder.css' %}">
+<script src="{% static 'js/utils.js' %}"></script>
+<script src="{% static 'js/builder.js' %}"></script>
+<form id="builderForm">
+    {% csrf_token %}
+    
+    <!-- Season Select -->
+    <label for="season">
+        <p>Choose Season:</p> 
+        <div class="errors" id="seasonErrors"></div>
+        <select name="season">
+            <option value="{{current_season.id}}">
+                {{current_season.start_year}}/{{current_season.end_year|stringformat:"i"|slice:"2:"}}
+            </option>
+            {% for season in seasons %}
+                {% if season.start_year != current_season.start_year %}
+                <option value="{{season.id}}">
+                    {{season.start_year}}/{{season.end_year|stringformat:"i"|slice:"2:"}}
+                </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </label>
+
+    <!-- Stats Select -->
+    <label>
+        <p>Select Query Fields:</p>
+        <div class="errors" id="selectStatsErrors"></div>
+        <div id="querySelects">
+            <div class="statsInputs" key="0">
+                {% include 'statsInputs.html' with name="select" key="0" %}
+            </div>
+            <div class="statsInputs hide" key="1">
+                {% include 'statsInputs.html' with name="select" key="1" %}
+            </div>
+            <div class="statsInputs hide" key="2">
+                {% include 'statsInputs.html' with name="select" key="2" last="true" %}
+            </div>
+        </div>
+    </label>
+
+    <!-- Filter Select -->
+    <label>
+        <p>Select Query Filters:</p>
+        <p class="subheading">
+            Tip: If querying Per 90 fields, try filtering by Minutes Played
+        </p>
+        <select id="queryFilterSelect">
+            <option></option>
+            <option value="leagueSelect">League</option>
+            <option value="clubSelect">Club</option>
+            <option value="minutesPlayedInput">Minutes Played</option>
+            <option value="filterStatsInput">Stats</option>
+            <option value="ageInput">Age</option>
+            <option value="nationalityInput">Nationality</option>
+            <option value="positionInput">Position</option>
+        </select>
+    </label>
+
+    <div id="queryFilters">
+        <label id="leagueSelect" class="hide" for="league">
+            <p>League:</p>
+            <div class="errors" id="leagueErrors"></div>
+            <select name="league">
+                <option></option>
+                {% for league_str in leagues %}
+                    {% with split_league=league_str|split:'@' %}
+                        <option value="{{split_league|fst}}">
+                            {{split_league|snd|title}}
+                        </option>
+                    {% endwith %}
+                {% endfor %}
+            </select>
+        </label>
+
+        <label id="clubSelect" class="hide" for="league">
+            <p>Club:</p>
+            <div class="errors" id="teamErrors"></div>
+            <div class="multipleSelects">
+                <select name="teamLeague">
+                    <option></option>
+                    {% for league_str in leagues %}
+                        {% with split_league=league_str|split:'@' %}
+                            <option value="{{split_league|fst}}">
+                                {{split_league|snd|title}}
+                            </option>
+                        {% endwith %}
+                    {% endfor %}
+                </select>
+                <select name="team">
+                    <option></option>
+                    {% for league_str, league in leagues.items %}
+                        {% with leagueId=league_str|split:'@'|fst %}
+                            {% for team_start_year, teams in league.items %}
+                                {% for team in teams %}
+                                    <option value="{{team.id}}" 
+                                        class="season-{{team_start_year}} league-{{leagueId}} hide" 
+                                    >
+                                        {{team.name|title}}
+                                    </option>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endwith %}
+                    {% endfor %}
+                </select>
+            </div>
+        </label>
+
+        <label id="minutesPlayedInput" class="hide" for="minutesPlayed">
+            <p>Minutes Played:</p>
+            <div class="errors" id="minutesPlayedErrors"></div>
+            <div class="multipleSelects">
+                <select name="minutesPlayed-logicalOp">
+                    <option></option>
+                    <option>=</option>
+                    <option><</option>
+                    <option>></option>
+                    <option value="><">Between</option>
+                </select>
+                <input type="number" name="minutesPlayed-firstVal">
+                <input type="number" name="minutesPlayed-secondVal" class="hide">
+            </div>
+        </label>
+
+        <label id="filterStatsInput" class="hide">
+            <p>Stats:</p>
+            <div class="errors" id="filterStatsErrors"></div>
+            <div id="statsFilters">
+                <div class="statsInputs" key="0">
+                    {% include 'statsInputs.html' with name="filter" key="0"%}
+                </div>
+                <div class="statsInputs hide" key="1">
+                    {% include 'statsInputs.html' with name="filter" key="1" %}
+                </div>
+                <div class="statsInputs hide" key="2">
+                    {% include 'statsInputs.html' with name="filter" key="2" last="true" %}
+                </div>
+            </div>
+        </label>
+
+        <label id="ageInput" class="hide" for="age">
+            <p>Age:</p>
+            <div class="errors" id="ageErrors"></div>
+            <div class="multipleSelects">
+                <select name="age-logicalOp">
+                    <option></option>
+                    <option>=</option>
+                    <option><</option>
+                    <option>></option>
+                    <option value="><">Between</option>
+                </select>
+                <input type="number" name="age-firstVal">
+                <input type="number" name="age-secondVal" class="hide">
+            </div>
+        </label>
+
+        <label id="nationalityInput" class="hide" for="nationality">
+            <p>Nationality:</p>
+            <div class="errors" id="nationalityErrors"></div>
+            <select name="nationality">
+                <option></option>
+                {% for country in countries %}
+                    <option value="{{country.id}}">{{country.name|title}}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label id="positionInput" class="hide" for="position">
+            <p>Position:</p>
+            <div class="errors" id="positionErrors"></div>
+            <select name="position">
+                <option></option>
+                {% for position in positions %}
+                    <option value="{{position.1}}">{{position.1|title}}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+
+    <!-- Stats Select -->
+    <label>
+        <p>
+            Select Order-By Field:
+            <p class="subheading">
+                By default, results will be sorted by the first seleted field
+            </p>
+        </p>
+        <div class="statsInputs">
+            {% include 'statsInputs.html' with name="orderBy"  key="" %}
+        </div>
+        <!-- Additional Select Fields -->
+    </label>
+    <label id="submitLabel">
+        <input type="submit" value="Make Query" />
+    </label>
+</form>

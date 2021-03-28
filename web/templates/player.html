@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        info.rm |
+        {{current_player.first_name|title}} {{current_player.last_name|title}}
+    </title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <!-- JQuery Link -->
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <!-- Self-defined CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/player.css' %}">
+</head>
+<body>
+    {% include 'nav.html' %} 
+    {% include 'dashNav.html' with perNinety=True page="player"%} 
+    <main>
+        <div id="playerPageHeader">
+            <h1>{{current_player.first_name|title}} {{current_player.last_name|title}}</h1>
+            <select id="cardsSelect">
+                {% for team in player_cards.teams %}
+                    <option value="{{team.id}}">{{team.name|title}}, {{team.league.name|title}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% for team in player_cards.teams %}
+            {% with curr_team_id=team.id %}
+            {% with curr_cards=player_cards.cards|get_item:curr_team_id %}
+                <div id="cards-{{curr_team_id}}"
+                    {% if forloop.counter == 1 %}
+                        class="playerCards active" 
+                    {% else %}
+                        class="playerCards" 
+                    {% endif %}
+                >
+                    {% include 'card.html' with type="bio" singleCard=True cards=curr_cards.bio.cards %}
+                    {% include 'card.html' with cards=curr_cards.stats.cards %}
+                </div>
+            {% endwith %}
+            {% endwith %}
+        {% endfor %}
+
+    </main>
+    {% include 'footer.html' %} 
+<script>
+    $(document).ready( function () {
+        $("select#cardsSelect").change( e => {
+            $("div.playerCards").removeClass("active");
+            $(`div#cards-${e.target.value}`).addClass("active");
+        });
+    });
+</script>
+</body>
+</html>

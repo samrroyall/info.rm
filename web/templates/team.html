@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        info-rm |
+        {{current_team.name|title}}
+    </title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <!-- JQuery Link -->
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <!-- Self-defined CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/team.css' %}">
+</head>
+<body>
+    {% include 'nav.html' %} 
+    {% include 'dashNav.html' with perNinety=False page="team"%}
+    <main>
+        <div id="teamHeader">
+            <img src="{{current_team.logo}}">
+            <h1>{{current_team.name|title}}</h1>
+        </div>
+        <div id="teamPlayersByPosition">
+            {% for position in positions %}
+            <div>
+                <h2>{{position.1|title}}</h2>
+                <ul>
+                {% for playerstat in current_playerstats %}
+                {% if playerstat.position == position.0 %}
+                    <li>
+                        <i class="bi bi-person-fill"></i>
+                        <a href="/player/{{playerstat.player.player_id}}/{{current_season.start_year}}">
+                            {{playerstat.player.first_name|title}}
+                            {{playerstat.player.last_name|title}}
+                        </a>
+                    </li> 
+                {% endif %}
+                {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        <div>
+    </main>
+    {% include 'footer.html' %} 
+</body>
+</html>

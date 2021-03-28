@@ -1,0 +1,118 @@
+div.cardContent:not(.active) { display: none; }
+
+div.card, div.cardBody {
+    margin: 3% 2%;
+    border: 1px solid lightgrey;
+    border-radius: 3px;
+}
+div.card { 
+    background-color: whitesmoke;
+    width: 400px; 
+    padding: 5px;
+}
+div.cardTitle {
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: calc(10px + 0.4vw);
+    font-weight: bold;
+}
+div.card.bioCard div.cardTitle {
+    display: block;
+    text-align: center;
+}
+div.cardTitle i { cursor: pointer; }
+div.cardTitle i:hover { color: black; }
+
+
+div.cardBody {
+    background-color: white;
+    font-size: calc(10px + 0.2vw);
+}
+div.cardBody ul.page:not(.active) { display: none; }
+div.cardBody li { 
+    height: calc(30px + 0.5vw);
+    border-bottom: 1px solid lightgrey; 
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+div.cardBody li:last-of-type { border-bottom: 0; }
+div.cardBody li img {
+    height: calc(20px + 0.5vw);
+    width: auto;
+}
+div.cardBody li div.playerTeamInfo {
+    width: 70%;
+    font-size: calc(8px + 0.2vw);
+    text-align: left;
+}
+div.cardBody li div.playerInfo a { color: black; }
+div.cardBody li div.playerInfo a:hover { text-decoration: underline; }
+div.cardBody li div.playerInfo { 
+    color: black;
+    font-weight: bold;
+}
+div.cardBody li a.logo {
+    display: inline-block;
+    width: calc(15% - 10px);
+    padding-left: 10px;
+    text-align: left;
+}
+
+div.cardBody li span.title { font-weight: bold; }
+
+div.cardBody li span.value {
+    width: calc(15% - 10px);
+    padding-right: 10px;
+    text-align: right;
+    font-size: calc(10px + 0.2vw);
+    font-weight: bold;
+    color: #007bff;
+}
+
+div.card.bioCard div.cardBody li span.value {
+    color: black;
+}
+
+
+ul.cardPagination {
+    padding-bottom: 5px;
+    display: flex;
+    font-size: calc(8px + 0.2vw);
+    justify-content: center;
+    align-items: center;
+}
+ul.cardPagination li {
+    height: calc(20px + 0.5vw);
+    width: calc(20px + 0.5vw);
+    background-color: white;
+    color: #007bff;
+    border-top: 0.5px solid lightgrey;
+    border-bottom: 0.5px solid lightgrey;
+    border-right: 0.5px solid lightgrey;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+ul.cardPagination li.active {
+    background-color: #007bff;
+    color: white;
+}
+ul.cardPagination li.active:hover {
+    background-color: #007bff;
+    color: white;
+}
+ul.cardPagination li:hover {
+    background-color: whitesmoke;
+}
+ul.cardPagination li:first-of-type {
+    border-left: 0.5px solid lightgrey;
+    border-radius: 3px 0 0 3px;
+}
+ul.cardPagination li:last-of-type {
+    border-radius: 0 3px 3px 0;
+}

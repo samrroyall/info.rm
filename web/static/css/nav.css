@@ -1,0 +1,112 @@
+/* Nav CSS */
+nav#mainNav { 
+    border-bottom: 1px solid lightgrey; 
+    background-color: #f8f9fa;
+}
+nav#mainNav ul {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+nav#mainNav li {
+    height: calc(25px + 1vw);
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav#mainNav a#brand { 
+    font-family: 'Century Gothic', sans-serif;
+    margin: 0 2% 0 0;
+    border-right: 1px solid lightgrey;
+    padding: 10px 3%;
+    color:  #6c757d;
+    font-weight: bold; 
+}
+nav#mainNav a#brand:hover { color: black; }
+nav#mainNav li.regularNav {
+    width: calc(50% - 1px);
+    border-right: 1px solid lightgrey; 
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+nav#mainNav li.regularNav i { 
+    /* figure out responsive height solution */
+    margin: 0 5%;
+}
+nav#mainNav li.regularNav a {
+    height: 100%;
+    margin: 0 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav#mainNav li.leagueNav { width: 50%; }
+nav#mainNav li.leagueNav div.firstRow {
+    height: calc(25px + 1vw);
+    width: 100%;
+    padding: 0px 0 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+nav#mainNav li.leagueNav div.firstRow a { 
+    width: calc(25px + 1vw);
+    margin: 0 5%; 
+    display: inline-block;
+}
+nav#mainNav li.leagueNav div.firstRow i { 
+    color: grey; 
+    cursor: pointer;
+}
+nav#mainNav li.leagueNav div.firstRow i:hover { color: black; }
+nav#mainNav li.leagueNav div.firstRow img { height: calc(20px + 1vw); }
+nav#mainNav li.leagueNav div.firstRow img:hover { height: calc(25px + 1vw); }
+
+nav#mainNav li.leagueNav div.secondRow {
+    height: calc(22px + 1vw);
+    width: 100%;
+    border-top: 1px solid lightgrey;
+    padding: 10px 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+nav#mainNav li.leagueNav div.secondRow a { 
+    width: calc(22px + 1vw);
+    margin: 0 3.5%; 
+    display: inline-block;
+}
+nav#mainNav li.leagueNav div.secondRow img { height: calc(17px + 1vw); }
+nav#mainNav li.leagueNav div.secondRow img:hover { height: calc(22px + 1vw); }
+
+nav#mainNav form { margin: 0 2%; }
+nav#mainNav input[type='text'] { 
+    outline: none;
+    border: 1px solid lightgrey; 
+    border-radius: 3px; 
+    padding: 5px; 
+}
+nav#mainNav input[type='text']:focus { 
+    color: grey;
+    border: 1px solid #DAA99B;
+}
+
+/* mobile */
+@media only screen and (max-width: 480px) {
+    nav#mainNav li.leagueNav { display: none; }
+    nav#mainNav li.regularNav .collapsible { display: none; }
+    nav#mainNav a#brand { border: 0; }
+}
+/* tablet */
+@media only screen and (max-width: 1023.9px) {
+    nav#mainNav li.regularNav { 
+        width: 100%; 
+        border: 0;
+    }
+    nav#mainNav li.leagueNav { display: none; }
+}
+/* desktop */
+@media only screen and (min-width: 1024px) {
+}
