@@ -6,7 +6,7 @@ import json
 
 from .builder import get_query_result, query_validator
 from .card_data import get_dashboard_data, get_player_data, get_from_cache, insert_to_cache
-from .queryset import initial_queryset
+from .queryset import modify_queryset
 from .management.commands.helpers.config import top_five_league_ids, other_league_ids, international_league_ids
 from .models import Country, Season, League, Team, Player, PlayerStat 
 
@@ -49,10 +49,25 @@ def get_per_ninety(request):
     return request.session.get("per_ninety")
 
 def get_card_data(season, per_ninety, league = None):
+    # return stored result if present
     card_cache_data = get_from_cache(season, per_ninety, league)
     if card_cache_data is not None:
         return card_cache_data
-    card_data = get_dashboard_data(initial_queryset(season, league), per_ninety)
+
+    # generate dashboard cards 
+    # current league(s)
+    valid_leagues = [ 
+        league if league is not None
+        else League.objects.get(league_id=id) for id in top_five_league_ids 
+    ]
+    # initial queryset filter lambdas
+    lambdas = [
+        lambda q: q.filter(team__season=season),
+        lambda q: q.filter(team__league__in=valid_leagues),
+        lambda q: q.filter(minutes_played__gte=get_max(q, "minutes_played")/5)
+    ]
+    initial_queryset = modify_queryset(PlayerStat.objects.all(), lambdas)
+    card_data = get_dashboard_data()
     insert_to_cache(season, per_ninety, league, card_data)
     return card_data
 

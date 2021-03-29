@@ -3,7 +3,7 @@ import math
 from typing import Any, Callable, Dict, List, Union
 
 from .models import PlayerStat
-from .queryset import order_queryset, filter_queryset, initial_queryset 
+from .queryset import order_queryset, modify_queryset
 
 #############################
 ######## CARDENTRY ##########
@@ -13,7 +13,7 @@ class CardEntry:
     def __init__(
         self, 
         title: str,
-        value: Union[int, float, str]
+        value: Union[int, float, str, None]
     ) -> None:
         self.title = title
         self.value = value
@@ -26,6 +26,18 @@ class CardEntry:
             f"{pct_string}%" if pct is True
             else float_string[0] + '.' + float_string[1][:2].ljust(2, '0')
         )
+
+class BioCardEntry(CardEntry):
+    def __init__(
+        self, 
+        title: str,
+        value: Union[int, float],
+        logo: Union[str, None] = None,
+        link: Union[str, None] = None
+    ) -> None:
+        super().__init__(title, value)
+        self.logo = logo
+        self.link = link
 
 class DashCardEntry(CardEntry):
     def __init__(
@@ -48,17 +60,27 @@ class DashCardEntry(CardEntry):
     def get_player_name(self):
         return f"{self.first_name[0].upper()}. {self.last_name.title()}"
 
-class BioCardEntry(CardEntry):
+class BuilderCardEntry(CardEntry):
     def __init__(
         self, 
-        title: str,
-        value: Union[int, float],
-        logo: Union[str, None] = None,
-        link: Union[str, None] = None
+        values: Dict[str, Union[int, float]],
+        data: PlayerStat,
+        rank: int
     ) -> None:
-        super().__init__(title, value)
-        self.logo = logo
-        self.link = link
+        super().__init__("", None)
+        self.values = values
+        self.data = data
+        self.rank = rank
+        self.player_id = self.data.player.player_id
+        self.first_name = self.data.player.first_name
+        self.last_name = self.data.player.last_name
+        self.team = self.data.team.name
+        self.team_id = self.data.team.team_id
+        self.team_logo = self.data.team.logo
+        self.league = self.data.team.league.name
+
+    def get_player_name(self):
+        return f"{self.first_name[0].upper()}. {self.last_name.title()}"
 
 #############################
 ########### CARD ############
@@ -72,6 +94,15 @@ class Card:
     ) -> None:
         self.title = title
         self.data = data
+        self.num_pages = math.ceil(len(self.data)/10)
+
+    def get_pages(self) -> List[ List[CardEntry] ]:
+        pages = []
+        for i in range(self.num_pages):
+            start = i*10
+            end = (i+1)*10 if (i+1)*10 <= len(self.data) else len(self.data)
+            pages.append( self.data[start:end] )
+        return pages
 
     @classmethod
     def from_list(
@@ -96,66 +127,6 @@ class Card:
         return Card(
             title=title,
             data=entries
-        )
-    
-class DashCard(Card):
-    def __init__(
-        self, 
-        title: str,
-        data: List[DashCardEntry]
-    ) -> None:
-        super().__init__(title, data)
-        self.num_pages = math.ceil(len(self.data)/10)
-
-    def get_pages(self) -> List[ List[CardEntry] ]:
-        pages = []
-        for i in range(self.num_pages):
-            start = i*10
-            end = (i+1)*10 if (i+1)*10 <= len(self.data) else len(self.data)
-            pages.append( self.data[start:end] )
-        return pages
-
-    @classmethod
-    def format_data( 
-        cls,
-        queryset: QuerySet, 
-        per_ninety: bool,
-        pct: bool
-    ) -> List[DashCardEntry]:
-        entries = []
-        prev_val = None
-        prev_rank = None
-        curr_rank = 0
-        for playerstat in queryset:
-            curr_rank += 1
-            val = playerstat.order_field
-            rank = curr_rank if (prev_val is None or prev_val != val) else prev_rank
-            prev_rank = rank 
-            prev_val = val
-            entries.append(DashCardEntry(
-                rank=rank, 
-                value=DashCardEntry.display_float(val, pct) if type(val) != int else val, 
-                data=playerstat
-            ))
-        return entries
-
-    @classmethod
-    def from_queryset(
-        cls,
-        queryset: QuerySet,
-        per_ninety: bool,
-        field: Union[str, IntegerField, FloatField],
-        title: Union[str, None] = None,
-        desc: bool = True,
-        pct: bool = False,
-        filter_lambdas: List[Callable] = []
-    ) -> Any:
-        filtered_queryset = filter_queryset(queryset, filter_lambdas)
-        ordered_queryset = order_queryset(filtered_queryset, field, per_ninety, desc)
-        title = field.replace('_',' ').title() if title is None else title
-        return DashCard(
-            title=title if per_ninety is False else f"{title} Per 90", 
-            data=cls.format_data(ordered_queryset, per_ninety, pct)
         )
 
 class BioCard(Card):
@@ -206,19 +177,115 @@ class BioCard(Card):
             value=f"{round(weight_lb)} lbs"
         ))
         return BioCard(data=data)
+    
+class DashCard(Card):
+    def __init__(
+        self, 
+        title: str,
+        data: List[DashCardEntry]
+    ) -> None:
+        super().__init__(title, data)
+
+    @classmethod
+    def format_data( 
+        cls,
+        queryset: QuerySet, 
+        pct: bool
+    ) -> List[DashCardEntry]:
+        entries = []
+        prev_val = None
+        prev_rank = None
+        curr_rank = 0
+        for playerstat in queryset:
+            curr_rank += 1
+            val = playerstat.order_field
+            rank = curr_rank if (prev_val is None or prev_val != val) else prev_rank
+            prev_rank = rank 
+            prev_val = val
+            entries.append(DashCardEntry(
+                rank=rank, 
+                value=CardEntry.display_float(val, pct) if type(val) != int else val, 
+                data=playerstat
+            ))
+        return entries
+
+    @classmethod
+    def from_queryset(
+        cls,
+        queryset: QuerySet,
+        per_ninety: bool,
+        field: Union[str, IntegerField, FloatField],
+        title: Union[str, None] = None,
+        desc: bool = True,
+        pct: bool = False,
+        lambdas: List[Callable] = []
+    ) -> Any:
+        filtered_queryset = modify_queryset(queryset, lambdas)
+        ordered_queryset = order_queryset(filtered_queryset, field, per_ninety, desc)
+        title = field.replace('_',' ').title() if title is None else title
+        return DashCard(
+            title=title if per_ninety is False else f"{title} Per 90", 
+            data=cls.format_data(ordered_queryset, per_ninety, pct)
+        )
+
+class BuilderCard(Card):
+    def __init__(
+        self, 
+        header: List[str], 
+        data: List[BuilderCardEntry]
+    ) -> Any:
+        super().__init__("Query Results", data)
+        self.header = header
+
+    @classmethod
+    def format_data( 
+        cls,
+        queryset: QuerySet, 
+        select_fields: Dict[str, Union[FloatField, IntegerField, bool]],
+        order_by_field: Dict[str, Union[FloatField, IntegerField, bool]]
+        # pct: bool
+    ) -> List[BuilderCardEntry]:
+        entries = []
+        prev_val = None
+        prev_rank = None
+        curr_rank = 0
+        for playerstat in queryset:
+            curr_rank += 1
+            val = playerstat.order_field
+            rank = curr_rank if (prev_val is None or prev_val != val) else prev_rank
+            prev_rank = rank 
+            prev_val = val
+            entries.append(
+                BuildCardEntry(
+                    rank=rank, 
+                    values=select_fields, # consider how to display floats/pcts
+                    data=playerstat
+                )
+            )
+        return entries
+
+
+
+    @classmethod
+    def from_queryset(
+        cls,
+        queryset: QuerySet,
+        select_fields: Dict[str, Union[FloatField, IntegerField, bool]],
+        order_by_field: Dict[str, Union[FloatField, IntegerField, bool]],
+        lambdas: List[Callable] = []
+    ) -> Any:
+        filtered_queryset = modify_queryset(queryset, lambdas)
+        ordered_queryset = order_queryset(
+            filtered_queryset, 
+            order_by_field["value"], 
+            order_by_field["per_ninety"], 
+            order_by_field["desc"]
+        )
+        return BuilderCard(
+            header=select_fields.keys(),
+            data=cls.format_data(ordered_queryset, select_fields, order_by_field)
+        )
 
 class CardList:
     def __init__(self, cards: List[Card]) -> None:
         self.cards = cards
-
-# class BuilderCardEntry:
-#     def __init__(self, 
-#         rank_to_values: Dict[int, Union[int, float]],
-#         player_stat: PlayerStat
-#     ) -> None:
-#         self.rank_to_values = this.rank_to_values,
-#         self.first_name = player_stat.player.first_name
-#         self.last_name = player_stat.player.last_name
-#         self.team = player_stat.team.name
-#         self.team_logo =  player_stat.team.logo
-#         self.league = player_stat.league.name

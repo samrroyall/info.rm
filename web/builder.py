@@ -1,46 +1,54 @@
-from django.db.models import F, FloatField, IntegerField, QuerySet, Max
+from django.db.models import F, FloatField, IntegerField, QuerySet
 from django.db.models.functions import Cast 
+from typing import Callable, Dict, List, Tuple, Union
 
+from .card import BuilderCard
 from .models import Country, Season, League, Team, Player, PlayerStat 
+from .queryset import annotate_queryset, modify_queryset, filter_by_comparison, order_queryset
 stat_list = [stat[0] for stat in PlayerStat.STATS]
 
 ############################
 #### VALIDATION HELPERS ####
 ############################
 
-def valid_team(id):
+def valid_team(id: str) -> bool:
     return id == "" or len(Team.objects.filter(id=int(id))) > 0
 
-def valid_league(id):
+def valid_league(id: str) -> bool:
     return id == "" or len(League.objects.filter(league_id=int(id))) > 0
 
-def valid_season(id):
+def valid_season(id: str) -> bool:
     return len(Season.objects.filter(id=int(id))) > 0
 
-def valid_number(n_str):
+def valid_number(n_str: str) -> bool:
     if '.' not in n_str: return n_str.isdecimal()
     split_n_str = n_str.split('.')
     return split_n_str[0].isdecimal() and split_n_str[1].isdecimal()
 
-def valid_position(pos):
+def valid_position(pos: str) -> bool:
     return pos == "" or PlayerStat.get_position(pos) != PlayerStat.DEFAULT_POSITION
 
-def valid_country(id):
+def valid_country(id: str) -> bool:
     return id == "" or len(Country.objects.filter(id=int(id))) > 0
 
-def valid_arith_op(op):
+def valid_arith_op(op: str) -> bool:
     return op in ["", "*", "/", "+", "-"]
 
-def valid_logical_op(op):
+def valid_logical_op(op: str) -> bool: 
     return op in ["<", ">", "=", "><"]
 
-def add_error(errors, key, message):
+def add_error(errors: Dict[str, List[str]], key: str, message: str) -> None:
     if key in errors:
         errors[key].append(message)
     else:
         errors[key] = [message]
 
-def check_comparison_val(errors, data, error_key, field_name):
+def check_comparison_val(
+    errors: Dict[str, List[str]], 
+    data: Dict[str, Union[str, int, float]], 
+    error_key: str, 
+    field_name: str
+) -> None:
     if not valid_logical_op(data["logicalOp"]):
         add_error(errors, error_key, f"Logical operator for {field_name} field is invalid")
     if not valid_number(data["firstVal"]):
@@ -50,7 +58,12 @@ def check_comparison_val(errors, data, error_key, field_name):
     ):
         add_error(errors, error_key, f"Second value for {field_name} field is invalid")
 
-def check_stat(errors, data, error_key, field_name):
+def check_stat(
+    errors: Dict[str, List[str]], 
+    data: Dict[str, Union[str, int, float]], 
+    error_key: str, 
+    field_name: str
+) -> None:
     # skip empty stats
     if data["firstStat"] == "": return
     # for select, filter, and orderBy stats
@@ -67,14 +80,16 @@ def check_stat(errors, data, error_key, field_name):
         check_comparison_val(errors, data, error_key, field_name)
     # for orderBy stats
     if "lowToHigh" in data and type(data["lowToHigh"]) != bool:
-            add_error(errors, error_key, f"Low to High toggle for {field_name} field is invalid")
+        add_error(errors, error_key, f"Low to High toggle for {field_name} field is invalid")
 
 ##########################
 ####### VALIDATION #######
 ##########################
 
-def query_validator(postData):
-    errors = {}
+def query_validator(
+    postData: Dict[str, Union[float, int]]
+) -> Dict[str, List[str]]:
+    errors: Dict[str, List[str]] = {}
 
     ##### REQUIRED VALIDATIONS #####
     # ensure that at least one select stat is selected
@@ -125,117 +140,99 @@ def query_validator(postData):
 #### QUERY HELPERS ####
 #######################
 
-def camelize(stat_name):
-    camel_stat = stat_name.replace('_', ' ').title().replace(' ', '')
+def camelize(stat_name: str) -> str:
+    camel_stat: str = stat_name.replace('_', ' ').title().replace(' ', '')
     return camel_stat[0].lower() + camel_stat[1:]
 
-def get_arith_annotation_name(stat1, op, stat2, per_ninety):
+def get_comparison_field_name(stat: Dict[str, Union[int, float]]) -> str:
     op_to_word = {
         "/": "Over",
         "*": "Times",
         "+": "Plus",
         "-": "Minus",
     }
-    return f"{ camelize(stat1) }{ op_to_word[op] }{ camelize(stat2) }{ 'Per90' if per_ninety is True else '' }"
-
-def get_annotation_name(stat):
     if stat["arithOp"] == "":
-        return f"{ camelize(stat['firstStat']) }Float{ 'Per90' if stat['perNinety'] is True else '' }"
-    return get_arith_annotation_name(stat["firstStat"], stat["arithOp"], stat["secondStat"], stat["perNinety"])
+        return camelize(stat['firstStat']) + "Float"
+    return camelize(stat["firstStat"]) + op_to_word[stat["arithOp"]] + camelize(stat["secondStat"])
 
-def get_arith_annotation_value(stat1, op, stat2):
+def get_comparison_field_value(
+    stat: Dict[str, Union[int, float]]
+) -> Union[IntegerField, FloatField]:
     op_to_callable = {
         "/": lambda a, b: a/b,
         "*": lambda a, b: a*b,
         "+": lambda a, b: a+b,
         "-": lambda a, b: a-b,
     }
-    if op == "/":
-        annotation_value = op_to_callable[op]( Cast(F(stat1), FloatField()), Cast(F(stat2), FloatField()) )
-    else:
-        annotation_value = op_to_callable[op]( F(stat1), F(stat2) )
-    return annotation_value
-
-def get_annotation_value(stat):
     if stat["arithOp"] == "":
-        annotation_value = Cast( F(stat["firstStat"]), FloatField() )
-    else:
-        annotation_value = get_arith_annotation_value(stat["firstStat"], stat["arithOp"], stat["secondStat"])
-    per_ninety_value = Cast(F("minutes_played"), FloatField())/90.0
-    return annotation_value if stat["perNinety"] is False else Cast(annotation_value, FloatField())/per_ninety_value
-
-def annotate_queryset(queryset, stat, annotation_name = None):
-    # annotate
-    if annotation_name is None: annotation_name = get_annotation_name(stat)
-    annotation_value = get_annotation_value(stat)
-    annotation_map = { annotation_name: annotation_value }
-    return queryset.annotate(**annotation_map), annotation_name
-
-def filter_queryset(queryset, stat, field_name):
-    # handle empty filters
-    if stat["logicalOp"] == "": return queryset
-    # filter
-    if stat["logicalOp"] in (">", "><"):
-        filter_map = { f"{field_name}__gt": float(stat["firstVal"]) } 
-        queryset = queryset.filter(**filter_map)
-    if stat["logicalOp"] in ("<", "><"):
-        filter_map = { f"{field_name}__lt": float(stat["firstVal" if stat["logicalOp"] == "<" else "secondVal"]) }
-        queryset = queryset.filter(**filter_map)
-    if stat["logicalOp"] == "=":
-        filter_map = { field_name: float(stat["firstVal"]) }
-        queryset = queryset.filter(**filter_map)
-    return queryset
+        return Cast( F(stat["firstStat"]), FloatField() )
+    return (
+        op_to_callable[op]( F(stat1), F(stat2) ) if op != "/"
+        else op_to_callable[op]( Cast(F(stat1), FloatField()), Cast(F(stat2), FloatField()) )
+    )
 
 ########################
 ####### DB QUERY #######
 ########################
 
-def get_filtered_queryset(queryset, post_data):
+def get_queryset_lambdas(
+    queryset: QuerySet, 
+    post_data: Dict[str, Union[float, int]]
+) -> QuerySet:
+    # season lambda
+    queryset_lambdas = [ lambda q: q.filter( team__season__id=int(post_data["seasonId"])) ]
+    count = 1
     for stat in post_data["filterStats"]:
-        # handle empty stat filters
         if stat["firstStat"] == "": continue
-        # annotate
-        queryset, annotation_name = annotate_queryset(queryset, stat)
-        # filter 
-        queryset = filter_queryset(queryset, stat, annotation_name)
-
-    # OTHER FILTERS
-    # minutesPlayed
-    queryset = filter_queryset(queryset, post_data["minutesPlayed"], "minutes_played")
-    # age
-    queryset = filter_queryset(queryset, post_data["age"], "age")
-    # league and team
-    if post_data["leagueId"] != "":
-        if post_data["team"]["id"] != "":
-            queryset = queryset.filter(team__id=int(post_data["team"]["id"]))
-        else:
-            queryset = queryset.filter(team__league__league_id=int(post_data["leagueId"]))
-    # nationality
+        annotation_name = f"filterStat{count}"
+        queryset_lambdas += [
+            # new field annotation lambda
+            lambda q: annotate_queryset(
+                queryset=q, 
+                field_value=get_comparison_field_value(stat),
+                per_ninety=stat["perNinety"],
+                annotation_name=annotation_name
+            ),
+            lambda q: filter_by_comparison(q, stat, annotation_name) # stat lambda
+        ]
+        count += 1
+    queryset_lambdas += [
+        lambda q: filter_by_comparison(q, post_data["minutesPlayed"], "minutes_played"), # minutesPlayed lambda
+        lambda q: filter_by_comparison(q, post_data["age"], "age") # age lambda
+    ]
+    # league/team lambda
+    if post_data["leagueId"] != "" and post_data["team"]["id"] != "":
+        queryset_lambdas.append( lambda q: q.filter(team__id=int(post_data["team"]["id"])) )
+    elif post_data["leagueId"] != "" :
+        queryset_lambdas.append( lambda q: q.filter(team__league__league_id=int(post_data["leagueId"])) )
+    # nationality lambda
     if post_data["country"] != "":
-        queryset = queryset.filter(player__nationality__id=int(post_data["country"]))
-    # position
+        queryset_lambdas.append( lambda q: q.filter(player__nationality__id=int(post_data["country"])) )
+    # position lambda
     if post_data["position"] != "":
-        queryset = queryset.filter(position=PlayerStat.get_position(post_data["position"]))
+        queryset_lambdas.append( lambda q: q.filter(position=PlayerStat.get_position(post_data["position"])) )
+    return queryset_lambdas
 
-    return queryset
-
-def get_ordered_queryset(queryset, post_data):
-    # default ordering is first select stat
-    order_by_stat = ( 
-        post_data["selectStats"][0] if post_data["orderByStat"]["firstStat"] == ""
-        else post_data["orderByStat"]
+def get_query_result(post_data: Dict[str, Union[int, float]]) -> BuilderCard:
+    select_fields = { 
+        get_comparison_field_name(stat): {
+            "value": get_comparison_field_value(stat),
+            "per_ninety": stat["perNinety"],
+            # "pct": ???
+        }
+        for stat in post_data["selectStat"] 
+        if stat["firstStat"] != "" 
+    }
+    order_by_field = {
+        "value": get_comparison_field_value(post_data["orderByStat"]),
+        "per_ninety": post_data["orderByStat"]["perNinety"],
+        "desc": not post_data["orderByStat"]["lowToHigh"],
+        # "pct": ???
+    }
+    queryset = PlayerStat.objects.all()
+    return BuilderCard.from_queryset(
+        queryset=queryset,
+        labmdas=get_queryset_lambdas(queryset, post_data),
+        select_fields=select_fields,
+        order_by_field=order_by_field
     )
-    # annotate queryset with order stat 
-    queryset, _ = annotate_queryset(queryset, order_by_stat, "orderByStat")
-    # annotate queryset with order_by field
-    order_field = "-orderByStat" if post_data["orderByStat"]["lowToHigh"] is False else "orderByStat"
-    return queryset.order_by(order_field)
-
-def get_query_result(post_data):
-    queryset = PlayerStat.objects.filter(team__season__id=int(post_data["seasonId"]))
-    # filter queryset
-    filtered_queryset = get_filtered_queryset(queryset, post_data)
-    # order queryset 
-    ordered_queryset = get_ordered_queryset(filtered_queryset, post_data)
-    # return subset of ordered result
-    return ordered_queryset[:50]

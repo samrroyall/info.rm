@@ -162,7 +162,7 @@ def get_dashboard_data(queryset: QuerySet, per_ninety: bool) -> List[CardList]:
 def get_player_data(
     playerstat: PlayerStat,
     per_ninety: bool
-) -> Dict[str, List[Union[Card, CardList]]]:
+) -> Dict[str, List[CardList]]:
     player_data = {}
     # create bio card
     player_data["bio"] = CardList([

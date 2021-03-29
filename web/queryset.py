@@ -1,52 +1,66 @@
 from django.db.models import F, FloatField, IntegerField, QuerySet, Max
 from django.db.models.functions import Cast 
-from typing import Callable, List, Union
+from typing import Callable, Dict, List, Union
 
-from .management.commands.helpers.config import top_five_league_ids
 from .models import Season, League, PlayerStat
 
 def get_max( queryset: QuerySet, field: str ) -> QuerySet:
     return float( list(queryset.aggregate( Max(field) ).values())[0] )
 
+def annotate_queryset(
+    queryset: QuerySet,
+    field_value: Union[FloatField, IntegerField],
+    per_ninety: bool,
+    field_name: str = "",
+    annotation_name: str = None
+) -> QuerySet:
+    per_ninety_value = 1 if per_ninety is False else Cast(F("minutes_played")/90.0, FloatField())
+    annotation_value = Cast(field_value/per_ninety_value, FloatField())
+    if annotation_name is None:
+        annotation_name = f"{field_name}{'' if per_ninety is False else 'Per90'}"
+    return queryset.annotate(**{annotation_name: annotation_value}), annotation_name
+
 def order_queryset(
     queryset: QuerySet, 
     field: Union[str, IntegerField, FloatField],
     per_ninety: bool,
-    desc: bool,
+    desc: bool = True,
     limit: int = 50
 ) -> QuerySet:
-    per_ninety_value = Cast(F("minutes_played"), FloatField())/90.0
-    field_value = field if type(field) != str else F(field)
-    order_value = field_value if per_ninety is False else Cast(field_value, FloatField())/per_ninety_value 
+    annotated_queryset, _ = annotate_queryset(
+        queryset=queryset, 
+        field_value=field if type(field) != str else F(field),
+        per_ninety=per_ninety,
+        annotation_name="order_field"
+    )
     # may need to filter queryset more for per90 cards
-    return queryset.annotate(order_field=order_value).order_by(
-        "-order_field" if desc is True else "order_field"
-    )[:limit]
+    return annotated_queryset.order_by("-order_field" if desc is True else "order_field")[:limit]
 
-def filter_queryset( 
+def filter_by_comparison(
+    queryset: QuerySet, 
+    data: Dict[str, Union[int, float]], 
+    field: str,
+    logical_op_field: str = "logicalOp",
+    first_stat_field: str = "firstVal",
+    second_stat_field: str = "secondVal",
+) -> QuerySet:
+    filter_map = {}
+    if data[logical_op_field] == "><":
+        filter_map = {
+            f"{field}__gt": float(data[first_stat_field]),
+            f"{field}__lt": float(data[second_stat_field])
+        }
+    elif stat[logical_op_field] == "<":
+        filter_map = { f"{field}__lt": float(data[first_stat_field]) }
+    elif stat[logical_op_field] == ">":
+        filter_map = { f"{field}__gt": float(data[first_stat_field]) } 
+    return queryset.filter(**filter_map)
+
+
+def modify_queryset( 
     queryset: QuerySet, 
     lambdas: List[Callable] 
 ) -> QuerySet:
     for l in lambdas:
         queryset = l(queryset)
     return queryset
-
-def initial_queryset(
-    current_season: Season,
-    league: Union[League, None]
-) -> QuerySet:
-    # get valid leagues
-    valid_leagues = [ 
-        league if league is not None
-        else League.objects.get(league_id=id) for id in top_five_league_ids 
-    ]
-    # get valid queryset based on leagues, season, and minutes_played
-    return filter_queryset(
-        PlayerStat.objects.all(),
-        [
-            lambda q: q.filter(team__season=current_season),
-            lambda q: q.filter(team__league__in=valid_leagues),
-            lambda q: q.filter(minutes_played__gte=get_max(q, "minutes_played")/5)
-        ]
-    )
-
