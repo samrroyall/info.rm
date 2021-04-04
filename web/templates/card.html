@@ -5,6 +5,8 @@
         class="card dashCard"
     {% elif type == "bio" %}
         class="card bioCard"
+    {% elif type == "builder" %}
+        class="card builderCard"
     {% else %}
         class="card"
     {% endif %}
@@ -53,7 +55,6 @@
                                             </a>
                                         </div>
                                         <span class="teamName">{{entry.team|title}}</span>
-                                        <!--<span class="leagueName">{{entry.league|title}}</span>-->
                                     </div>
                                     <span class="value">{{entry.value}}</span>
                                 </li>
@@ -95,6 +96,66 @@
                         {% endfor %}
                     </ul>
                 </div>
+            <!-- BUILDER CARD BODY -->
+            {% elif type == "builder" %}
+                <div class="cardBody">
+                    {% for page in card.get_pages %}
+                        <table                                
+                            {% if forloop.counter == 1 %}
+                                class="page active"
+                            {% else %}
+                                class="page"
+                            {% endif %}
+                        >
+                            <thead>
+                                <tr>
+                                    <th class="playerInfoCol"></th>
+                                    {% for field_name in card.get_pretty_header %} 
+                                        <th>{{field_name|title}}</th> 
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in page %}
+                                    <tr>
+                                        <td class="playerInfoCol">  
+                                            <a href="/team/{{entry.team_id}}/{{current_season.start_year}}" class="logo">
+                                                <img src="{{entry.team_logo}}" />
+                                            </a>
+                                            <div class="playerTeamInfo">
+                                                <div class="playerInfo">
+                                                    <span class="rank">{{entry.rank}}.</span>
+                                                    &nbsp;
+                                                    <a class="playerName" href="/player/{{entry.player_id}}/{{current_season.start_year}}">
+                                                        {{entry.get_player_name}}
+                                                    </a>
+                                                </div>
+                                                <span class="teamName">{{entry.team|title}}</span>
+                                                <br/>
+                                                <span class="leagueName">{{entry.league|title}}</span>
+                                            </div>
+                                        </td>
+                                        {% for field_name in card.header %} 
+                                            <td class="value">{{ entry.values|get_item:field_name }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endfor %}
+                </div>
+                <!-- Card Pagination --> 
+                <ul class="cardPagination">
+                {% for _ in card.get_pages %}
+                    {% if forloop.counter == 1 %}
+                        <li class="active">
+                    {% else %}
+                        <li>
+                    {% endif %}
+                        <span>{{forloop.counter}}</span>
+                    </li>
+                {% endfor %}
+                </ul>
             <!-- REGULAR CARD BODY -->
             {% else %}
                 <div class="cardBody">
@@ -107,7 +168,6 @@
                         {% endfor %}
                     </ul>
                 </div>
-            <!-- ... -->
             {% endif %}
         </div>
     {% endfor %}
@@ -138,7 +198,7 @@
         });
         $("div.cardContent ul.cardPagination li").click( function() {
             const currentCardBody = $(this).parent().parent().children("div.cardBody").first();
-            const cards = currentCardBody.children("ul.page");
+            const cards = currentCardBody.children("ul.page, table.page");
             // remove active class from active page and pagination item 
             const activePage = $(this).siblings("li.active").first();
             const active_page_num = parseInt(activePage.text());

@@ -20,6 +20,9 @@
     {% include 'nav.html' %} 
     <main>
         {% include 'builderForm.html' %}
+        {% if builder_card is not None %}
+            {% include 'card.html' with type='builder' singleCard=True cards=builder_card.cards %}
+        {% endif %}
     </main>
     {% include 'footer.html' %} 
 </body>

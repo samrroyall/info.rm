@@ -30,4 +30,6 @@ nav#dashNav select {
     padding: 3px;
 }
 
-nav#dashNav select { outline: none; }
+nav#dashNav select { 
+    outline: none; 
+}

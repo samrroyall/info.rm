@@ -1,37 +1,80 @@
 div.cardContent:not(.active) { display: none; }
 
+div.card { margin: 3% 2%; }
+div.cardBody { margin: 5px 10px; }
 div.card, div.cardBody {
-    margin: 3% 2%;
     border: 1px solid lightgrey;
     border-radius: 3px;
 }
+div.card:not(.builderCard) { width: 400px; }
 div.card { 
     background-color: whitesmoke;
-    width: 400px; 
     padding: 5px;
 }
+
 div.cardTitle {
-    padding: 10px 30px;
+    padding: calc(5px + 0.2vw) calc(15px + 0.2vw);
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: calc(10px + 0.4vw);
     font-weight: bold;
 }
-div.card.bioCard div.cardTitle {
+div.card.bioCard div.cardTitle,
+div.card.builderCard div.cardTitle {
     display: block;
     text-align: center;
 }
 div.cardTitle i { cursor: pointer; }
 div.cardTitle i:hover { color: black; }
-
-
 div.cardBody {
     background-color: white;
     font-size: calc(10px + 0.2vw);
 }
-div.cardBody ul.page:not(.active) { display: none; }
-div.cardBody li { 
+
+div.cardBody table { 
+    width: calc(100% + 1px); 
+    border-collapse: collapse;
+    font-size: calc(6px + 0.2vw);
+}
+div.cardBody table tr { width: 100%; }
+
+div.cardBody ul.page:not(.active),
+div.cardBody table.page:not(.active) {
+    display: none; 
+}
+div.cardBody li:last-of-type { border-bottom: 0; }
+div.cardBody table.page tr td { 
+    border-top: 1px solid lightgrey;
+}
+div.cardBody table.page tr td:not(:first-of-type) { 
+    border-left: 1px solid lightgrey;
+}
+
+div.cardBody img {
+    height: calc(20px + 0.5vw);
+    width: auto;
+}
+div.cardBody a.logo {
+    display: inline-block;
+    width: calc(20px + 0.5vw);
+    padding-right: calc(5px + 1vw);
+    text-align: left;
+}
+
+div.cardBody th { 
+    color: black;
+    font-size: calc(4px + 0.5vw);
+    padding: 8px 3px; 
+}
+div.cardBody td.playerInfoCol {
+    height: calc(40px + 1vw);
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+div.cardBody li {
     height: calc(30px + 0.5vw);
     border-bottom: 1px solid lightgrey; 
     padding: 5px 10px;
@@ -39,47 +82,41 @@ div.cardBody li {
     justify-content: space-between;
     align-items: center;
 }
-div.cardBody li:last-of-type { border-bottom: 0; }
-div.cardBody li img {
-    height: calc(20px + 0.5vw);
-    width: auto;
-}
-div.cardBody li div.playerTeamInfo {
-    width: 70%;
-    font-size: calc(8px + 0.2vw);
+
+div.cardBody div.playerTeamInfo {
+    width: 60%;
+    font-size: calc(6px + 0.4vw);
     text-align: left;
 }
-div.cardBody li div.playerInfo a { color: black; }
-div.cardBody li div.playerInfo a:hover { text-decoration: underline; }
-div.cardBody li div.playerInfo { 
+div.cardBody div.playerInfo a { color: black; }
+div.cardBody div.playerInfo a:hover { text-decoration: underline; }
+div.cardBody div.playerInfo {
     color: black;
     font-weight: bold;
 }
-div.cardBody li a.logo {
-    display: inline-block;
-    width: calc(15% - 10px);
-    padding-left: 10px;
-    text-align: left;
+div.cardBody span.leagueName { 
+    font-style: italic; 
+    font-size: calc(6px + 0.4vw);
 }
 
-div.cardBody li span.title { font-weight: bold; }
-
-div.cardBody li span.value {
+div.cardBody span.title { font-weight: bold; }
+div.cardBody span.value,
+div.cardBody td.value {
     width: calc(15% - 10px);
     padding-right: 10px;
     text-align: right;
-    font-size: calc(10px + 0.2vw);
+    font-size: calc(8px + 0.2vw);
     font-weight: bold;
     color: #007bff;
 }
-
-div.card.bioCard div.cardBody li span.value {
-    color: black;
+div.cardBody td.value { 
+    padding: 0;
+    text-align: center; 
 }
-
+div.card.bioCard div.cardBody span.value { color: black; }
 
 ul.cardPagination {
-    padding-bottom: 5px;
+    padding: 5px 0;
     display: flex;
     font-size: calc(8px + 0.2vw);
     justify-content: center;

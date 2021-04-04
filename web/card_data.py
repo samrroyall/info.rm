@@ -54,7 +54,7 @@ def get_dashboard_data(queryset: QuerySet, per_ninety: bool) -> List[CardList]:
         per_ninety=False,
         field=Cast(F("goals"), FloatField())/Cast(F("shots"), FloatField()),
         title="Goals Per Shot",
-        filter_lambdas=[lambda q: q.filter( shots__gte=get_max(q, "shots")/5 )]
+        lambdas=[lambda q: q.filter( shots__gte=get_max(q, "shots")/5 )]
     )
     shots_card = DashCard.from_queryset(
         queryset=queryset,
@@ -84,7 +84,7 @@ def get_dashboard_data(queryset: QuerySet, per_ninety: bool) -> List[CardList]:
         field="passes_accuracy",
         title="Pass Accuracy",
         pct=True,
-        filter_lambdas=[lambda q: q.filter( passes__gte=get_max(q, "passes")/5 )]
+        lambdas=[lambda q: q.filter( passes__gte=get_max(q, "passes")/5 )]
     )
     # DRIBBLES CARDS
     successful_dribbles_card = DashCard.from_queryset(
@@ -105,7 +105,7 @@ def get_dashboard_data(queryset: QuerySet, per_ninety: bool) -> List[CardList]:
         field="dribbles_succeeded_pct",
         title="Dribble Success Rate",
         pct=True,
-        filter_lambdas=[
+        lambdas=[
             lambda q: q.filter(
                 dribbles_attempted__gte=get_max(q, "dribbles_attempted")/5 
             )
@@ -139,7 +139,7 @@ def get_dashboard_data(queryset: QuerySet, per_ninety: bool) -> List[CardList]:
         per_ninety=True,
         field="goals_conceded",
         desc=False,
-        filter_lambdas=[
+        lambdas=[
             lambda q: q.filter(position=PlayerStat.get_position("goalkeeper")),
             lambda q: q.filter(minutes_played__gte=get_max(q, "minutes_played")/4)
         ]

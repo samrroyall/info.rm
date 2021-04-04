@@ -2,7 +2,7 @@ from django.db.models import F, FloatField, IntegerField, QuerySet
 from django.db.models.functions import Cast 
 from typing import Callable, Dict, List, Tuple, Union
 
-from .card import BuilderCard
+from .card import BuilderCard, CardList
 from .models import Country, Season, League, Team, Player, PlayerStat 
 from .queryset import annotate_queryset, modify_queryset, filter_by_comparison, order_queryset
 stat_list = [stat[0] for stat in PlayerStat.STATS]
@@ -141,19 +141,13 @@ def query_validator(
 #######################
 
 def camelize(stat_name: str) -> str:
-    camel_stat: str = stat_name.replace('_', ' ').title().replace(' ', '')
-    return camel_stat[0].lower() + camel_stat[1:]
+    camel_stat: str = stat_name.replace('_', ' ').title()
+    return camel_stat
 
 def get_comparison_field_name(stat: Dict[str, Union[int, float]]) -> str:
-    op_to_word = {
-        "/": "Over",
-        "*": "Times",
-        "+": "Plus",
-        "-": "Minus",
-    }
     if stat["arithOp"] == "":
         return camelize(stat['firstStat']) + "Float"
-    return camelize(stat["firstStat"]) + op_to_word[stat["arithOp"]] + camelize(stat["secondStat"])
+    return camelize(stat["firstStat"]) + " " + stat["arithOp"] + " " + camelize(stat["secondStat"])
 
 def get_comparison_field_value(
     stat: Dict[str, Union[int, float]]
@@ -166,9 +160,9 @@ def get_comparison_field_value(
     }
     if stat["arithOp"] == "":
         return Cast( F(stat["firstStat"]), FloatField() )
-    return (
-        op_to_callable[op]( F(stat1), F(stat2) ) if op != "/"
-        else op_to_callable[op]( Cast(F(stat1), FloatField()), Cast(F(stat2), FloatField()) )
+    return op_to_callable[stat["arithOp"]]( 
+        Cast(F(stat["firstStat"]), FloatField()), 
+        Cast(F(stat["secondStat"]), FloatField()) 
     )
 
 ########################
@@ -183,7 +177,7 @@ def get_queryset_lambdas(
     queryset_lambdas = [ lambda q: q.filter( team__season__id=int(post_data["seasonId"])) ]
     count = 1
     for stat in post_data["filterStats"]:
-        if stat["firstStat"] == "": continue
+        if stat["firstStat"] == "" or stat["logicalOp"] == "": continue
         annotation_name = f"filterStat{count}"
         queryset_lambdas += [
             # new field annotation lambda
@@ -196,10 +190,12 @@ def get_queryset_lambdas(
             lambda q: filter_by_comparison(q, stat, annotation_name) # stat lambda
         ]
         count += 1
-    queryset_lambdas += [
-        lambda q: filter_by_comparison(q, post_data["minutesPlayed"], "minutes_played"), # minutesPlayed lambda
-        lambda q: filter_by_comparison(q, post_data["age"], "age") # age lambda
-    ]
+    # minutesPlayed lambda
+    if post_data["minutesPlayed"]["logicalOp"] != "":
+        queryset_lambdas.append( lambda q: filter_by_comparison(q, post_data["minutesPlayed"], "minutes_played") )
+    # age lambda
+    if post_data["age"]["logicalOp"] != "":
+        queryset_lambdas.append( lambda q: filter_by_comparison(q, post_data["age"], "age") )
     # league/team lambda
     if post_data["leagueId"] != "" and post_data["team"]["id"] != "":
         queryset_lambdas.append( lambda q: q.filter(team__id=int(post_data["team"]["id"])) )
@@ -218,21 +214,28 @@ def get_query_result(post_data: Dict[str, Union[int, float]]) -> BuilderCard:
         get_comparison_field_name(stat): {
             "value": get_comparison_field_value(stat),
             "per_ninety": stat["perNinety"],
-            # "pct": ???
         }
-        for stat in post_data["selectStat"] 
-        if stat["firstStat"] != "" 
+        for stat in post_data["selectStats"] if stat["firstStat"] != ""
     }
+    order_by_stat = (
+        post_data["orderByStat"] if post_data["orderByStat"]["firstStat"]
+        else post_data["selectStats"][0]
+    )
     order_by_field = {
-        "value": get_comparison_field_value(post_data["orderByStat"]),
-        "per_ninety": post_data["orderByStat"]["perNinety"],
-        "desc": not post_data["orderByStat"]["lowToHigh"],
+        "value": get_comparison_field_value(order_by_stat),
+        "per_ninety": order_by_stat["perNinety"],
+        "desc": (
+            True if "lowToHigh" not in order_by_stat 
+            else (not order_by_stat["lowToHigh"])
+        )
         # "pct": ???
     }
     queryset = PlayerStat.objects.all()
-    return BuilderCard.from_queryset(
-        queryset=queryset,
-        labmdas=get_queryset_lambdas(queryset, post_data),
-        select_fields=select_fields,
-        order_by_field=order_by_field
-    )
+    return CardList([
+        BuilderCard.from_queryset(
+            queryset=queryset,
+            lambdas=get_queryset_lambdas(queryset, post_data),
+            select_fields=select_fields,
+            order_by_field=order_by_field
+        )
+    ])

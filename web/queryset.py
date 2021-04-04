@@ -11,8 +11,8 @@ def annotate_queryset(
     queryset: QuerySet,
     field_value: Union[FloatField, IntegerField],
     per_ninety: bool,
-    field_name: str = "",
-    annotation_name: str = None
+    annotation_name: Union[str, None] = None,
+    field_name: str = ""
 ) -> QuerySet:
     per_ninety_value = 1 if per_ninety is False else Cast(F("minutes_played")/90.0, FloatField())
     annotation_value = Cast(field_value/per_ninety_value, FloatField())
@@ -22,14 +22,14 @@ def annotate_queryset(
 
 def order_queryset(
     queryset: QuerySet, 
-    field: Union[str, IntegerField, FloatField],
+    field_value: Union[str, IntegerField, FloatField],
     per_ninety: bool,
     desc: bool = True,
     limit: int = 50
 ) -> QuerySet:
     annotated_queryset, _ = annotate_queryset(
         queryset=queryset, 
-        field_value=field if type(field) != str else F(field),
+        field_value=Cast(F(field_value), FloatField()) if type(field_value) == str else field_value,
         per_ninety=per_ninety,
         annotation_name="order_field"
     )
@@ -50,9 +50,9 @@ def filter_by_comparison(
             f"{field}__gt": float(data[first_stat_field]),
             f"{field}__lt": float(data[second_stat_field])
         }
-    elif stat[logical_op_field] == "<":
+    elif data[logical_op_field] == "<":
         filter_map = { f"{field}__lt": float(data[first_stat_field]) }
-    elif stat[logical_op_field] == ">":
+    elif data[logical_op_field] == ">":
         filter_map = { f"{field}__gt": float(data[first_stat_field]) } 
     return queryset.filter(**filter_map)
 

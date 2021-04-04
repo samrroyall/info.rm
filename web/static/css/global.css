@@ -32,9 +32,11 @@ body {
 
 /* main CSS */
 main {
-    min-height: 80vh;
+    min-height: 82vh;
     padding: 50px 1%;
     text-align: center;
 }
 
-
+select {
+    background-color: white;
+}

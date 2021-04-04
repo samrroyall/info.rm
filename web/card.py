@@ -3,7 +3,7 @@ import math
 from typing import Any, Callable, Dict, List, Union
 
 from .models import PlayerStat
-from .queryset import order_queryset, modify_queryset
+from .queryset import annotate_queryset, order_queryset, modify_queryset
 
 #############################
 ######## CARDENTRY ##########
@@ -182,7 +182,7 @@ class DashCard(Card):
     def __init__(
         self, 
         title: str,
-        data: List[DashCardEntry]
+        data: List[DashCardEntry],
     ) -> None:
         super().__init__(title, data)
 
@@ -204,7 +204,7 @@ class DashCard(Card):
             prev_val = val
             entries.append(DashCardEntry(
                 rank=rank, 
-                value=CardEntry.display_float(val, pct) if type(val) != int else val, 
+                value=CardEntry.display_float(val, pct) if int(val) != val else int(val), 
                 data=playerstat
             ))
         return entries
@@ -221,11 +221,16 @@ class DashCard(Card):
         lambdas: List[Callable] = []
     ) -> Any:
         filtered_queryset = modify_queryset(queryset, lambdas)
-        ordered_queryset = order_queryset(filtered_queryset, field, per_ninety, desc)
+        ordered_queryset = order_queryset(
+            queryset=filtered_queryset, 
+            field_value=field, 
+            per_ninety=per_ninety, 
+            desc=desc
+        )
         title = field.replace('_',' ').title() if title is None else title
         return DashCard(
             title=title if per_ninety is False else f"{title} Per 90", 
-            data=cls.format_data(ordered_queryset, per_ninety, pct)
+            data=cls.format_data(ordered_queryset, pct)
         )
 
 class BuilderCard(Card):
@@ -237,12 +242,20 @@ class BuilderCard(Card):
         super().__init__("Query Results", data)
         self.header = header
 
+    def get_pretty_header(self) -> List[str]:
+        pretty_header = []
+        for field_name in self.header:
+            pretty_field_name = field_name
+            if "Float" in pretty_field_name:
+                pretty_field_name = pretty_field_name.replace("Float", "")
+            pretty_header.append(pretty_field_name)
+        return pretty_header
+
     @classmethod
     def format_data( 
         cls,
         queryset: QuerySet, 
-        select_fields: Dict[str, Union[FloatField, IntegerField, bool]],
-        order_by_field: Dict[str, Union[FloatField, IntegerField, bool]]
+        select_fields: List[str],
         # pct: bool
     ) -> List[BuilderCardEntry]:
         entries = []
@@ -256,15 +269,14 @@ class BuilderCard(Card):
             prev_rank = rank 
             prev_val = val
             entries.append(
-                BuildCardEntry(
+                BuilderCardEntry(
                     rank=rank, 
-                    values=select_fields, # consider how to display floats/pcts
+                    # consider how to display floats/pcts
+                    values={ field_name: getattr(playerstat, field_name) for field_name in select_fields},
                     data=playerstat
                 )
             )
         return entries
-
-
 
     @classmethod
     def from_queryset(
@@ -276,14 +288,21 @@ class BuilderCard(Card):
     ) -> Any:
         filtered_queryset = modify_queryset(queryset, lambdas)
         ordered_queryset = order_queryset(
-            filtered_queryset, 
-            order_by_field["value"], 
-            order_by_field["per_ninety"], 
-            order_by_field["desc"]
+            queryset=filtered_queryset, 
+            field_value=order_by_field["value"], 
+            per_ninety=order_by_field["per_ninety"], 
+            desc=order_by_field["desc"]
         )
+        for field_name, field_data in select_fields.items():
+            ordered_queryset, _ = annotate_queryset(
+                queryset=ordered_queryset,
+                field_value=field_data["value"],
+                per_ninety=field_data["per_ninety"],
+                annotation_name=field_name,
+            )
         return BuilderCard(
-            header=select_fields.keys(),
-            data=cls.format_data(ordered_queryset, select_fields, order_by_field)
+            header=select_fields,
+            data=cls.format_data(ordered_queryset, select_fields.keys())
         )
 
 class CardList:

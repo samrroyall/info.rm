@@ -137,7 +137,7 @@ const builderFormData = () => {
 }
 
 const displayErrors = errors => {
-    console.log(errors);
+    if (errors == null) return;
     // clear old errors
     $('form#builderForm div.errors').html("");
     for (const [id, errs] of Object.entries(errors)) {
@@ -161,7 +161,7 @@ const builderFormSubmit = () => {
             url: "/make_query",
             data: encodeURIComponent(JSON.stringify(formData)),
             dataType: 'json',
-            success: res => { console.log(res); },
+            success: res => { location.reload(); },
             error: errs => { displayErrors(errs.responseJSON); },
         });
     });

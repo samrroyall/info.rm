@@ -6,7 +6,7 @@ import json
 
 from .builder import get_query_result, query_validator
 from .card_data import get_dashboard_data, get_player_data, get_from_cache, insert_to_cache
-from .queryset import modify_queryset
+from .queryset import get_max, modify_queryset
 from .management.commands.helpers.config import top_five_league_ids, other_league_ids, international_league_ids
 from .models import Country, Season, League, Team, Player, PlayerStat 
 
@@ -67,7 +67,7 @@ def get_card_data(season, per_ninety, league = None):
         lambda q: q.filter(minutes_played__gte=get_max(q, "minutes_played")/5)
     ]
     initial_queryset = modify_queryset(PlayerStat.objects.all(), lambdas)
-    card_data = get_dashboard_data()
+    card_data = get_dashboard_data(initial_queryset, per_ninety)
     insert_to_cache(season, per_ninety, league, card_data)
     return card_data
 
@@ -184,8 +184,9 @@ def builder(request):
     context["stats"] = PlayerStat.STATS
     # get leagues/teams for each season
     context["leagues"] = get_all_leagues()
-    # builder form errors
-    context["errors"] = request.session["errors"] if "errors" in request.session else {}
+    # query result
+    if "query_data" in request.session:
+        context["builder_card"] = get_query_result(request.session["query_data"])
     return render(request, "builder.html", context)
 
 #############################
@@ -203,9 +204,9 @@ def make_query(request):
     if request.method != "POST" or not request.is_ajax():
         return redirect("/builder")
     post_data = json.loads(list(request.POST.keys())[0])
+    # validate query
     errors = query_validator(post_data)
     if len(errors) > 0:
         return JsonResponse(errors, status=400) 
-    query_result = get_query_result(post_data)
-    # print([ f"{ps.player.first_name} {ps.player.last_name}: {ps.goalsFloatPer90}" for ps in query_result ])
-    return JsonResponse({"result": "query was success"}, status=200) 
+    request.session["query_data"] = post_data
+    return JsonResponse({"result": "query was success"}, status=200)
