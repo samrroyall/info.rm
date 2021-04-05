@@ -49,6 +49,11 @@ class Player(models.Model):
 class PlayerStat(models.Model):
     PCT_STATS = [
         ["passes_accuracy", "Pass Accuracy"],
+        ["shots_on_target_pct", "Shots on Target %"],
+        ["duels_won_pct", "Duels Won %"],
+        ["dribbles_succeeded_pct", "Dribbles Succeeded %"],
+        ["penalties_scored_pct", "Penalties Scored %"],
+
     ]
     STATS = [
         ["shots", "Total Shots"],

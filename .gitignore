@@ -1,6 +1,6 @@
 __pycache__
 *.pyc
 venv/
-inform_django/*.sqlite3
-inform_django/web/management/commands/log/
-inform_django/web/migrations/
+*.sqlite3
+web/management/commands/log/
+web/migrations/

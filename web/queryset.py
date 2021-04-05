@@ -18,7 +18,6 @@ def annotate_queryset(
     annotation_value = field_value/per_ninety_value if per_ninety is True else field_value
     if annotation_name is None:
         annotation_name = f"{field_name}{'Per90' if per_ninety is True else ''}"
-    print(f"annotating... {annotation_name}: {annotation_value}")
     return queryset.annotate(**{annotation_name: Cast(annotation_value, FloatField())}), annotation_name
 
 def order_queryset(
@@ -48,15 +47,11 @@ def filter_by_comparison(
     field_lt = field + "__lt"
     field_gt = field + "__gt"
     if data[logical_op] == "><":
-        print(f"filtering... {field_gt}: {float(data[first_val])}")
         queryset = queryset.filter( Q(**{ field_gt: float(data[first_val]) }) ) 
-        print(f"filtering... {field_lt}: {float(data[second_val])}")
         queryset = queryset.filter( Q(**{ field_lt: float(data[second_val]) }) )
     elif data[logical_op] == "<":
-        print(f"filtering... {field_lt}: {float(data[first_val])}")
         queryset = queryset.filter( Q(**{ field_lt: float(data[first_val]) }) )
     elif data[logical_op] == ">":
-        print(f"filtering... {field_gt}: {float(data[first_val])}")
         queryset = queryset.filter( Q(**{ field_gt: float(data[first_val]) }) )
     return queryset
 

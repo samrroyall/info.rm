@@ -20,12 +20,12 @@ class CardEntry:
 
     @classmethod
     def display_float(cls, value: float, pct: bool) -> str:
-        pct_string = str( round(100*round(value, 3)) )
+        if pct is True:
+            return str( round(100*round(value, 3)) )
+        if int(value) == value:
+            return str( int(value) )
         float_string = str( round(value,3) ).split('.')
-        return ( 
-            f"{pct_string}%" if pct is True
-            else float_string[0] + '.' + float_string[1][:2].ljust(2, '0')
-        )
+        return float_string[0] + '.' + float_string[1][:2].ljust(2, '0')
 
 class BioCardEntry(CardEntry):
     def __init__(
@@ -242,18 +242,22 @@ class BuilderCard(Card):
         super().__init__("Query Results", data)
         self.header = header
 
+    @classmethod
+    def pretty_field(cls, field_name) -> str:
+        pretty_field_name = field_name
+        pretty_field_name = pretty_field_name.replace("Float", "")
+        pretty_field_name = pretty_field_name.replace("Per90", "/90")
+        pretty_field_name = pretty_field_name.replace("Minus", "-")
+        pretty_field_name = pretty_field_name.replace("Plus", "+")
+        pretty_field_name = pretty_field_name.replace("Over", "/")
+        pretty_field_name = pretty_field_name.replace("Times", "*")
+        pretty_field_name = pretty_field_name.replace("_", " ")
+        return pretty_field_name
+
     def get_pretty_header(self) -> List[str]:
         pretty_header = []
         for field_name in self.header:
-            pretty_field_name = field_name
-            pretty_field_name = pretty_field_name.replace("Float", "")
-            pretty_field_name = pretty_field_name.replace("Per90", "/90")
-            pretty_field_name = pretty_field_name.replace("Minus", "-")
-            pretty_field_name = pretty_field_name.replace("Plus", "+")
-            pretty_field_name = pretty_field_name.replace("Over", "/")
-            pretty_field_name = pretty_field_name.replace("Times", "*")
-            pretty_field_name = pretty_field_name.replace("_", " ")
-            pretty_header.append(pretty_field_name)
+            pretty_header.append(self.__class__.pretty_field(field_name))
         return pretty_header
 
     @classmethod
@@ -273,16 +277,16 @@ class BuilderCard(Card):
             rank = curr_rank if (prev_val is None or prev_val != val) else prev_rank
             prev_rank = rank 
             prev_val = val
+            # create values dict
+            values_dict = {}
+            for field_name in select_fields:
+                field_value = getattr(playerstat, field_name)
+                pct = cls.pretty_field(field_name) in [stat[1] for stat in PlayerStat.PCT_STATS]
+                values_dict[field_name] = BuilderCardEntry.display_float(field_value, pct)
             entries.append(
                 BuilderCardEntry(
                     rank=rank, 
-                    values={ 
-                        field_name: (
-                            int(getattr(playerstat, field_name)) if int(getattr(playerstat, field_name)) == getattr(playerstat, field_name)
-                            else BuilderCardEntry.display_float(getattr(playerstat, field_name), False)
-                        )
-                        for field_name in select_fields
-                    },
+                    values=values_dict,
                     data=playerstat
                 )
             )
