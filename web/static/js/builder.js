@@ -25,9 +25,9 @@ const showBetweenSecondValue = prefix => {
 
 const showLeagueTeams = () => {
     $("form#builderForm select[name='teamLeague']").change( e => {
-        const currStartYear = $("form#builderForm select[name='season']").val();
+        const currStartYear = $("form#builderForm select[name='season']").text().split("/")[0].trim();
         const currLeague = e.currentTarget.value;
-        const clubs = e.currentTarget.parentElement.getElementsByTagName("select")[1].getElementsByTagName("option");
+        const clubs = $("form#builderForm select[name='team'] option");
         for (let club of clubs) {
             if (
                 club.classList.contains(`league-${currLeague}`) &&
@@ -77,7 +77,7 @@ const builderFormData = () => {
                 arithOp: $("form#builderForm select[name='selectStat2-arithOp']").first().val(),
                 firstStat: $("form#builderForm select[name='selectStat2-firstStat']").first().val(),
                 secondStat: $("form#builderForm select[name='selectStat2-secondStat']").first().val(),
-                perNinety: $("form#builderForm input[name='selectStat1-perNinety']").first().is(":checked"),
+                perNinety: $("form#builderForm input[name='selectStat2-perNinety']").first().is(":checked"),
             },
         ],
         leagueId: $("form#builderForm select[name='league']").first().val(),
@@ -170,7 +170,9 @@ const builderFormSubmit = () => {
 $(document).ready( () => {
     showMoreStats();
     showLeagueTeams();
-    for (let key = 0; key < 3; key++) showBetweenSecondValue(`filterStat${key}`);
+    for (let key = 0; key < 3; key++) {
+        showBetweenSecondValue(`filterStat${key}`);
+    }
     showBetweenSecondValue("age");
     showBetweenSecondValue("minutesPlayed");
     showQueryFilters();

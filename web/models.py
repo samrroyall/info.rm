@@ -47,6 +47,9 @@ class Player(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class PlayerStat(models.Model):
+    PCT_STATS = [
+        ["passes_accuracy", "Pass Accuracy"],
+    ]
     STATS = [
         ["shots", "Total Shots"],
         ["shots_on_target", "Shots on Target"],

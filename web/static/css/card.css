@@ -68,7 +68,7 @@ div.cardBody th {
     padding: 8px 3px; 
 }
 div.cardBody td.playerInfoCol {
-    height: calc(40px + 1vw);
+    height: calc(40px + 1.5vw);
     display: flex;
     justify-content: center; 
     align-items: center;
@@ -81,6 +81,9 @@ div.cardBody li {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+div.dashCard div.cardBody li {
+    justify-content: space-around;
 }
 
 div.cardBody div.playerTeamInfo {

@@ -1,5 +1,6 @@
 from django.db.models import F, FloatField, IntegerField, QuerySet
 from django.db.models.functions import Cast 
+from copy import deepcopy
 from typing import Callable, Dict, List, Tuple, Union
 
 from .card import BuilderCard, CardList
@@ -140,14 +141,27 @@ def query_validator(
 #### QUERY HELPERS ####
 #######################
 
-def camelize(stat_name: str) -> str:
-    camel_stat: str = stat_name.replace('_', ' ').title()
-    return camel_stat
+def get_display_name(stat_name: str) -> str:
+    for name, display_name in PlayerStat.STATS:
+        if name == stat_name:
+            return display_name.replace(' ', '_')
+    return stat_name.replace('_', ' ').title().replace(' ', '_')
 
 def get_comparison_field_name(stat: Dict[str, Union[int, float]]) -> str:
+    op_str = {
+        "/": "Over",
+        "*": "Times",
+        "+": "Plus",
+        "-": "Minus", 
+    }
     if stat["arithOp"] == "":
-        return camelize(stat['firstStat']) + "Float"
-    return camelize(stat["firstStat"]) + " " + stat["arithOp"] + " " + camelize(stat["secondStat"])
+        return get_display_name(stat['firstStat']) + "Float" + ("Per90" if stat["perNinety"] is True else "")
+    return (
+        get_display_name(stat["firstStat"]) + 
+        op_str[stat["arithOp"]] +
+        get_display_name(stat["secondStat"]) + 
+        ("Per90" if stat["perNinety"] is True else "")
+    )
 
 def get_comparison_field_value(
     stat: Dict[str, Union[int, float]]
@@ -159,7 +173,7 @@ def get_comparison_field_value(
         "-": lambda a, b: a-b,
     }
     if stat["arithOp"] == "":
-        return Cast( F(stat["firstStat"]), FloatField() )
+        return Cast(F(stat["firstStat"]), FloatField())
     return op_to_callable[stat["arithOp"]]( 
         Cast(F(stat["firstStat"]), FloatField()), 
         Cast(F(stat["secondStat"]), FloatField()) 
@@ -170,34 +184,18 @@ def get_comparison_field_value(
 ########################
 
 def get_queryset_lambdas(
-    queryset: QuerySet, 
     post_data: Dict[str, Union[float, int]]
-) -> QuerySet:
+) -> List[Callable]:
     # season lambda
     queryset_lambdas = [ lambda q: q.filter( team__season__id=int(post_data["seasonId"])) ]
-    count = 1
-    for stat in post_data["filterStats"]:
-        if stat["firstStat"] == "" or stat["logicalOp"] == "": continue
-        annotation_name = f"filterStat{count}"
-        queryset_lambdas += [
-            # new field annotation lambda
-            lambda q: annotate_queryset(
-                queryset=q, 
-                field_value=get_comparison_field_value(stat),
-                per_ninety=stat["perNinety"],
-                annotation_name=annotation_name
-            ),
-            lambda q: filter_by_comparison(q, stat, annotation_name) # stat lambda
-        ]
-        count += 1
     # minutesPlayed lambda
     if post_data["minutesPlayed"]["logicalOp"] != "":
         queryset_lambdas.append( lambda q: filter_by_comparison(q, post_data["minutesPlayed"], "minutes_played") )
     # age lambda
     if post_data["age"]["logicalOp"] != "":
-        queryset_lambdas.append( lambda q: filter_by_comparison(q, post_data["age"], "age") )
+        queryset_lambdas.append( lambda q: filter_by_comparison(q, post_data["age"], "player__age") )
     # league/team lambda
-    if post_data["leagueId"] != "" and post_data["team"]["id"] != "":
+    if post_data["team"]["id"] != "":
         queryset_lambdas.append( lambda q: q.filter(team__id=int(post_data["team"]["id"])) )
     elif post_data["leagueId"] != "" :
         queryset_lambdas.append( lambda q: q.filter(team__league__league_id=int(post_data["leagueId"])) )
@@ -207,6 +205,26 @@ def get_queryset_lambdas(
     # position lambda
     if post_data["position"] != "":
         queryset_lambdas.append( lambda q: q.filter(position=PlayerStat.get_position(post_data["position"])) )
+    # filter stat lambdas
+    for stat in post_data["filterStats"]:
+        if stat["firstStat"] == "" or stat["logicalOp"] == "": 
+            continue
+        stat_copy = deepcopy(stat)
+        annotation_name = get_comparison_field_name(stat_copy)
+        annotation_value = get_comparison_field_value(stat_copy)
+        queryset_lambdas.append(
+            # new field annotation lambda, returns tuple, so must select 0th element
+            lambda q: filter_by_comparison(
+                queryset=annotate_queryset(
+                    queryset=q, 
+                    field_value=annotation_value,
+                    per_ninety=stat_copy["perNinety"],
+                    annotation_name=annotation_name
+                )[0], 
+                data=stat_copy, 
+                field=annotation_name
+            ) 
+        )
     return queryset_lambdas
 
 def get_query_result(post_data: Dict[str, Union[int, float]]) -> BuilderCard:
@@ -214,6 +232,7 @@ def get_query_result(post_data: Dict[str, Union[int, float]]) -> BuilderCard:
         get_comparison_field_name(stat): {
             "value": get_comparison_field_value(stat),
             "per_ninety": stat["perNinety"],
+            # "pct": ???
         }
         for stat in post_data["selectStats"] if stat["firstStat"] != ""
     }
@@ -230,11 +249,10 @@ def get_query_result(post_data: Dict[str, Union[int, float]]) -> BuilderCard:
         )
         # "pct": ???
     }
-    queryset = PlayerStat.objects.all()
     return CardList([
         BuilderCard.from_queryset(
-            queryset=queryset,
-            lambdas=get_queryset_lambdas(queryset, post_data),
+            queryset=PlayerStat.objects.all(),
+            lambdas=get_queryset_lambdas(post_data),
             select_fields=select_fields,
             order_by_field=order_by_field
         )

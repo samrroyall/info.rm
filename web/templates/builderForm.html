@@ -64,11 +64,9 @@
             <div class="errors" id="leagueErrors"></div>
             <select name="league">
                 <option></option>
-                {% for league_str in leagues %}
+                {% for league_str in leagues.keys|sort %}
                     {% with split_league=league_str|split:'@' %}
-                        <option value="{{split_league|fst}}">
-                            {{split_league|snd|title}}
-                        </option>
+                        <option value="{{split_league|snd}}">{{split_league|fst|title}}</option>
                     {% endwith %}
                 {% endfor %}
             </select>
@@ -80,18 +78,16 @@
             <div class="multipleSelects">
                 <select name="teamLeague">
                     <option></option>
-                    {% for league_str in leagues %}
+                    {% for league_str in leagues.keys|sort %}
                         {% with split_league=league_str|split:'@' %}
-                            <option value="{{split_league|fst}}">
-                                {{split_league|snd|title}}
-                            </option>
+                            <option value="{{split_league|snd}}">{{split_league|fst|title}}</option>
                         {% endwith %}
                     {% endfor %}
                 </select>
                 <select name="team">
                     <option></option>
                     {% for league_str, league in leagues.items %}
-                        {% with leagueId=league_str|split:'@'|fst %}
+                        {% with leagueId=league_str|split:'@'|snd %}
                             {% for team_start_year, teams in league.items %}
                                 {% for team in teams %}
                                     <option value="{{team.id}}" 

@@ -246,8 +246,13 @@ class BuilderCard(Card):
         pretty_header = []
         for field_name in self.header:
             pretty_field_name = field_name
-            if "Float" in pretty_field_name:
-                pretty_field_name = pretty_field_name.replace("Float", "")
+            pretty_field_name = pretty_field_name.replace("Float", "")
+            pretty_field_name = pretty_field_name.replace("Per90", "/90")
+            pretty_field_name = pretty_field_name.replace("Minus", "-")
+            pretty_field_name = pretty_field_name.replace("Plus", "+")
+            pretty_field_name = pretty_field_name.replace("Over", "/")
+            pretty_field_name = pretty_field_name.replace("Times", "*")
+            pretty_field_name = pretty_field_name.replace("_", " ")
             pretty_header.append(pretty_field_name)
         return pretty_header
 
@@ -271,8 +276,13 @@ class BuilderCard(Card):
             entries.append(
                 BuilderCardEntry(
                     rank=rank, 
-                    # consider how to display floats/pcts
-                    values={ field_name: getattr(playerstat, field_name) for field_name in select_fields},
+                    values={ 
+                        field_name: (
+                            int(getattr(playerstat, field_name)) if int(getattr(playerstat, field_name)) == getattr(playerstat, field_name)
+                            else BuilderCardEntry.display_float(getattr(playerstat, field_name), False)
+                        )
+                        for field_name in select_fields
+                    },
                     data=playerstat
                 )
             )
@@ -301,7 +311,7 @@ class BuilderCard(Card):
                 annotation_name=field_name,
             )
         return BuilderCard(
-            header=select_fields,
+            header=select_fields.keys(),
             data=cls.format_data(ordered_queryset, select_fields.keys())
         )
 

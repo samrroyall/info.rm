@@ -1,4 +1,4 @@
-from django.db.models import F, FloatField, IntegerField, QuerySet, Max
+from django.db.models import F, FloatField, IntegerField, Q, QuerySet, Max
 from django.db.models.functions import Cast 
 from typing import Callable, Dict, List, Union
 
@@ -14,11 +14,12 @@ def annotate_queryset(
     annotation_name: Union[str, None] = None,
     field_name: str = ""
 ) -> QuerySet:
-    per_ninety_value = 1 if per_ninety is False else Cast(F("minutes_played")/90.0, FloatField())
-    annotation_value = Cast(field_value/per_ninety_value, FloatField())
+    per_ninety_value = Cast(F("minutes_played")/90.0, FloatField())
+    annotation_value = field_value/per_ninety_value if per_ninety is True else field_value
     if annotation_name is None:
-        annotation_name = f"{field_name}{'' if per_ninety is False else 'Per90'}"
-    return queryset.annotate(**{annotation_name: annotation_value}), annotation_name
+        annotation_name = f"{field_name}{'Per90' if per_ninety is True else ''}"
+    print(f"annotating... {annotation_name}: {annotation_value}")
+    return queryset.annotate(**{annotation_name: Cast(annotation_value, FloatField())}), annotation_name
 
 def order_queryset(
     queryset: QuerySet, 
@@ -40,21 +41,24 @@ def filter_by_comparison(
     queryset: QuerySet, 
     data: Dict[str, Union[int, float]], 
     field: str,
-    logical_op_field: str = "logicalOp",
-    first_stat_field: str = "firstVal",
-    second_stat_field: str = "secondVal",
+    logical_op: str = "logicalOp",
+    first_val: str = "firstVal",
+    second_val: str = "secondVal",
 ) -> QuerySet:
-    filter_map = {}
-    if data[logical_op_field] == "><":
-        filter_map = {
-            f"{field}__gt": float(data[first_stat_field]),
-            f"{field}__lt": float(data[second_stat_field])
-        }
-    elif data[logical_op_field] == "<":
-        filter_map = { f"{field}__lt": float(data[first_stat_field]) }
-    elif data[logical_op_field] == ">":
-        filter_map = { f"{field}__gt": float(data[first_stat_field]) } 
-    return queryset.filter(**filter_map)
+    field_lt = field + "__lt"
+    field_gt = field + "__gt"
+    if data[logical_op] == "><":
+        print(f"filtering... {field_gt}: {float(data[first_val])}")
+        queryset = queryset.filter( Q(**{ field_gt: float(data[first_val]) }) ) 
+        print(f"filtering... {field_lt}: {float(data[second_val])}")
+        queryset = queryset.filter( Q(**{ field_lt: float(data[second_val]) }) )
+    elif data[logical_op] == "<":
+        print(f"filtering... {field_lt}: {float(data[first_val])}")
+        queryset = queryset.filter( Q(**{ field_lt: float(data[first_val]) }) )
+    elif data[logical_op] == ">":
+        print(f"filtering... {field_gt}: {float(data[first_val])}")
+        queryset = queryset.filter( Q(**{ field_gt: float(data[first_val]) }) )
+    return queryset
 
 
 def modify_queryset( 

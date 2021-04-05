@@ -27,6 +27,10 @@ def snd(list):
     return list[1]
 
 @register.filter
+def sort(list):
+    return sorted(list)
+
+@register.filter
 def split(str, char):
     return str.split(char)
 
@@ -94,13 +98,17 @@ def get_player_cards(playerstats, per_ninety):
 
 def get_all_leagues():
     leagues_dict = {}
+    # create a dict with keys league, season, team
     for league in League.objects.all():
-        league_str = f"{league.league_id}@{league.name}"
+        league_str = f"{league.name} ({league.country.name})@{league.league_id}"
         leagues_dict[league_str] = {}
         for team in league.teams.all():
             if team.season.start_year not in leagues_dict[league_str]:
                 leagues_dict[league_str][team.season.start_year] = []
             leagues_dict[league_str][team.season.start_year].append(team)
+        # sort league.season values by team name
+        for season in leagues_dict[league_str]:
+            leagues_dict[league_str][season] = sorted( leagues_dict[league_str][season], key=lambda t: t.name )
     return leagues_dict
     
 #############################
