@@ -3,6 +3,7 @@
 <script src="{% static 'js/nav.js' %}"></script>
 <nav id="mainNav">
     <ul>
+        <!-- Main Navbar -->
         <li class="regularNav">
             <a href="/" id="brand">
                 <h1>info-rm</h1>
@@ -15,6 +16,9 @@
                 <h5><input type="text" placeholder="Search" /></h5>
             </form>
         </li>
+        <!-- Burger Button -->
+        <li class="burgerButton"> <i class="bi bi-list"></i> </li>
+        <!-- League Navbar -->
         <li class="leagueNav">
             <div class="firstRow">
                 {% for league in first_row_leagues %}
@@ -34,4 +38,33 @@
             </div>
         </li>
     </ul>
+</nav>
+<nav id="collapsedNav">
+    <div>
+        <a href="/builder" class="collapsedBuilder">
+            <h5> StatBuilder </h5>
+            <i class="bi bi-hammer"></i>
+        </a>
+    </div>
+    <div>
+        <form>
+            <h5><input type="text" placeholder="Search" /></h5>
+        </form>
+    </div>
+    <div class="collapsedLeagueNav">
+        <div class="firstRow">
+            {% for league in first_row_leagues %}
+                <a href="/league/{{league.league_id}}/{{current_season.start_year}}">
+                    <img src="{{league.logo}}"/>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="secondRow">
+            {% for league in second_row_leagues %}
+                <a href="/league/{{league.league_id}}/{{current_season.start_year}}">
+                    <img src="{{league.logo}}"/>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
 </nav>

@@ -1,14 +1,40 @@
 /* Nav CSS */
-nav#mainNav { 
+nav#mainNav, nav#collapsedNav { 
     border-bottom: 1px solid lightgrey; 
     background-color: #f8f9fa;
 }
-nav#mainNav ul {
+nav#mainNav ul { 
     display: flex;
     justify-content: flex-start;
     align-items: center;
 }
-nav#mainNav li {
+nav#collapsedNav { 
+    height: calc(175px + 3vw); 
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+}
+nav#collapsedNav div { padding: 10px; }
+nav#collapsedNav div.collapsedLeagueNav div {
+    width: calc(100% - 20px);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+nav#collapsedNav div.collapsedLeagueNav img {
+    margin: 0 10px;
+}
+nav#collapsedNav a.collapsedBuilder { 
+    display: flex; 
+    align-items: center;
+}
+nav#collapsedNav a.collapsedBuilder i { 
+    margin-left: calc(1px + 0.3vw);
+    font-size: calc(8px + 0.4vw);
+}
+
+nav#mainNav li, nav#collapsedDiv div {
     height: calc(25px + 1vw);
     padding: 10px 0;
     text-align: center;
@@ -23,6 +49,14 @@ nav#mainNav a#brand {
     font-weight: bold; 
 }
 nav#mainNav a#brand:hover { color: black; }
+nav#mainNav li.burgerButton {
+    width: 50%;
+    padding: 10px;
+    text-align: right;
+}
+nav#mainNav li.burgerButton i.bi-list {
+    cursor: pointer;
+}
 nav#mainNav li.regularNav {
     width: calc(50% - 1px);
     border-right: 1px solid lightgrey; 
@@ -31,7 +65,6 @@ nav#mainNav li.regularNav {
     align-items: center;
 }
 nav#mainNav li.regularNav i { 
-    /* figure out responsive height solution */
     margin: 0 5%;
 }
 nav#mainNav li.regularNav a {
@@ -61,8 +94,14 @@ nav#mainNav li.leagueNav div.firstRow i {
     cursor: pointer;
 }
 nav#mainNav li.leagueNav div.firstRow i:hover { color: black; }
-nav#mainNav li.leagueNav div.firstRow img { height: calc(20px + 1vw); }
-nav#mainNav li.leagueNav div.firstRow img:hover { height: calc(25px + 1vw); }
+nav#mainNav li.leagueNav div.firstRow img, 
+nav#collapsedNav img { 
+    height: calc(20px + 1vw); 
+}
+nav#mainNav li.leagueNav div.firstRow img:hover, 
+nav#collapsedNav img:hover { 
+    height: calc(25px + 1vw); 
+}
 
 nav#mainNav li.leagueNav div.secondRow {
     height: calc(22px + 1vw);
@@ -82,31 +121,31 @@ nav#mainNav li.leagueNav div.secondRow img { height: calc(17px + 1vw); }
 nav#mainNav li.leagueNav div.secondRow img:hover { height: calc(22px + 1vw); }
 
 nav#mainNav form { margin: 0 2%; }
-nav#mainNav input[type='text'] { 
+nav#mainNav input[type='text'],
+nav#collapsedNav input[type='text'] { 
     outline: none;
     border: 1px solid lightgrey; 
     border-radius: 3px; 
     padding: 5px; 
 }
-nav#mainNav input[type='text']:focus { 
+nav#mainNav input[type='text']:focus, 
+nav#collapsedNav input[type='text']:focus { 
     color: grey;
     border: 1px solid #DAA99B;
 }
 
 /* mobile */
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 1023.9px) {
     nav#mainNav li.leagueNav { display: none; }
+    nav#mainNav li.regularNav { border: 0; }
     nav#mainNav li.regularNav .collapsible { display: none; }
     nav#mainNav a#brand { border: 0; }
-}
-/* tablet */
-@media only screen and (max-width: 1023.9px) {
-    nav#mainNav li.regularNav { 
-        width: 100%; 
-        border: 0;
+    nav#mainNav li.burgerButton { 
+        display: flex; 
+        justify-content: flex-end;
+        align-items: center;
     }
-    nav#mainNav li.leagueNav { display: none; }
 }
-/* desktop */
 @media only screen and (min-width: 1024px) {
+    nav#mainNav li.burgerButton { display: none; }
 }
