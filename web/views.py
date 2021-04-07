@@ -198,8 +198,37 @@ def builder(request):
     return render(request, "builder.html", context)
 
 #############################
-####### POST REQUESTS #######
+####### AJAX REQUESTS #######
 #############################
+
+def get_players(request):
+    # return player first_name/last_name and id 
+    if request.method != "GET" or not request.is_ajax():
+        return redirect("/")
+    return JsonResponse({"result": [{
+        "name": player.first_name + " " + player.last_name,
+        "id": player.player_id
+    } for player in Player.objects.all() ]}, status=200) 
+
+def get_teams(request):
+    # return team name, id, and logo
+    if request.method != "GET" or not request.is_ajax():
+        return redirect("/")
+    return JsonResponse({"result": [{
+        "name": team.name,
+        "id": team.team_id,
+        "logo": team.logo,
+    } for team in Team.objects.all() ]}, status=200) 
+
+def get_leagues(request):
+    # return league name, id, and logo
+    if request.method != "GET" or not request.is_ajax():
+        return redirect("/")
+    return JsonResponse({"result": [{
+        "name": league.name,
+        "id": league.league_id,
+        "logo": league.logo,
+    } for league in League.objects.all() ]}, status=200) 
 
 def change_per_ninety(request):
     if request.method != "POST" or not request.is_ajax():

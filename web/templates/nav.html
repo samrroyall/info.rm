@@ -12,8 +12,10 @@
                 <h5> StatBuilder </h5>
                 <i class="bi bi-hammer"></i>
             </a>
-            <form class="collapsible">
-                <h5><input type="text" placeholder="Search" /></h5>
+            <form class="collapsible" id="searchForm">
+                {% csrf_token %}
+                <h5><input type="text" name="search" id="mainSearchBar" placeholder="Search" autocomplete="off"/></h5>
+                <ul class="searchResults" id="mainSearchResults"></ul>
             </form>
         </li>
         <!-- Burger Button -->
@@ -48,7 +50,9 @@
     </div>
     <div>
         <form>
-            <h5><input type="text" placeholder="Search" /></h5>
+            {% csrf_token %}
+            <h5><input type="text" name="search" id="collapsedSearchBar" placeholder="Search" autocomplete="off"/></h5>
+            <ul class="searchResults" id="collapsedSearchResults"></ul>
         </form>
     </div>
     <div class="collapsedLeagueNav">

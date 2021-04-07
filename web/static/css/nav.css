@@ -9,23 +9,26 @@ nav#mainNav ul {
     align-items: center;
 }
 nav#collapsedNav { 
-    height: calc(175px + 3vw); 
+    padding: 0 10px;
     display: none;
     flex-direction: column;
     justify-content: center;
 }
-nav#collapsedNav div { padding: 10px; }
 nav#collapsedNav div.collapsedLeagueNav div {
-    width: calc(100% - 20px);
-    padding: 10px;
+    height: calc(45px + 1vw); 
+    width: 100%;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-nav#collapsedNav div.collapsedLeagueNav img {
-    margin: 0 10px;
+nav#collapsedNav div.collapsedLeagueNav a {
+    display: inline-block;
+    min-width: calc(45px + 1vw);
+    text-align: center;
 }
 nav#collapsedNav a.collapsedBuilder { 
+    margin: 10px 0;
     display: flex; 
     align-items: center;
 }
@@ -76,7 +79,9 @@ nav#mainNav li.regularNav a {
 }
 
 nav#mainNav li.leagueNav { width: 50%; }
-nav#mainNav li.leagueNav div.firstRow {
+
+nav#mainNav li.leagueNav div.firstRow,
+nav#collapsedNav li.leagueNav div.firstRow {
     height: calc(25px + 1vw);
     width: 100%;
     padding: 0px 0 10px;
@@ -84,23 +89,13 @@ nav#mainNav li.leagueNav div.firstRow {
     justify-content: center;
     align-items: center;
 }
-nav#mainNav li.leagueNav div.firstRow a { 
-    width: calc(25px + 1vw);
-    margin: 0 5%; 
+nav#mainNav li.leagueNav div a,
+nav#collapsedNav li.leagueNav div a { 
+    width: calc(35px + 2vw);
+    margin: 0;
+    padding: 0;
     display: inline-block;
-}
-nav#mainNav li.leagueNav div.firstRow i { 
-    color: grey; 
-    cursor: pointer;
-}
-nav#mainNav li.leagueNav div.firstRow i:hover { color: black; }
-nav#mainNav li.leagueNav div.firstRow img, 
-nav#collapsedNav img { 
-    height: calc(20px + 1vw); 
-}
-nav#mainNav li.leagueNav div.firstRow img:hover, 
-nav#collapsedNav img:hover { 
-    height: calc(25px + 1vw); 
+    text-align: center;
 }
 
 nav#mainNav li.leagueNav div.secondRow {
@@ -112,17 +107,24 @@ nav#mainNav li.leagueNav div.secondRow {
     justify-content: center;
     align-items: center;
 }
-nav#mainNav li.leagueNav div.secondRow a { 
-    width: calc(22px + 1vw);
-    margin: 0 3.5%; 
-    display: inline-block;
+
+nav div.firstRow i { 
+    color: grey; 
+    cursor: pointer;
 }
-nav#mainNav li.leagueNav div.secondRow img { height: calc(17px + 1vw); }
-nav#mainNav li.leagueNav div.secondRow img:hover { height: calc(22px + 1vw); }
+nav div.firstRow i:hover { color: black; }
+
+
+nav div.firstRow img { height: calc(20px + 1vw); }
+nav div.firstRow img:hover { height: calc(25px + 1vw); }
+
+nav div.secondRow img { height: calc(17px + 1vw); }
+nav div.secondRow img:hover { height: calc(22px + 1vw); }
 
 nav#mainNav form { margin: 0 2%; }
 nav#mainNav input[type='text'],
 nav#collapsedNav input[type='text'] { 
+    margin: 10px 0;
     outline: none;
     border: 1px solid lightgrey; 
     border-radius: 3px; 
@@ -133,6 +135,38 @@ nav#collapsedNav input[type='text']:focus {
     color: grey;
     border: 1px solid #DAA99B;
 }
+
+nav ul.searchResults {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    margin-top: -7px;
+    min-width: calc(150px + 2.5vw);
+    border: 1px solid lightgrey;
+    border-radius: 3px;
+    background-color: white;
+}
+nav ul.searchResults li {
+    display: flex;
+    align-items: center;
+    height: calc(5px + 0.4vw) !important;
+    width: calc(100% - 10px - 2vw) !important;
+    border-bottom: 1px solid lightgrey;
+    padding: calc(1px + 1vw) calc(5px + 1vw) !important;
+    text-align: left !important;
+}
+nav ul.searchResults li:last-of-type { border-bottom: 0; }
+nav ul.searchResults li.header {
+    font-size: calc(10px + 0.4vw);
+    font-weight: bold;
+    justify-content: center;
+}
+nav ul.searchResults li.entry a {
+    font-size: calc(8px + 0.4vw);
+    font-weight: bold;
+    color: black !important;
+}
+nav ul.searchResults li.entry a:hover { text-decoration: underline; }
 
 /* mobile */
 @media only screen and (max-width: 1023.9px) {
@@ -148,4 +182,5 @@ nav#collapsedNav input[type='text']:focus {
 }
 @media only screen and (min-width: 1024px) {
     nav#mainNav li.burgerButton { display: none; }
+    nav#collapsedNav { display: none; }
 }
