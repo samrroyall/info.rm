@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="{% static 'css/nav.css' %}">
 <script src="{% static 'js/nav.js' %}"></script>
 <nav id="mainNav">
-    <ul>
+    <ul id="navList">
         <!-- Main Navbar -->
         <li class="regularNav">
             <a href="/" id="brand">
@@ -72,3 +72,19 @@
         </div>
     </div>
 </nav>
+<script>
+    $(document).ready(() => {
+        // grab csrf token
+        const token = $("nav#mainNav form#searchForm input[name='csrfmiddlewaretoken']").val();
+        // create search tries
+        const tries = { players: [], teams: [], leagues: [] };
+        createTrie('/get_players', token) 
+            .then(res => tries.players = generateTrie(res.result));
+        createTrie('/get_teams', token)
+            .then(res => tries.teams = generateTrie(res.result));
+        createTrie('/get_leagues', token)
+            .then(res => tries.leagues = generateTrie(res.result));
+        // as user types, return search results
+        $("nav form input[type='text']").keyup( e => playerSearch(tries, e, {{current_season.start_year}}) );
+    })
+</script>

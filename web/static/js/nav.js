@@ -156,37 +156,69 @@ async function createTrie(url, token) {
     });
 }
 
-const playerSearch = (tries, e) => {
+const title = str => {
+    let result = '';
+    splitStr = str.split(' ');
+    for (let word of splitStr) {
+        result += `${word[0].toLocaleUpperCase()}${word.substring(1)} `;
+    }
+    return result.substring(0, result.length-1);
+}
+
+const playerSearch = (tries, e, currSeason) => {
     const query = e.target.value;
         
     // player search result 
     const playerResult = searchTrie(tries.players, query);
     const playerList = playerResult.map(player =>
-        `<li class='entry'><a href='#'>${player.name}</a></li>`
+        `<li class='entry'>
+            <i class='bi bi-person-fill'></i>
+            <a href='/player/${player.id}/${currSeason}'>
+                ${title(player.name)}
+            </a>
+        </li>`
     );
     // add teams to result
     const teamResult = searchTrie(tries.teams, query);
     const teamList = teamResult.map(team =>
-        `<li class='entry'><a href='#'>${team.name}</a></li>`
+        `<li class='entry'>
+            <div class='logo'><img src='${team.logo}' /></div>
+            <a href='/team/${team.id}/${currSeason}'>
+                ${title(team.name)}
+            </a>
+        </li>`
     );
     // add leagues to result
     const leagueResult = searchTrie(tries.leagues, query);
     const leagueList = leagueResult.map(league =>
-        `<li class='entry'><a href='#'>${league.name}</a></li>`
+        `<li class='entry'>
+            <div class='logo'><img src='${league.logo}' /></div>
+            <a href='/league/${league.id}/${currSeason}'>
+                ${title(league.name)}
+            </a>
+        </li>`
     );
 
     const resultList = (e.target.id === "mainSearchBar" ? $("ul#mainSearchResults") : $("ul#collapsedSearchResults") );
     // clear previous result list
     resultList.html("");
     // create result list
-    resultList.html(`
-    <li class='header'> PLAYERS </li>
-    ${playerList.join('\n')}
-    <li class='header'> TEAMS </li>
-    ${teamList.join('\n')}
-    <li class='header'> LEAGUES </li>
-    ${leagueList.join('\n')}
-    `);
+    const playerListStr = (
+        playerList.length > 0 
+        ? `<li class='header'> PLAYERS </li>${playerList.join('\n')}` 
+        : ''
+    );
+    const teamListStr = (
+        teamList.length > 0
+        ? `<li class='header'> TEAMS </li>${teamList.join('\n')}`
+        : ''
+    );
+    const leagueListStr = (
+        leagueList.length > 0
+        ? `<li class='header'> LEAGUES </li>${leagueList.join('\n')}`
+        : ''
+    );
+    resultList.html(`${playerListStr}${teamListStr}${leagueListStr}`);
 }
 
 //////////////////////////
@@ -206,16 +238,13 @@ $(document).ready( () => {
     $("nav#mainNav form").submit( e => e.preventDefault() );
     $("nav#collapsedNav form").submit( e => e.preventDefault() );
 
-    // create tries
-    const token = $("nav#mainNav form#searchForm input[name='csrfmiddlewaretoken']").val();
-    const tries = { players: [], teams: [], leagues: [] };
-    createTrie('/get_players', token) 
-        .then(res => tries.players = generateTrie(res.result));
-    createTrie('/get_teams', token)
-        .then(res => tries.teams = generateTrie(res.result));
-    createTrie('/get_leagues', token)
-        .then(res => tries.leagues = generateTrie(res.result));
-
-    // as user types, return search results
-    $("nav form input[type='text']").keyup( e => playerSearch(tries, e) );
+    // when search bar is focused, show     
+    // $("nav form input[type='text']").focus( e => {
+    //     const resultsId = (e.target.id === "mainSearchBar" ? "mainSearchResults" : "collapsedSearchResults");
+    //     $(`ul#${resultsId}`).css("display", "flex");
+    // });
+    // $("nav form input[type='text']").focusout( e => {
+    //     const resultsId = (e.target.id === "mainSearchBar" ? "mainSearchResults" : "collapsedSearchResults");
+    //     $(`ul#${resultsId}`).css("display", "none");
+    // });
 });

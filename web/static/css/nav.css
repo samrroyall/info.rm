@@ -3,7 +3,7 @@ nav#mainNav, nav#collapsedNav {
     border-bottom: 1px solid lightgrey; 
     background-color: #f8f9fa;
 }
-nav#mainNav ul { 
+nav#mainNav ul#navList { 
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -37,7 +37,7 @@ nav#collapsedNav a.collapsedBuilder i {
     font-size: calc(8px + 0.4vw);
 }
 
-nav#mainNav li, nav#collapsedDiv div {
+nav#mainNav ul#navList li, nav#collapsedDiv div {
     height: calc(25px + 1vw);
     padding: 10px 0;
     text-align: center;
@@ -130,8 +130,8 @@ nav#collapsedNav input[type='text'] {
     border-radius: 3px; 
     padding: 5px; 
 }
-nav#mainNav input[type='text']:focus, 
-nav#collapsedNav input[type='text']:focus { 
+nav#mainNav input#mainSearchBar:focus, 
+nav#collapsedNav input#collapsedSearchBar:focus { 
     color: grey;
     border: 1px solid #DAA99B;
 }
@@ -139,20 +139,24 @@ nav#collapsedNav input[type='text']:focus {
 nav ul.searchResults {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
     position: absolute;
     margin-top: -7px;
-    min-width: calc(150px + 2.5vw);
+    /*min-width: calc(150px + 2.5vw);*/
     border: 1px solid lightgrey;
     border-radius: 3px;
     background-color: white;
+    z-index: 6000;
 }
 nav ul.searchResults li {
     display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     align-items: center;
-    height: calc(5px + 0.4vw) !important;
-    width: calc(100% - 10px - 2vw) !important;
+    width: 100% !important;
     border-bottom: 1px solid lightgrey;
-    padding: calc(1px + 1vw) calc(5px + 1vw) !important;
+    padding: calc(1px + 1vw) 0 !important;
     text-align: left !important;
 }
 nav ul.searchResults li:last-of-type { border-bottom: 0; }
@@ -162,11 +166,30 @@ nav ul.searchResults li.header {
     justify-content: center;
 }
 nav ul.searchResults li.entry a {
+    margin: 0 calc(2px + 1vw) 0 0 !important;
+    padding: 0 !important;
     font-size: calc(8px + 0.4vw);
     font-weight: bold;
     color: black !important;
 }
 nav ul.searchResults li.entry a:hover { text-decoration: underline; }
+
+nav ul.searchResults li.entry i,
+nav ul.searchResults li.entry div.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(30px + 1vw);
+    margin: 0 !important;
+}
+nav ul.searchResults li.entry img {
+    height: calc(10px + 1vw);
+}
+nav ul.searchResults li.entry i {
+    color: black;
+    font-size: calc(10px + 1vw);
+    text-align: left;
+}
 
 /* mobile */
 @media only screen and (max-width: 1023.9px) {
